@@ -103,7 +103,7 @@
     hostId = "deaf25e4";
     useDHCP = false;
 
-    interfaces.eth0.ipv4.addresses = [
+    interfaces.enp0s20f0u4.ipv4.addresses = [
       {
         address = staticIP;
         prefixLength = 24;
