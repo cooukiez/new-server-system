@@ -15,7 +15,6 @@
   modulesPath,
   ...
 }:
-
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
@@ -27,7 +26,6 @@
     "usb_storage"
     "sd_mod"
   ];
-
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
@@ -38,7 +36,7 @@
   };
 
   fileSystems."/boot" = {
-    device = "/dev/disk/by-uuid/17E0-EBA8";
+    device = "/dev/disk/by-uuid/1BC0-2314";
     fsType = "vfat";
     options = [
       "fmask=0077"
