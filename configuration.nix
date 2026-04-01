@@ -191,32 +191,37 @@
 
   # virtualisation
   virtualisation.quadlet.enable = true;
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    extraSpecialArgs = { inherit inputs; };
 
-  home-manager.users.squ =
-    {
-      inputs,
-      config,
-      pkgs,
-      ...
-    }:
-    {
-      imports = [ inputs.quadlet-nix.homeManagerModules.quadlet ];
+    users.squ =
+      {
+        inputs,
+        config,
+        pkgs,
+        ...
+      }:
+      {
+        imports = [ inputs.quadlet-nix.homeManagerModules.quadlet ];
 
-      virtualisation.quadlet.containers = {
-        echo-server = {
-          autoStart = true;
-          serviceConfig = {
-            RestartSec = "10";
-            Restart = "always";
-          };
-          containerConfig = {
-            image = "docker.io/mendhak/http-https-echo:31";
-            publishPorts = [ "127.0.0.1:8080:8080" ];
-            userns = "keep-id";
+        virtualisation.quadlet.containers = {
+          echo-server = {
+            autoStart = true;
+            serviceConfig = {
+              RestartSec = "10";
+              Restart = "always";
+            };
+            containerConfig = {
+              image = "docker.io/mendhak/http-https-echo:31";
+              publishPorts = [ "127.0.0.1:8080:8080" ];
+              userns = "keep-id";
+            };
           };
         };
       };
-    };
+  };
 
   # passwordless sudo
   security.sudo.wheelNeedsPassword = false;
