@@ -6,6 +6,10 @@
 */
 
 {
+  config,
+  ...
+}:
+{
   imports = [
     ./dns.nix
   ];
