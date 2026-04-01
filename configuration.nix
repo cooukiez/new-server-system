@@ -52,6 +52,7 @@
   nix =
     let
       flakeInputs = lib.filterAttrs (_: lib.isType "flake") inputs;
+      myNixPath = lib.mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
     in
     {
       settings = {
@@ -60,14 +61,14 @@
         # opinionated: disable global registry
         flake-registry = "";
         # workaround for https://github.com/NixOS/nix/issues/9574
-        nix-path = lib.mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
+        nix-path = myNixPath;
       };
 
       # opinionated: disable channels
       channel.enable = false;
       # opinionated: make flake registry and nix path match flake inputs
       registry = lib.mapAttrs (_: flake: { inherit flake; }) flakeInputs;
-      nixPath = lib.mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
+      nixPath = myNixPath;
 
       optimise.automatic = true;
       optimise.dates = [ "03:45" ];
