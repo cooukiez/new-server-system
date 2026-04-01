@@ -152,7 +152,7 @@
       # standalone home-manager configuration entrypoint
       homeConfigurations = {
         "admin@dhs" = mkHomeConfiguration hostSystem "admin" "dhs";
-        "srv-quadlet@dhs" = mkHomeConfiguration hostSystem "srv-quadlet" "dhs";
+        "svc-quadlet@dhs" = mkHomeConfiguration hostSystem "svc-quadlet" "dhs";
       };
     };
 }
