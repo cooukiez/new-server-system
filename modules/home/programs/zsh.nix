@@ -26,6 +26,7 @@
       uh = "sync-flake && home-manager switch --flake /etc/nixos#${userConfig.name}@${hostname}";
 
       sw-nix = "sudo nixos-rebuild switch --upgrade-all --impure";
+      sw-nix-offline = "sudo nixos-rebuild switch --upgrade-all --impure --option substitute false";
       sw-home = "home-manager switch --flake /etc/nixos#${userConfig.name}@${hostname}";
 
       nus = "sync-flake && nh os switch /etc/nixos";
