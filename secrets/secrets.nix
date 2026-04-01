@@ -38,8 +38,6 @@ in
 
   "gluetun-wg-key.age".publicKeys = newAllKeys;
 
-  "immich-key.age".publicKeys = oldKeys;
-
   "slsk-user.age".publicKeys = newAllKeys;
   "slsk-pass.age".publicKeys = newAllKeys;
   "slsk-webui-pass.age".publicKeys = newAllKeys;
