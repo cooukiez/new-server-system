@@ -13,4 +13,11 @@
     githubEmail = "";
     name = "admin";
   };
+  svc-quadlet = {
+    email = "";
+    fullName = "Service User Quadlet";
+    githubName = "";
+    githubEmail = "";
+    name = "svc-quadlet";
+  };
 }
