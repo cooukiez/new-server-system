@@ -167,25 +167,26 @@
   environment.localBinInPath = true;
 
   # user configuration
-  users.users = lib.mapAttrs (_: user: {
-    description = user.fullName;
-    isNormalUser = true;
-    extraGroups = [
-      "wheel"
-      "networkmanager"
-    ];
-    password = "CHANGE-ME";
-    shell = pkgs.zsh;
-  }) users;
-
-  users.users.quadlet-user = {
-    description = "quadlet-user";
-
-    # required for auto start before user login
-    linger = true;
-    # required for rootless container with multiple users
-    autoSubUidGidRange = true;
-  };
+  users.users =
+    (lib.mapAttrs (_: user: {
+      description = user.fullName;
+      isNormalUser = true;
+      extraGroups = [
+        "wheel"
+        "networkmanager"
+      ];
+      password = "CHANGE-ME";
+      shell = pkgs.zsh;
+    }) users)
+    // {
+      # merged static system user
+      quadlet-user = {
+        description = "quadlet-user";
+        isNormalUser = true;
+        linger = true;
+        autoSubUidGidRange = true;
+      };
+    };
 
   # virtualisation
   virtualisation.quadlet.enable = true;
