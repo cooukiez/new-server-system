@@ -2,7 +2,7 @@
   configuration.nix
 
   part of der-home-server
-  created 2026-03-18
+  created 2026-04-02
 */
 
 # system configuration file
@@ -107,10 +107,12 @@
     useDHCP = false;
 
     nameservers = dnsServers;
-    interfaces.enp0s20f0u4.ipv4.addresses = [{
-      address = "192.168.178.3";
-      prefixLength = 24;
-    }];
+    interfaces.enp0s20f0u4.ipv4.addresses = [
+      {
+        address = "192.168.178.3";
+        prefixLength = 24;
+      }
+    ];
 
     defaultGateway = "192.168.178.1";
 
@@ -231,64 +233,6 @@
 
           inputs.quadlet-nix.homeManagerModules.quadlet
         ];
-
-
-  virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes networks pods;
-  in {
-    volumes.adguard-work.volumeConfig = {
-      type = "bind";
-      device = "/opt/adguardhome/work";
-    };
-    volumes.adguard-conf.volumeConfig = {
-      type = "bind";
-      device = "/opt/adguardhome/conf";
-    };
-
-    networks = {
-        internal.networkConfig.subnets = [ "10.1.1.1/24" ];
-    };
-    
-    containers.echo-server = {
-                autoStart = true;
-                serviceConfig = {
-                    RestartSec = "10";
-                    Restart = "always";
-                };
-
-                containerConfig = {
-                    image = "docker.io/mendhak/http-https-echo:31";
-                    publishPorts = [ "127.0.0.1:8080:8080" ];
-                    userns = "keep-id";
-                };
-            };
-
-    containers.adguardhome = {
-      autoStart = true;
-      serviceConfig = {
-        Restart = "always";
-        RestartSec = "10";
-      };
-
-      containerConfig = {
-        image = "docker.io/adguard/adguardhome:latest";
-
-        volumes = [
-          "${volumes.adguard-work.ref}:/opt/adguardhome/work"
-          "${volumes.adguard-conf.ref}:/opt/adguardhome/conf"
-        ];
-
-        publishPorts = [
-          "127.0.0.1:53:53/tcp"
-          "127.0.0.1:53:53/udp"
-          "127.0.0.1:3000:3000/tcp"
-          "127.0.0.1:80:80/tcp"
-        ];
-
-        userns = "keep-id";
-      };
-    };
-  };
 
         home.stateVersion = "25.11";
       };

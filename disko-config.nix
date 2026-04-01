@@ -1,3 +1,10 @@
+/*
+  disko-config.nix
+
+  part of der-home-server
+  created 2026-04-01
+*/
+
 {
   lib,
   ...

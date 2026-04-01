@@ -2,7 +2,7 @@
   secrets/secrets.nix
 
   part of der-home-server
-  created 2026-03-24
+  created 2026-03-30
 */
 
 let

@@ -1,3 +1,10 @@
+/*
+  modules/nixos/services/tmpfiles.nix
+
+  part of der-home-server
+  created 2026-04-02
+*/
+
 {
   systemd.tmpfiles.rules = [
     "d /opt/adguardhome 0755 10000 10000 -"

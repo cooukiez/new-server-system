@@ -2,7 +2,7 @@
   modules/home/programs/zsh.nix
 
   part of der-home-server
-  created 2026-03-18
+  created 2026-04-02
 */
 
 {
