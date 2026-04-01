@@ -38,6 +38,7 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
+    quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
     agenix.url = "github:ryantm/agenix";
   };
 
@@ -151,6 +152,7 @@
       # standalone home-manager configuration entrypoint
       homeConfigurations = {
         "admin@dhs" = mkHomeConfiguration hostSystem "admin" "dhs";
+        "quadlet-user@dhs" = mkHomeConfiguration hostSystem "quadlet-user" "dhs";
       };
     };
 }

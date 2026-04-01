@@ -26,6 +26,7 @@
     inputs.self.nixosModules.common
     inputs.self.nixosModules.services
 
+    inputs.quadlet-nix.nixosModules.quadlet
     inputs.agenix.nixosModules.default
   ];
   nixpkgs = {
@@ -172,11 +173,22 @@
     extraGroups = [
       "wheel"
       "networkmanager"
-      "docker"
     ];
     password = "CHANGE-ME";
     shell = pkgs.zsh;
   }) users;
+
+  users.users.quadlet-user = {
+    description = "quadlet-user";
+
+    # required for auto start before user login
+    linger = true;
+    # required for rootless container with multiple users
+    autoSubUidGidRange = true;
+  };
+
+  # virtualisation
+  virtualisation.quadlet.enable = true;
 
   # passwordless sudo
   security.sudo.wheelNeedsPassword = false;
