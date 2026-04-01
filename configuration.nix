@@ -26,6 +26,7 @@
     inputs.self.nixosModules.common
     inputs.self.nixosModules.services
 
+    inputs.home-manager.nixosModules.home-manager
     inputs.quadlet-nix.nixosModules.quadlet
     inputs.agenix.nixosModules.default
   ];
