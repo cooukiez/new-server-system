@@ -181,14 +181,6 @@
   # passwordless sudo
   security.sudo.wheelNeedsPassword = false;
 
-  # swap configuration
-  swapDevices = [
-    {
-      device = "/swap";
-      size = 16 * 1024;
-    }
-  ];
-
   # zram configuration
   zramSwap.enable = true;
   zramSwap.memoryPercent = 50;

@@ -101,6 +101,17 @@
             options."com.sun:auto-snapshot" = "false";
           };
 
+          "swap" = {
+            type = "zfs_unmanaged";
+            content = {
+              type = "zfs_volume";
+              size = "16G";
+              content = {
+                type = "swap";
+              };
+            };
+          };
+
           reserved = {
             type = "zfs_fs";
             options = {
