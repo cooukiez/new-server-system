@@ -195,13 +195,13 @@
         subUidRanges = [
           {
             startUid = 10001;
-            count = 55536;
+            count = 55535;
           }
         ];
         subGidRanges = [
           {
             startGid = 10001;
-            count = 55536;
+            count = 55535;
           }
         ];
       };
