@@ -101,7 +101,7 @@
   networking = {
     hostName = hostname;
     hostId = "deaf25e4";
-    useDHCP = false;
+    useDHCP = lib.mkForce true;
 
     interfaces.enp0s20f0u4.ipv4.addresses = [
       {
@@ -110,7 +110,7 @@
       }
     ];
 
-    defaultGateway = "192.168.178.1";
+    defaultGateway = "192.168.100.1";
     networkmanager.enable = true;
 
     hosts = {
