@@ -25,6 +25,8 @@
       us = "sync-flake && sudo nixos-rebuild switch --upgrade-all --impure";
       uh = "sync-flake && home-manager switch --flake /etc/nixos#${userConfig.name}@${hostname}";
 
+      uc = "sync-flake && home-manager switch --flake /etc/nixos#quadlet-user@${hostname}";
+
       nus = "sync-flake && nh os switch /etc/nixos";
       nuus = "sync-flake && nh os switch /etc/nixos --update";
       nuh = "sync-flake && nh home switch /etc/nixos";
