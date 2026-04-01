@@ -184,10 +184,28 @@
       squ = {
         description = "quadlet-user";
         isSystemUser = true;
+        group = "squ";
+        uid = 10000;
+
         linger = true;
-        autoSubUidGidRange = true;
+
+        # under 65536
+        subUidRanges = [
+          {
+            startUid = 10000;
+            count = 55536;
+          }
+        ];
+        subGidRanges = [
+          {
+            startGid = 10000;
+            count = 55536;
+          }
+        ];
       };
     };
+
+  users.groups.squ.gid = 10000;
 
   # virtualisation
   virtualisation.quadlet.enable = true;
