@@ -61,9 +61,7 @@
         hostSystem
       ];
 
-      # set local subnet static IP
-      staticIP = "192.168.100.98";
-
+      staticIP = "0.0.0.0";
       dnsServers = [
         "1.1.1.1"
         "8.8.8.8"

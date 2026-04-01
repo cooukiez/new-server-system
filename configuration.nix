@@ -13,7 +13,6 @@
   pkgs,
   lib,
   hostname,
-  staticIP,
   users,
   ...
 }:
@@ -104,20 +103,11 @@
   networking = {
     hostName = hostname;
     hostId = "deaf25e4";
-    useDHCP = lib.mkForce true;
 
-    interfaces.enp0s20f0u4.ipv4.addresses = [
-      {
-        address = staticIP;
-        prefixLength = 24;
-      }
-    ];
-
-    # defaultGateway = "192.168.100.1";
     networkmanager.enable = true;
 
     hosts = {
-      staticIP = [ "home.lan" ];
+      # staticIP = [ "home.lan" ];
     };
 
     firewall = {
