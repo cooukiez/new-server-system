@@ -111,7 +111,7 @@
       }
     ];
 
-    defaultGateway = "192.168.100.1";
+    # defaultGateway = "192.168.100.1";
     networkmanager.enable = true;
 
     hosts = {
