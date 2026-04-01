@@ -184,7 +184,7 @@
   # swap configuration
   swapDevices = [
     {
-      device = "/var/lib/swapfile";
+      device = "/swap";
       size = 16 * 1024;
     }
   ];
