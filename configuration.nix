@@ -167,24 +167,54 @@
   environment.localBinInPath = true;
 
   # user configuration
-  users.users = lib.mapAttrs (_: user: {
-    description = user.fullName;
-    isNormalUser = true;
-    extraGroups = [
-      "wheel"
-      "networkmanager"
-    ];
-    password = "CHANGE-ME";
-    shell = pkgs.zsh;
-
-    # required for auto start before user login
-    linger = true;
-    # required for rootless container with multiple users
-    autoSubUidGidRange = true;
-  }) users;
+  users.users =
+    (lib.mapAttrs (_: user: {
+      description = user.fullName;
+      isNormalUser = true;
+      extraGroups = [
+        "wheel"
+        "networkmanager"
+      ];
+      password = "CHANGE-ME";
+      shell = pkgs.zsh;
+    }) users)
+    // {
+      squ = {
+        description = "quadlet-user";
+        isSystemUser = true;
+        linger = true;
+        autoSubUidGidRange = true;
+      };
+    };
 
   # virtualisation
   virtualisation.quadlet.enable = true;
+
+  home-manager.users.squ =
+    {
+      inputs,
+      config,
+      pkgs,
+      ...
+    }:
+    {
+      imports = [ inputs.quadlet-nix.homeManagerModules.quadlet ];
+
+      virtualisation.quadlet.containers = {
+        echo-server = {
+          autoStart = true;
+          serviceConfig = {
+            RestartSec = "10";
+            Restart = "always";
+          };
+          containerConfig = {
+            image = "docker.io/mendhak/http-https-echo:31";
+            publishPorts = [ "127.0.0.1:8080:8080" ];
+            userns = "keep-id";
+          };
+        };
+      };
+    };
 
   # passwordless sudo
   security.sudo.wheelNeedsPassword = false;
