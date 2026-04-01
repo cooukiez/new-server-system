@@ -173,6 +173,7 @@
     (lib.mapAttrs (_: user: {
       description = user.fullName;
       isNormalUser = true;
+      createHome = true;
       extraGroups = [
         "wheel"
         "networkmanager"
@@ -183,7 +184,8 @@
     // {
       squ = {
         description = "quadlet-user";
-        isSystemUser = true;
+        isNormalUser = true;
+        createHome = true;
         group = "squ";
         uid = 10000;
 
