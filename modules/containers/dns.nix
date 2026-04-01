@@ -25,7 +25,7 @@
         };
 
         containerConfig = {
-          image = "docker.io/adguard/adguardhome:latest";
+          image = "ghcr.io/adguard/adguardhome:latest";
 
           volumes = [
             "${volumes.adguard-work.ref}:/opt/adguardhome/work"
