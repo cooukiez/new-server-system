@@ -195,13 +195,13 @@
         subUidRanges = [
           {
             startUid = 10001;
-            count = 55535;
+            count = 4095;
           }
         ];
         subGidRanges = [
           {
             startGid = 10001;
-            count = 55535;
+            count = 4095;
           }
         ];
       };
@@ -224,22 +224,11 @@
         ...
       }:
       {
-        imports = [ inputs.quadlet-nix.homeManagerModules.quadlet ];
+        imports = [
+          inputs.self.containerModules
 
-        virtualisation.quadlet.containers = {
-          echo-server = {
-            autoStart = true;
-            serviceConfig = {
-              RestartSec = "10";
-              Restart = "always";
-            };
-            containerConfig = {
-              image = "docker.io/mendhak/http-https-echo:31";
-              publishPorts = [ "127.0.0.1:8080:8080" ];
-              userns = "keep-id";
-            };
-          };
-        };
+          inputs.quadlet-nix.homeManagerModules.quadlet
+        ];
 
         home.stateVersion = "25.11";
       };

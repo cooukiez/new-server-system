@@ -144,6 +144,9 @@
       # home-manager modules
       homeManagerModules = import ./modules/home;
 
+      # container modules
+      containerModules = import ./modules/containers;
+
       # nixos configuration entrypoint
       nixosConfigurations = {
         dhs = mkNixosConfiguration "dhs";
