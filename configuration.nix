@@ -194,13 +194,13 @@
         # under 65536
         subUidRanges = [
           {
-            startUid = 10000;
+            startUid = 10001;
             count = 55536;
           }
         ];
         subGidRanges = [
           {
-            startGid = 10000;
+            startGid = 10001;
             count = 55536;
           }
         ];
