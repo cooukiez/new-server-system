@@ -186,24 +186,24 @@
     // {
       squ = {
         description = "quadlet-user";
+
         isNormalUser = true;
         createHome = true;
+        linger = true;
+
         group = "squ";
         uid = 10000;
 
-        linger = true;
-
-        # under 65536
         subUidRanges = [
           {
-            startUid = 10001;
-            count = 65536;
+            startUid = 100000;
+            count = 100000;
           }
         ];
         subGidRanges = [
           {
-            startGid = 10001;
-            count = 65536;
+            startGid = 100000;
+            count = 100000;
           }
         ];
       };
