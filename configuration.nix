@@ -210,7 +210,6 @@
       driver = "overlay";
 
       options.overlay.mount_program = "${pkgs.fuse-overlayfs}/bin/fuse-overlayfs";
-      # options.overlay.mountopt = "nodev,metacopy=on";
     };
   };
 
