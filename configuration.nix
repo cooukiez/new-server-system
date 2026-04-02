@@ -89,6 +89,8 @@
     loader.timeout = 0;
     # required for subnet routing
     kernel.sysctl = {
+      "net.ipv4.ip_unprivileged_port_start" = 1;
+
       "net.ipv4.ip_forward" = 1;
       "net.ipv6.conf.all.forwarding" = 1;
     };
@@ -235,12 +237,14 @@
       };
   };
 
-  security.wrappers.pasta = {
-    owner = "root";
-    group = "root";
-    capabilities = "cap_net_bind_service+ep";
-    source = "${pkgs.passt}/bin/pasta";
-  };
+  /*
+    security.wrappers.pasta = {
+      owner = "root";
+      group = "root";
+      capabilities = "cap_net_bind_service+ep";
+      source = "${pkgs.passt}/bin/pasta";
+    };
+  */
 
   # passwordless sudo
   security.sudo.wheelNeedsPassword = false;
