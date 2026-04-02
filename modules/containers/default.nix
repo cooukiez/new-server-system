@@ -11,7 +11,7 @@
 }:
 {
   imports = [
-    # ./dns.nix
+    ./dns.nix
   ];
 
   virtualisation.quadlet =
