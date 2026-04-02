@@ -25,12 +25,7 @@
         };
 
         containerConfig = {
-          image = "docker.io/adguard/adguardhome:latest";
-
-          addCapabilities = [
-            "NET_ADMIN"
-            "NET_BIND_SERVICE"
-          ];
+          image = "ghcr.io/adguard/adguardhome:latest";
 
           volumes = [
             "${volumes.adguard-work.ref}:/opt/adguardhome/work"

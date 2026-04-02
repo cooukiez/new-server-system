@@ -191,6 +191,7 @@
 
         isNormalUser = true;
         createHome = true;
+
         linger = true;
         autoSubUidGidRange = true;
 
