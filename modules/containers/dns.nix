@@ -1,3 +1,10 @@
+/*
+  modules/containers/dns.nix
+
+  part of der-home-server
+  created 2026-04-02
+*/
+
 {
   config,
   ...
@@ -17,7 +24,7 @@
         type = "bind";
         device = "/opt/adguardhome/work";
       };
-      
+
       containers.adguardhome = {
         autoStart = true;
         serviceConfig = {

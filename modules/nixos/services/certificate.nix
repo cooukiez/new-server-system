@@ -1,3 +1,10 @@
+/*
+  modules/nixos/services/certificate.nix
+
+  part of der-home-server
+  created 2026-04-03
+*/
+
 {
   environment.etc."cert/req.conf" = {
     text = ''
@@ -17,4 +24,12 @@
       DNS.2 = *.home.lan
     '';
   };
+
+  /*
+    cd /etc/cert &&
+    sudo openssl req -x509 -nodes -days 365 -newkey rsa:4096 \
+    -keyout home.lan.key \
+    -out home.lan.crt \
+    -config req.conf -extensions v3_req
+  */
 }
