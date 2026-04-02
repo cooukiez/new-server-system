@@ -24,6 +24,10 @@
           RestartSec = "10";
         };
 
+        addCapabilities = [
+          "NET_ADMIN"
+        ];
+
         containerConfig = {
           image = "docker.io/adguard/adguardhome:latest";
 
