@@ -190,22 +190,10 @@
         isNormalUser = true;
         createHome = true;
         linger = true;
+        autoSubUidGidRange = true;
 
         group = "squ";
         uid = 10000;
-
-        subUidRanges = [
-          {
-            startUid = 100000;
-            count = 100000;
-          }
-        ];
-        subGidRanges = [
-          {
-            startGid = 100000;
-            count = 100000;
-          }
-        ];
       };
     };
 
