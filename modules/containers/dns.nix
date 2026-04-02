@@ -29,6 +29,7 @@
 
           addCapabilities = [
             "NET_ADMIN"
+            "NET_BIND_SERVICE"
           ];
 
           volumes = [
@@ -45,7 +46,7 @@
             ];
           */
 
-          userns = "keep-id";
+          # userns = "keep-id";
         };
       };
     };
