@@ -24,12 +24,12 @@
           RestartSec = "10";
         };
 
-        addCapabilities = [
-          "NET_ADMIN"
-        ];
-
         containerConfig = {
           image = "docker.io/adguard/adguardhome:latest";
+
+          addCapabilities = [
+            "NET_ADMIN"
+          ];
 
           volumes = [
             "${volumes.adguard-work.ref}:/opt/adguardhome/work"
