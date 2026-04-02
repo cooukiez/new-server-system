@@ -8,15 +8,16 @@
       inherit (config.virtualisation.quadlet) volumes networks pods;
     in
     {
-      volumes.adguard-work.volumeConfig = {
-        type = "bind";
-        device = "/opt/adguardhome/work";
-      };
       volumes.adguard-conf.volumeConfig = {
         type = "bind";
         device = "/opt/adguardhome/conf";
       };
 
+      volumes.adguard-work.volumeConfig = {
+        type = "bind";
+        device = "/opt/adguardhome/work";
+      };
+      
       containers.adguardhome = {
         autoStart = true;
         serviceConfig = {
@@ -28,8 +29,8 @@
           image = "ghcr.io/adguard/adguardhome:latest";
 
           volumes = [
-            "${volumes.adguard-work.ref}:/opt/adguardhome/work"
             "${volumes.adguard-conf.ref}:/opt/adguardhome/conf"
+            "${volumes.adguard-work.ref}:/opt/adguardhome/work"
           ];
 
           publishPorts = [

@@ -12,6 +12,7 @@
 {
   imports = [
     ./dns.nix
+    ./reverse-proxy.nix
   ];
 
   virtualisation.quadlet =
