@@ -3,6 +3,13 @@
   ...
 }:
 {
+  virtualisation.containers.storage.settings = {
+    storage = {
+      driver = "overlay";
+      options.overlay.mount_program = "/run/current-system/sw/bin/fuse-overlayfs";
+    };
+  };
+
   virtualisation.quadlet =
     let
       inherit (config.virtualisation.quadlet) volumes networks pods;
