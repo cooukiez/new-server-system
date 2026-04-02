@@ -215,6 +215,13 @@
   virtualisation.quadlet.enable = true;
   virtualisation.podman.defaultNetwork.settings.dns_enabled = true;
 
+  virtualisation.containers.storage.settings = {
+    storage = {
+      driver = "overlay";
+      options.overlay.mount_program = "/run/current-system/sw/bin/fuse-overlayfs";
+    };
+  };
+
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
