@@ -13,6 +13,7 @@
   pkgs,
   lib,
   hostname,
+  staticIP,
   dnsServers,
   users,
   ...
@@ -217,13 +218,14 @@
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    extraSpecialArgs = { inherit inputs; };
+    extraSpecialArgs = { inherit inputs staticIP; };
 
     users.squ =
       {
         inputs,
         config,
         pkgs,
+        staticIP,
         ...
       }:
       {

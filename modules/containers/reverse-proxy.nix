@@ -7,13 +7,37 @@
 
 {
   config,
+  staticIP,
   ...
 }:
 {
   home.file."/containers/caddy/Caddyfile" = {
     text = ''
-      :80 {
-          respond "Hello from Home Manager managed Caddy"
+      (my_tls) {
+        tls /etc/caddy/certs/home.lan.crt /etc/caddy/certs/home.lan.key
+      }
+
+      home.lan {
+        import my_tls
+        root * /var/www/home
+        file_server
+      }
+
+      *.home.lan {
+        import my_tls
+        
+        @dns host dns.home.lan
+        handle @dns {
+            reverse_proxy 127.0.0.1:3000
+        }
+
+        handle {
+            abort
+        }
+      }
+
+      ${staticIP}:3000 {
+        reverse_proxy host.containers.internal:3000
       }
     '';
 
@@ -56,9 +80,10 @@
           ];
 
           publishPorts = [
-            "127.0.0.1:80:80/tcp"
-            "127.0.0.1:443:443/tcp"
-            "127.0.0.1:443:443/udp"
+            "80:80/tcp"
+            "443:443/tcp"
+            "443:443/udp"
+            "3000:3000/tcp"
           ];
         };
       };

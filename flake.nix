@@ -61,7 +61,7 @@
         hostSystem
       ];
 
-      staticIP = "0.0.0.0";
+      staticIP = "192.168.178.3";
       dnsServers = [
         "1.1.1.1"
         "8.8.8.8"
