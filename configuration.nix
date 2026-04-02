@@ -206,7 +206,9 @@
   virtualisation.containers.storage.settings = {
     storage = {
       driver = "overlay";
-      options.overlay.mount_program = "/run/current-system/sw/bin/fuse-overlayfs";
+
+      options.overlay.mount_program = "${pkgs.fuse-overlayfs}/bin/fuse-overlayfs";
+      # options.overlay.mountopt = "nodev,metacopy=on";
     };
   };
 
@@ -231,6 +233,13 @@
 
         home.stateVersion = "25.11";
       };
+  };
+
+  security.wrappers.pasta = {
+    owner = "root";
+    group = "root";
+    capabilities = "cap_net_bind_service+ep";
+    source = "${pkgs.passt}/bin/pasta";
   };
 
   # passwordless sudo
