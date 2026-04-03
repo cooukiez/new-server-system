@@ -8,6 +8,7 @@
 {
   config,
   pkgs,
+  staticIP,
   ...
 }:
 let
@@ -22,6 +23,8 @@ let
       bind_hosts = [ "0.0.0.0" ];
       port = 53;
 
+      upstream_mode = "fastest_addr";
+      upstream_timeout = "2s";
       upstream_dns = [ "https://dns10.quad9.net/dns-query" ];
 
       bootstrap_dns = [
@@ -48,6 +51,26 @@ let
         id = 2;
       }
     ];
+
+    filtering = {
+      rewrites = [
+        {
+          enabled = true;
+          domain = "home.lan";
+          answer = "${staticIP}";
+        }
+        {
+          enabled = true;
+          domain = "*.home.lan";
+          answer = "${staticIP}";
+        }
+        {
+          enabled = true;
+          domain = "*.home.lan.fritz.box";
+          answer = "${staticIP}";
+        }
+      ];
+    };
 
     schema_version = 33;
   };
@@ -97,8 +120,6 @@ in
             "53:53/udp"
             "3000:3000/tcp"
           ];
-
-          # userns = "keep-id";
         };
       };
     };

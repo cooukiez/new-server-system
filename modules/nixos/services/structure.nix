@@ -7,6 +7,8 @@
 
 {
   systemd.tmpfiles.rules = [
+    "Z /etc/cert 0400 10000 10000 -"
+
     "d /opt/authelia 0755 10000 10000 -"
     "d /opt/authelia/config 0755 10000 10000 -"
 

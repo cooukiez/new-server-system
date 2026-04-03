@@ -17,6 +17,9 @@
       CN = home.lan
 
       [v3_req]
+      keyUsage = critical, digitalSignature, keyEncipherment
+      extendedKeyUsage = serverAuth
+      basicConstraints = critical, CA:FALSE
       subjectAltName = @alt_names
 
       [alt_names]
@@ -27,7 +30,7 @@
 
   /*
     cd /etc/cert &&
-    sudo openssl req -x509 -nodes -days 365 -newkey rsa:4096 \
+    openssl req -x509 -nodes -days 365 -newkey rsa:4096 \
     -keyout home.lan.key \
     -out home.lan.crt \
     -config req.conf -extensions v3_req

@@ -14,7 +14,7 @@
   home.file."containers/caddy/Caddyfile" = {
     text = ''
       (my_tls) {
-        tls /etc/caddy/certs/home.lan.crt /etc/caddy/certs/home.lan.key
+        tls /etc/cert/home.lan.crt /etc/cert/home.lan.key
       }
 
       home.lan {
@@ -67,6 +67,10 @@
           volumes = [
             # config files
             "${config.home.homeDirectory}/containers/caddy/Caddyfile:/etc/caddy/Caddyfile:ro"
+
+            # certificates
+            " /etc/cert/home.lan.crt:/etc/cert/home.lan.crt:ro"
+            " /etc/cert/home.lan.key:/etc/cert/home.lan.key:ro"
 
             # volumes
             "${volumes.caddy-config.ref}:/config"
