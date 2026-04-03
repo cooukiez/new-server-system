@@ -73,7 +73,8 @@ let
             algorithm = "RS256";
             use = "sig";
 
-            key = "{{ secret \"/run/secrets/OIDC_JWK_RSA_KEY\" | mindent 10 \"|\" | msquote }}";
+            # openssl genpkey -algorithm RSA -out rsa.2048.key -pkeyopt rsa_keygen_bits:2048
+            key = builtins.readFile ../../secrets/rsa.2048.key;
           }
         ];
 
