@@ -31,6 +31,7 @@
     # services
     #
     "d /opt/immich 0755 10000 10000 -"
+    "d /opt/immich/db 0755 10000 10000 -"
     "d /opt/immich/ml-cache 0755 10000 10000 -"
 
     # media directories

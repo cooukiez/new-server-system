@@ -37,6 +37,11 @@ let
         }
 
         # user
+        {
+          domain = "immich.home.lan";
+          policy = "one_factor";
+          subject = [ "group:admins" "group:users" ];
+        }
 
         # admin
         {
@@ -60,6 +65,46 @@ let
       inactivity = "5m";
     };
     
+    identity_providers = {
+      oidc = {
+        jwks = [
+          {
+            key_id = "main-rsa";
+            algorithm = "RS256";
+            use = "sig";
+            
+            key_file = "/run/secrets/OIDC_JWKS_RSA_KEY";
+            certificate_chain_file = "/run/secrets/OIDC_JWKS_RSA_CERT";
+          }
+        ];
+
+        clients = [
+          {
+            client_id = "immich";
+            client_name = "Immich";
+
+            public = false;
+            authorization_policy = "two_factor";
+            require_pkce = false;
+
+            redirect_uris = [
+              "https://immich.home.lan/auth/login"
+              "https://immich.home.lan/user-settings"
+              "app.immich:///oauth-callback"
+            ];
+
+            scopes = [ "openid" "profile" "email" ];
+            response_types = [ "code" ];
+            grant_types = [ "authorization_code" ];
+
+            access_token_signed_response_alg = "none";
+            userinfo_signed_response_alg = "none";
+            token_endpoint_auth_method = "client_secret_post";
+          }
+        ];
+      };
+    };
+
     storage = {
       postgres = {
         address = "tcp://host.containers.internal:5432";
@@ -80,19 +125,17 @@ in
     source = settingsFormat.generate "authelia-configuration.yml" autheliaSettings;
   };
 
-  age.secrets = {
-    auth-jwt = {
-      file = ../../secrets/auth-jwt.age;
-    };
-    auth-session = {
-      file = ../../secrets/auth-session.age;
-    };
-    auth-storage-pw = {
-      file = ../../secrets/postgres-pw.age;
-    };
-    auth-storage-key = {
-      file = ../../secrets/auth-storage-key.age;
-    };
+  age.secrets = builtins.mapAttrs (_: f: { file = ../../secrets/${f}.age; }) {
+    auth-jwt = "auth-jwt";
+    auth-session = "auth-session";
+    auth-storage-pw  = "postgres-pw";
+    auth-storage-key = "auth-storage-key";
+
+    auth-oidc-hmac = "auth-oidc-hmac";
+    auth-key = "auth-key";
+    auth-cert = "auth-cert";
+
+    auth-immich-secret = "auth-immich-secret";
   };
 
   virtualisation.quadlet =
@@ -131,6 +174,12 @@ in
             "${config.age.secrets.auth-storage-pw.path}:/run/secrets/STORAGE_PASSWORD"
             "${config.age.secrets.auth-storage-key.path}:/run/secrets/STORAGE_ENCRYPTION_KEY"
 
+            "${config.age.secrets.auth-oidc-hmac.path}:/run/secrets/OIDC_HMAC_SECRET"
+            "${config.age.secrets.auth-key.path}:/run/secrets/OIDC_JWKS_RSA_KEY"
+            "${config.age.secrets.auth-cert.path}:/run/secrets/OIDC_JWKS_RSA_CERT"
+
+            "${config.age.secrets.auth-immich-secret.path}:/run/secrets/OIDC_IMMICH_SECRET"
+
             # volumes
             "${volumes.authelia-config.ref}:/config"
           ];
@@ -140,6 +189,10 @@ in
             AUTHELIA_SESSION_SECRET_FILE = "/run/secrets/SESSION_SECRET";
             AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE = "/run/secrets/STORAGE_PASSWORD";
             AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE = "/run/secrets/STORAGE_ENCRYPTION_KEY";
+
+            AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE = "/run/secrets/OIDC_HMAC_SECRET";
+
+            AUTHELIA_IDENTITY_PROVIDERS_OIDC_CLIENTS_IMMICH_SECRET_FILE = "/run/secrets/OIDC_IMMICH_SECRET";
           };
 
           publishPorts = [

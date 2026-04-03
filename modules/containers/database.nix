@@ -17,14 +17,6 @@
     '';
   };
 
-  home.file."containers/postgres/immich-init.sql" = {
-    text = ''
-      CREATE DATABASE immich;
-      GRANT ALL PRIVILEGES ON DATABASE immich TO admin;
-    '';
-  };
-
-
   virtualisation.quadlet =
     let
       inherit (config.virtualisation.quadlet) volumes;
@@ -58,7 +50,6 @@
             "${volumes.postgres-data.ref}:/var/lib/postgresql"
 
             "${config.home.homeDirectory}/containers/postgres/authelia-init.sql:/docker-entrypoint-initdb.d/authelia-init.sql:ro"
-            "${config.home.homeDirectory}/containers/postgres/immich-init.sql:/docker-entrypoint-initdb.d/immich-init.sql:ro"
           ];
 
           publishPorts = [

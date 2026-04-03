@@ -181,6 +181,7 @@
       description = user.fullName;
       isNormalUser = true;
       createHome = true;
+      linger = true;
       extraGroups = [
         "wheel"
         "networkmanager"

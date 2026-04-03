@@ -4,9 +4,11 @@
 }:
 let
   mediaPath = "/media/photos";
+  dbPath = "/opt/immich/db";
   mlCachePath = "/opt/immich/ml-cache";
 
-  immichVersion = "latest";
+  immichVersion = "release";
+  immichDbVersion = "14-vectorchord0.5.3";
   redisVersion = "alpine";
 in
 {
@@ -30,6 +32,11 @@ in
       volumes.immich-media.volumeConfig = {
         type = "bind";
         device = mediaPath;
+      };
+
+      volumes.immich-db.volumeConfig = {
+        type = "bind";
+        device = dbPath;
       };
 
       volumes.immich-ml-cache.volumeConfig = {
@@ -75,6 +82,34 @@ in
         };
       };
 
+      # immich database
+      containers.immich-postgres = {
+        autoStart = true;
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
+        };
+
+        containerConfig = {
+          image = "ghcr.io/immich-app/postgres:${immichDbVersion}";
+          name = "immich-postgres";
+          networks = [ "immich-net" ];
+          
+          environments = {
+            POSTGRES_USER = "admin";
+            POSTGRES_PASSWORD_FILE = "/run/secrets/IMMICH_DB_PW";
+
+            POSTGRES_DB = "immich";
+            POSTGRES_INITDB_ARGS = "--data-checksums";
+          };
+
+          volumes = [
+            "${volumes.immich-db.ref}:/var/lib/postgresql/data"
+            "${config.age.secrets.immich-db-pw.path}:/run/secrets/IMMICH_DB_PW"
+          ];
+        };
+      };
+
       # main immich server
       containers.immich-server = {
         autoStart = true;
@@ -89,13 +124,12 @@ in
           networks = [ "immich-net" ];
           
           environments = {
-            DB_HOSTNAME = "tcp://host.containers.internal";
+            DB_DATABASE_NAME = "immich";
+            DB_HOSTNAME = "immich-postgres";
             DB_PORT = "5432";
 
             DB_USERNAME = "admin";
             DB_PASSWORD_FILE = "/run/secrets/IMMICH_DB_PW";
-
-            DB_DATABASE_NAME = "immich";
             
             IMMICH_MACHINE_LEARNING_URL = "http://immich-ml:3003";
             REDIS_HOSTNAME = "immich-redis";

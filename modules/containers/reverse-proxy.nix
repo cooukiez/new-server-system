@@ -37,6 +37,12 @@
         handle @auth {
           reverse_proxy host.containers.internal:9091
         }
+
+        @immich host immich.home.lan
+        handle @immich {
+          import auth_verify
+          reverse_proxy host.containers.internal:2283
+        }
         
         @dns host dns.home.lan
         handle @dns {
