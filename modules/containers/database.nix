@@ -5,9 +5,16 @@
 }:
 {
   age.secrets = {
-    postgresql-pw = {
-      file = ../../secrets/postgresql-pw.age;
+    postgres-pw = {
+      file = ../../secrets/postgres-pw.age;
     };
+  };
+
+  home.file."containers/postgres/authelia-init.sql" = {
+    text = ''
+      CREATE DATABASE authelia;
+      GRANT ALL PRIVILEGES ON DATABASE authelia TO admin;
+    '';
   };
 
   virtualisation.quadlet =
@@ -30,16 +37,18 @@
         containerConfig = {
           image = "docker.io/library/postgres:alpine";
 
-          environment = {
+          environments = {
             POSTGRES_USER = "admin";
-            POSTGRES_PASSWORD_FILE = "/run/secrets/POSTGRESQL_PASSWORD";
+            POSTGRES_PASSWORD_FILE = "/run/secrets/POSTGRES_PASSWORD";
 
             POSTGRES_DB = "app_db";
           };
 
           volumes = [
-            "${config.age.secrets.postgresql-pw.path}:/run/secrets/POSTGRESQL_PASSWORD"
+            "${config.age.secrets.postgres-pw.path}:/run/secrets/POSTGRES_PASSWORD"
             "${volumes.postgres-data.ref}:/var/lib/postgresql"
+
+            "${config.age.secrets.postgres-pw.path}/containers/postgres/authelia-init.sql:/docker-entrypoint-initdb.d/authelia-init.sql"
           ];
 
           publishPorts = [

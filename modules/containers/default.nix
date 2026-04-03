@@ -12,6 +12,7 @@
 {
   imports = [
     ./auth.nix
+    ./database.nix
     ./dns.nix
     ./reverse-proxy.nix
   ];

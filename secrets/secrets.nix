@@ -41,5 +41,5 @@ in
   "auth-session.age".publicKeys = allKeys;
   "auth-storage-key.age".publicKeys = allKeys;
 
-  "postgresql-pw.age".publicKeys = allKeys;
+  "postgres-pw.age".publicKeys = allKeys;
 }

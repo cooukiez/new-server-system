@@ -24,7 +24,7 @@
     "d /opt/caddy/data 0755 10000 10000 -"
 
     # database
-    "d /opt/prostgresql 0755 10000 10000 -"
-    "d /opt/prostgresql/data 0755 10000 10000 -"
+    "d /opt/postgres 0755 10000 10000 -"
+    "d /opt/postgres/data 0755 10000 10000 -"
   ];
 }

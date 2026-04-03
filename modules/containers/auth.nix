@@ -7,8 +7,7 @@ let
   settingsFormat = pkgs.formats.yaml { };
 
   autheliaSettings = {
-    theme = "light";
-    default_redirection_url = "https://home.lan";
+    theme = "dark";
 
     server = {
       address = "tcp://0.0.0.0:9091";
@@ -48,8 +47,10 @@ let
     };
     
     storage = {
-      local = {
-        path = "/config/db.sqlite3";
+      postgres = {
+        address = "tcp://127.0.0.1:5432";
+        database = "authelia";
+        username = "admin";
       };
     };
 
@@ -73,7 +74,7 @@ in
       file = ../../secrets/auth-session.age;
     };
     auth-storage-pw = {
-      file = ../../secrets/postgresql-pw.age;
+      file = ../../secrets/postgres-pw.age;
     };
     auth-storage-key = {
       file = ../../secrets/auth-storage-key.age;
