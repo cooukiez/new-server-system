@@ -11,7 +11,7 @@
   ...
 }:
 {
-  home.file."/containers/caddy/Caddyfile" = {
+  home.file."containers/caddy/Caddyfile" = {
     text = ''
       (my_tls) {
         tls /etc/caddy/certs/home.lan.crt /etc/caddy/certs/home.lan.key
@@ -28,20 +28,14 @@
         
         @dns host dns.home.lan
         handle @dns {
-            reverse_proxy 127.0.0.1:3000
+            reverse_proxy host.containers.internal:3000
         }
 
         handle {
             abort
         }
       }
-
-      ${staticIP}:3000 {
-        reverse_proxy host.containers.internal:3000
-      }
     '';
-
-    executable = false;
   };
 
   virtualisation.quadlet =
@@ -83,7 +77,6 @@
             "80:80/tcp"
             "443:443/tcp"
             "443:443/udp"
-            "3000:3000/tcp"
           ];
         };
       };

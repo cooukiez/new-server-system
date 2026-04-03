@@ -7,6 +7,9 @@
 
 {
   systemd.tmpfiles.rules = [
+    "d /opt/authelia 0755 10000 10000 -"
+    "d /opt/authelia/config 0755 10000 10000 -"
+
     "d /opt/adguardhome 0755 10000 10000 -"
     "d /opt/adguardhome/conf 0755 10000 10000 -"
     "d /opt/adguardhome/work 0755 10000 10000 -"

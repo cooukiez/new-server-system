@@ -7,9 +7,56 @@
 
 {
   config,
+  pkgs,
   ...
 }:
+let
+  settingsFormat = pkgs.formats.yaml { };
+  
+  adguardSettings = {
+    http = {
+      address = "0.0.0.0:3000";
+    };
+
+    dns = {
+      bind_hosts = [ "0.0.0.0" ];
+      port = 53;
+
+      upstream_dns = [ "https://dns10.quad9.net/dns-query" ];
+
+      bootstrap_dns = [
+        "9.9.9.10"
+        "149.112.112.10"
+      ];
+    };
+    
+    dhcp = {
+      enabled = false;
+    };
+
+    filters = [
+      {
+        enabled = true;
+        url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt";
+        name = "AdGuard DNS filter";
+        id = 1;
+      }
+      {
+        enabled = false;
+        url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_2.txt";
+        name = "AdAway Default Blocklist";
+        id = 2;
+      }
+    ];
+
+    schema_version = 33;
+  };
+in
 {
+  home.file."containers/adguardhome/AdGuardHome.yaml" = {
+    source = settingsFormat.generate "AdGuardHome.yaml" adguardSettings;
+  };
+
   virtualisation.quadlet =
     let
       inherit (config.virtualisation.quadlet) volumes networks pods;
@@ -30,6 +77,11 @@
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/adguardhome/AdGuardHome.yaml /opt/adguardhome/conf/AdGuardHome.yaml"
+            "${pkgs.coreutils}/bin/chmod 644 /opt/adguardhome/conf/AdGuardHome.yaml"
+          ];
         };
 
         containerConfig = {
@@ -41,10 +93,9 @@
           ];
 
           publishPorts = [
-            "127.0.0.1:53:53/tcp"
-            "127.0.0.1:53:53/udp"
-            "127.0.0.1:3000:3000/tcp"
-            # "127.0.0.1:80:80/tcp"
+            "53:53/tcp"
+            "53:53/udp"
+            "3000:3000/tcp"
           ];
 
           # userns = "keep-id";

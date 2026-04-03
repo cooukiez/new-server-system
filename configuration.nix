@@ -144,6 +144,7 @@
 
       allowedUDPPorts = [
         53 # allow dns
+        443 # https quic
 
         config.services.tailscale.port
       ];
