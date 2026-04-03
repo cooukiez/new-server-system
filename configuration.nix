@@ -136,15 +136,16 @@
       allowedTCPPorts = [
         22 # allow openssh
         53 # allow dns
+
         80 # allow http for redirect
         443 # allow https
-        2283 # for immich
-        3000 # backup dns interface
+
+        # 2283 # for immich
       ];
 
       allowedUDPPorts = [
         53 # allow dns
-        443 # https quic
+        443 # allow https quic
 
         config.services.tailscale.port
       ];
@@ -234,7 +235,10 @@
           inputs.self.containerModules
 
           inputs.quadlet-nix.homeManagerModules.quadlet
+          inputs.agenix.homeManagerModules.default
         ];
+
+        age.identityPaths = [ "${config.home.homeDirectory}/.ssh/id_ed25519.pub" ];
 
         home.stateVersion = "25.11";
       };

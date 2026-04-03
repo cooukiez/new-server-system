@@ -25,6 +25,11 @@
 
       *.home.lan {
         import my_tls
+
+        @auth host auth.home.lan
+        handle @auth {
+            reverse_proxy host.containers.internal:9091
+        }
         
         @dns host dns.home.lan
         handle @dns {
@@ -43,6 +48,11 @@
       inherit (config.virtualisation.quadlet) volumes networks pods;
     in
     {
+      volumes.caddy-certs.volumeConfig = {
+        type = "bind";
+        device = "/etc/cert";
+      };
+
       volumes.caddy-config.volumeConfig = {
         type = "bind";
         device = "/opt/caddy/config";
@@ -68,11 +78,8 @@
             # config files
             "${config.home.homeDirectory}/containers/caddy/Caddyfile:/etc/caddy/Caddyfile:ro"
 
-            # certificates
-            " /etc/cert/home.lan.crt:/etc/cert/home.lan.crt:ro"
-            " /etc/cert/home.lan.key:/etc/cert/home.lan.key:ro"
-
             # volumes
+            "${volumes.caddy-certs.ref}:/etc/cert"
             "${volumes.caddy-config.ref}:/config"
             "${volumes.caddy-data.ref}:/data"
           ];

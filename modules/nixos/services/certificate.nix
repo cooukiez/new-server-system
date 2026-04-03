@@ -19,7 +19,6 @@
       [v3_req]
       keyUsage = critical, digitalSignature, keyEncipherment
       extendedKeyUsage = serverAuth
-      basicConstraints = critical, CA:FALSE
       subjectAltName = @alt_names
 
       [alt_names]

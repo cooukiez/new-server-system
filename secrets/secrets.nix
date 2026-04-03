@@ -14,31 +14,31 @@ let
   rootLaptop = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOe6C64fZmVmZN1uQSJexFBoQRFaQXOpfg9piE+r8cdQ";
 
   # server keys
-  adminUser = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDGteDPPpAVNuYBA06UnbawTDhNEek83a8sALWWuGnQZ admin@dhs";
-  dhsServer = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIESWux3pGlD3wCWU+UHFut7rJn6T8DCL4L6ccHz8uRDY root@dhs";
+  squUser = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICJUMtqXM+M2NPPa1/BvATAn40e3nZRh2RzHc/BkSqeN squ@dhs";
+  adminUser = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGqloF2EAQJl6bwdOBhMXvkund47pwRzIQC8KMaiBEbK admin@dhs";
+  dhsServer = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID7ao1FUxiK3WeHSeVsxlrIMWlFJVsHndjadOxzP4taE root@dhs";
 
-  oldKeys = [
+  serverKeys = [
+    squUser
     adminUser
     dhsServer
   ];
 
-  newAllKeys = [
+  allKeys = [
     ceirsLaptop
     ludwLaptop
     rediLapotp
 
     rootLaptop
 
+    squUser
     adminUser
     dhsServer
   ];
 in
 {
-  "maxmind-license.age".publicKeys = oldKeys;
-
-  "gluetun-wg-key.age".publicKeys = newAllKeys;
-
-  "slsk-user.age".publicKeys = newAllKeys;
-  "slsk-pass.age".publicKeys = newAllKeys;
-  "slsk-webui-pass.age".publicKeys = newAllKeys;
+  "auth-jwt.age".publicKeys = allKeys;
+  "auth-session.age".publicKeys = allKeys;
+  "auth-storage-pw.age".publicKeys = allKeys;
+  "auth-storage-key.age".publicKeys = allKeys;
 }

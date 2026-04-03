@@ -29,7 +29,7 @@
       UseDns = true;
       X11Forwarding = false;
 
-      PermitRootLogin = "no";
+      PermitRootLogin = "yes";
       PasswordAuthentication = true;
     };
   };

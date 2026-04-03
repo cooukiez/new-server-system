@@ -1,8 +1,89 @@
 {
   config,
+  pkgs,
   ...
 }:
+let
+  settingsFormat = pkgs.formats.yaml { };
+
+  autheliaSettings = {
+    theme = "light";
+    default_redirection_url = "https://home.lan";
+
+    server = {
+      address = "tcp://0.0.0.0:9091";
+    };
+
+    log = {
+      level = "info";
+    };
+
+    authentication_backend = {
+      file = {
+        path = "/config/users.yml";
+      };
+    };
+
+    access_control = {
+      default_policy = "deny";
+      rules = [
+        {
+          domain = "*.home.lan";
+          policy = "one_factor";
+        }
+      ];
+    };
+
+    session = {
+      name = "authelia_session";
+      domain = "home.lan";
+
+      expiration = "1h";
+      inactivity = "5m";
+    };
+
+    storage = {
+      local = {
+        path = "/config/db.sqlite3";
+      };
+    };
+
+    notifier = {
+      filesystem = {
+        filename = "/config/emails.txt";
+      };
+    };
+  };
+in
 {
+  home.file."containers/authelia/configuration.yml" = {
+    source = settingsFormat.generate "authelia-configuration.yml" autheliaSettings;
+  };
+
+  age.secrets = {
+    auth-jwt = {
+      file = ../../secrets/auth-jwt.age;
+    };
+    auth-session = {
+      file = ../../secrets/auth-session.age;
+    };
+    auth-storage-pw = {
+      file = ../../secrets/auth-storage-pw.age;
+    };
+    auth-storage-key = {
+      file = ../../secrets/auth-storage-key.age;
+    };
+  };
+
+  home.file."containers/authelia/authelia.env" = {
+    text = ''
+    AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE = "/run/secrets/JWT_SECRET"
+    AUTHELIA_SESSION_SECRET_FILE = "/run/secrets/SESSION_SECRET"
+    AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE = "/run/secrets/STORAGE_PASSWORD"
+    AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE = "/run/secrets/STORAGE_ENCRYPTION_KEY"
+    '';
+  };
+
   virtualisation.quadlet =
     let
       inherit (config.virtualisation.quadlet) volumes networks pods;
@@ -18,13 +99,29 @@
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/configuration.yml /opt/authelia/config/configuration.yml"
+            "${pkgs.coreutils}/bin/chmod 644 /opt/authelia/config/configuration.yml"
+          ];
         };
 
         containerConfig = {
           image = "docker.io/authelia/authelia:latest";
 
           volumes = [
+            "${config.age.secrets.auth-jwt.path}:/run/secrets/JWT_SECRET"
+            "${config.age.secrets.auth-session.path}:/run/secrets/SESSION_SECRET"
+            "${config.age.secrets.auth-storage-pw.path}:/run/secrets/STORAGE_PASSWORD"
+            "${config.age.secrets.auth-storage-key.path}:/run/secrets/STORAGE_ENCRYPTION_KEY"
+
             "${volumes.authelia-config.ref}:/config"
+          ];
+
+          environmentFiles = [ "${config.home.homeDirectory}/containers/authelia/authelia.env" ];
+
+          publishPorts = [
+            "9091:9091/tcp"
           ];
         };
       };
