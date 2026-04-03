@@ -36,6 +36,7 @@
 
         containerConfig = {
           image = "docker.io/library/postgres:alpine";
+          name = "postgres";
 
           environments = {
             POSTGRES_USER = "admin";

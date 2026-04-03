@@ -30,22 +30,18 @@ let
           domain = "auth.home.lan";
           policy = "bypass";
         }
-
-        # dns interface
         {
-          domain = "dns.home.lan";
-          policy = "deny";
+          domain = "home.lan";
+          policy = "bypass";
         }
+
+        # user
+
+        # admin
         {
           domain = "dns.home.lan";
           policy = "one_factor";
           subject = [ "group:admins" ];
-        }
-
-        {
-          domain = "*.home.lan";
-          policy = "one_factor";
-          subject = [ "group:users" ];
         }
       ];
     };
@@ -125,13 +121,16 @@ in
 
         containerConfig = {
           image = "docker.io/authelia/authelia:latest";
+          name = "authelia";
 
           volumes = [
+            # secrets
             "${config.age.secrets.auth-jwt.path}:/run/secrets/JWT_SECRET"
             "${config.age.secrets.auth-session.path}:/run/secrets/SESSION_SECRET"
             "${config.age.secrets.auth-storage-pw.path}:/run/secrets/STORAGE_PASSWORD"
             "${config.age.secrets.auth-storage-key.path}:/run/secrets/STORAGE_ENCRYPTION_KEY"
 
+            # volumes
             "${volumes.authelia-config.ref}:/config"
           ];
 

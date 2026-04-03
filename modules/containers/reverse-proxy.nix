@@ -80,6 +80,7 @@
 
         containerConfig = {
           image = "docker.io/library/caddy:latest";
+          name = "caddy";
           addCapabilities = [ "NET_ADMIN" ];
 
           volumes = [

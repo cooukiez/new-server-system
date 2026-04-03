@@ -109,6 +109,7 @@ in
 
         containerConfig = {
           image = "docker.io/adguard/adguardhome:latest";
+          name = "adguardhome";
 
           volumes = [
             "${volumes.adguard-conf.ref}:/opt/adguardhome/conf"

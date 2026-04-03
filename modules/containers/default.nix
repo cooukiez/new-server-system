@@ -11,6 +11,8 @@
 }:
 {
   imports = [
+    ./services/immich.nix
+    
     ./auth.nix
     ./database.nix
     ./dns.nix

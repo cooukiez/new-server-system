@@ -26,5 +26,15 @@
     # database
     "d /opt/postgres 0755 10000 10000 -"
     "d /opt/postgres/data 0755 10000 10000 -"
+
+    #
+    # services
+    #
+    "d opt/immich 0755 10000 10000 -"
+    "d opt/immich/db 0755 10000 10000 -"
+
+    # media directories
+    "d /media 0755 10000 10000 -"
+    "d /media/photos 0755 10000 10000 -"
   ];
 }
