@@ -72,9 +72,8 @@ let
             key_id = "main-rsa";
             algorithm = "RS256";
             use = "sig";
-            
-            key_file = "/run/secrets/OIDC_JWKS_RSA_KEY";
-            certificate_chain_file = "/run/secrets/OIDC_JWKS_RSA_CERT";
+
+            key = "{{ secret \"/run/secrets/OIDC_JWK_RSA_KEY\" | mindent 10 \"|\" | msquote }}";
           }
         ];
 
@@ -82,6 +81,7 @@ let
           {
             client_id = "immich";
             client_name = "Immich";
+            client_secret = "$pbkdf2-sha512$310000$X5CgmGSCM2XEmtT0jqohVA$H8TqZ1CSfnrr8M.zzjO7VAuNQtaZf2saqVBwCrTzNeHlVpaAhuQV8nhNUJ8p8jktsvT7oJBdsHa7ftQfbGynVQ";
 
             public = false;
             authorization_policy = "two_factor";
@@ -128,14 +128,11 @@ in
   age.secrets = builtins.mapAttrs (_: f: { file = ../../secrets/${f}.age; }) {
     auth-jwt = "auth-jwt";
     auth-session = "auth-session";
+
     auth-storage-pw  = "postgres-pw";
     auth-storage-key = "auth-storage-key";
 
     auth-oidc-hmac = "auth-oidc-hmac";
-    auth-key = "auth-key";
-    auth-cert = "auth-cert";
-
-    auth-immich-secret = "auth-immich-secret";
   };
 
   virtualisation.quadlet =
@@ -171,14 +168,11 @@ in
             # secrets
             "${config.age.secrets.auth-jwt.path}:/run/secrets/JWT_SECRET"
             "${config.age.secrets.auth-session.path}:/run/secrets/SESSION_SECRET"
+
             "${config.age.secrets.auth-storage-pw.path}:/run/secrets/STORAGE_PASSWORD"
             "${config.age.secrets.auth-storage-key.path}:/run/secrets/STORAGE_ENCRYPTION_KEY"
 
             "${config.age.secrets.auth-oidc-hmac.path}:/run/secrets/OIDC_HMAC_SECRET"
-            "${config.age.secrets.auth-key.path}:/run/secrets/OIDC_JWKS_RSA_KEY"
-            "${config.age.secrets.auth-cert.path}:/run/secrets/OIDC_JWKS_RSA_CERT"
-
-            "${config.age.secrets.auth-immich-secret.path}:/run/secrets/OIDC_IMMICH_SECRET"
 
             # volumes
             "${volumes.authelia-config.ref}:/config"
@@ -187,12 +181,11 @@ in
           environments = {
             AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE = "/run/secrets/JWT_SECRET";
             AUTHELIA_SESSION_SECRET_FILE = "/run/secrets/SESSION_SECRET";
+
             AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE = "/run/secrets/STORAGE_PASSWORD";
             AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE = "/run/secrets/STORAGE_ENCRYPTION_KEY";
 
             AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE = "/run/secrets/OIDC_HMAC_SECRET";
-
-            AUTHELIA_IDENTITY_PROVIDERS_OIDC_CLIENTS_IMMICH_SECRET_FILE = "/run/secrets/OIDC_IMMICH_SECRET";
           };
 
           publishPorts = [

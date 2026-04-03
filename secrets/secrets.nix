@@ -42,12 +42,6 @@ in
   "auth-storage-key.age".publicKeys = allKeys;
 
   "auth-oidc-hmac.age".publicKeys = allKeys;
-  "auth-immich-secret.age".publicKeys = allKeys;
-
-  "auth-cert.age".publicKeys = allKeys;
-  "auth-key.age".publicKeys = allKeys;
-  "auth-ec-cert.age".publicKeys = allKeys;
-  "auth-ec-key.age".publicKeys = allKeys;
 
   "postgres-pw.age".publicKeys = allKeys;
 }
