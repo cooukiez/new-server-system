@@ -6,6 +6,7 @@
 let
   settingsFormat = pkgs.formats.yaml { };
 
+  autheliaVersion = "latest";
   autheliaSettings = {
     theme = "dark";
 
@@ -120,7 +121,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/authelia/authelia:latest";
+          image = "docker.io/authelia/authelia:${autheliaVersion}";
           name = "authelia";
 
           volumes = [

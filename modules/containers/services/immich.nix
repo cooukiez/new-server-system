@@ -4,16 +4,15 @@
 }:
 let
   mediaPath = "/media/photos";
-  dbPath = "/opt/immich/db";
   mlCachePath = "/opt/immich/ml-cache";
 
-  immichVersion = "v1.102.3";
+  immichVersion = "latest";
   redisVersion = "alpine";
 in
 {
   age.secrets = {
     immich-db-pw = {
-      file = ../../secrets/postgres-pw.age;
+      file = ../../../secrets/postgres-pw.age;
     };
   };
 
@@ -22,6 +21,17 @@ in
       inherit (config.virtualisation.quadlet) networks volumes;
     in
     {
+      networks.immich-net = {
+        networkConfig = {
+          internal = false;
+        };
+      };
+
+      volumes.immich-media.volumeConfig = {
+        type = "bind";
+        device = mediaPath;
+      };
+
       volumes.immich-ml-cache.volumeConfig = {
         type = "bind";
         device = mlCachePath;
@@ -38,6 +48,7 @@ in
         containerConfig = {
           image = "ghcr.io/immich-app/immich-machine-learning:${immichVersion}";
           name = "immich-ml";
+          networks = [ "immich-net" ];
 
           volumes = [
             "${volumes.immich-ml-cache.ref}:/cache"
@@ -60,6 +71,7 @@ in
         containerConfig = {
           image = "docker.io/valkey/valkey:${redisVersion}";
           name = "immich-redis";
+          networks = [ "immich-net" ];
         };
       };
 
@@ -74,6 +86,7 @@ in
         containerConfig = {
           image = "ghcr.io/immich-app/immich-server:${immichVersion}";
           name = "immich-server";
+          networks = [ "immich-net" ];
           
           environments = {
             DB_HOSTNAME = "tcp://host.containers.internal";
@@ -84,7 +97,8 @@ in
 
             DB_DATABASE_NAME = "immich";
             
-            IMMICH_MACHINE_LEARNING_URL = "tcp://host.containers.internal:3003";
+            IMMICH_MACHINE_LEARNING_URL = "http://immich-ml:3003";
+            REDIS_HOSTNAME = "immich-redis";
           };
 
           volumes = [
@@ -94,7 +108,7 @@ in
             "${config.age.secrets.immich-db-pw.path}:/run/secrets/IMMICH_DB_PW"
 
             # volumes
-            "${mediaPath}:/data"
+            "${volumes.immich-media.ref}:/data"
           ];
 
           devices = [
