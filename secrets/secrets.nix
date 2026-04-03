@@ -43,5 +43,7 @@ in
 
   "auth-oidc-hmac.age".publicKeys = allKeys;
 
+  "smtp-pw.age".publicKeys = allKeys;
+
   "postgres-pw.age".publicKeys = allKeys;
 }

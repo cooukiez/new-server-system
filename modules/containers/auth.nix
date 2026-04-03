@@ -115,8 +115,11 @@ let
     };
 
     notifier = {
-      filesystem = {
-        filename = "/config/emails.txt";
+      smtp = {
+        address = "smtp.mailbox.org:587";
+        sender = "authelia@home.lan";
+        username = "ludwig.geyer@mailbox.org";
+        password_file = "/run/secrets/SMTP-PW"; 
       };
     };
   };
@@ -134,6 +137,8 @@ in
     auth-storage-key = "auth-storage-key";
 
     auth-oidc-hmac = "auth-oidc-hmac";
+
+    smtp-pw = "smtp-pw";
   };
 
   virtualisation.quadlet =
@@ -174,6 +179,8 @@ in
             "${config.age.secrets.auth-storage-key.path}:/run/secrets/STORAGE_ENCRYPTION_KEY"
 
             "${config.age.secrets.auth-oidc-hmac.path}:/run/secrets/OIDC_HMAC_SECRET"
+
+            "${config.age.secrets.smtp-pw.path}:/run/secrets/SMTP-PW"
 
             # volumes
             "${volumes.authelia-config.ref}:/config"
