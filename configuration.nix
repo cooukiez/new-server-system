@@ -238,7 +238,7 @@
           inputs.agenix.homeManagerModules.default
         ];
 
-        age.identityPaths = [ "${config.home.homeDirectory}/.ssh/id_ed25519.pub" ];
+        age.identityPaths = [ "/home/squ/.ssh/id_ed25519" ];
 
         home.stateVersion = "25.11";
       };

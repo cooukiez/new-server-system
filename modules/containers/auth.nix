@@ -36,12 +36,17 @@ let
 
     session = {
       name = "authelia_session";
-      domain = "home.lan";
-
+      cookies = [
+        {
+          domain = "home.lan";
+          authelia_url = "https://auth.home.lan";
+          default_redirection_url = "https://home.lan";
+        }
+      ];
       expiration = "1h";
       inactivity = "5m";
     };
-
+    
     storage = {
       local = {
         path = "/config/db.sqlite3";
@@ -68,20 +73,11 @@ in
       file = ../../secrets/auth-session.age;
     };
     auth-storage-pw = {
-      file = ../../secrets/auth-storage-pw.age;
+      file = ../../secrets/postgresql-pw.age;
     };
     auth-storage-key = {
       file = ../../secrets/auth-storage-key.age;
     };
-  };
-
-  home.file."containers/authelia/authelia.env" = {
-    text = ''
-    AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE = "/run/secrets/JWT_SECRET"
-    AUTHELIA_SESSION_SECRET_FILE = "/run/secrets/SESSION_SECRET"
-    AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE = "/run/secrets/STORAGE_PASSWORD"
-    AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE = "/run/secrets/STORAGE_ENCRYPTION_KEY"
-    '';
   };
 
   virtualisation.quadlet =
@@ -118,7 +114,12 @@ in
             "${volumes.authelia-config.ref}:/config"
           ];
 
-          environmentFiles = [ "${config.home.homeDirectory}/containers/authelia/authelia.env" ];
+          environments = {
+            AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE = "/run/secrets/JWT_SECRET";
+            AUTHELIA_SESSION_SECRET_FILE = "/run/secrets/SESSION_SECRET";
+            AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE = "/run/secrets/STORAGE_PASSWORD";
+            AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE = "/run/secrets/STORAGE_ENCRYPTION_KEY";
+          };
 
           publishPorts = [
             "9091:9091/tcp"

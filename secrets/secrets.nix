@@ -39,6 +39,7 @@ in
 {
   "auth-jwt.age".publicKeys = allKeys;
   "auth-session.age".publicKeys = allKeys;
-  "auth-storage-pw.age".publicKeys = allKeys;
   "auth-storage-key.age".publicKeys = allKeys;
+
+  "postgresql-pw.age".publicKeys = allKeys;
 }
