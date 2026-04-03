@@ -1,3 +1,7 @@
+{
+  pkgs,
+  ...
+}:
 let
   settingsFormat = pkgs.formats.yaml { };
 

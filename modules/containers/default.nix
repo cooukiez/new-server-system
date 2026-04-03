@@ -15,6 +15,7 @@
     ./database.nix
     ./dns.nix
     ./reverse-proxy.nix
+    ./users.nix
   ];
 
   virtualisation.quadlet =

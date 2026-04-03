@@ -27,8 +27,25 @@ let
       default_policy = "deny";
       rules = [
         {
+          domain = "auth.home.lan";
+          policy = "bypass";
+        }
+
+        # dns interface
+        {
+          domain = "dns.home.lan";
+          policy = "deny";
+        }
+        {
+          domain = "dns.home.lan";
+          policy = "one_factor";
+          subject = [ "group:admins" ];
+        }
+
+        {
           domain = "*.home.lan";
           policy = "one_factor";
+          subject = [ "group:users" ];
         }
       ];
     };

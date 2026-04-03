@@ -16,6 +16,13 @@
       (my_tls) {
         tls /etc/cert/home.lan.crt /etc/cert/home.lan.key
       }
+      
+      (auth_verify) {
+        forward_auth host.containers.internal:9091 {
+          uri /api/verify?rd=https://auth.home.lan/
+          copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+        }
+      }
 
       home.lan {
         import my_tls
@@ -28,16 +35,17 @@
 
         @auth host auth.home.lan
         handle @auth {
-            reverse_proxy host.containers.internal:9091
+          reverse_proxy host.containers.internal:9091
         }
         
         @dns host dns.home.lan
         handle @dns {
-            reverse_proxy host.containers.internal:3000
+          import auth_verify
+          reverse_proxy host.containers.internal:3000
         }
 
         handle {
-            abort
+          abort
         }
       }
     '';
