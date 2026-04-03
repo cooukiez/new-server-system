@@ -45,10 +45,10 @@
           };
 
           volumes = [
-            "${config.age.secrets.postgres-pw.path}:/run/secrets/POSTGRES_PASSWORD"
+            "${config.age.secrets.postgres-pw.path}:/run/secrets/POSTGRES_PASSWORD:ro"
             "${volumes.postgres-data.ref}:/var/lib/postgresql"
 
-            "${config.age.secrets.postgres-pw.path}/containers/postgres/authelia-init.sql:/docker-entrypoint-initdb.d/authelia-init.sql"
+            "${config.home.homeDirectory}/containers/postgres/authelia-init.sql:/docker-entrypoint-initdb.d/authelia-init.sql:ro"
           ];
 
           publishPorts = [

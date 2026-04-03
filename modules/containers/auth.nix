@@ -48,7 +48,7 @@ let
     
     storage = {
       postgres = {
-        address = "tcp://127.0.0.1:5432";
+        address = "tcp://host.containers.internal:5432";
         database = "authelia";
         username = "admin";
       };
@@ -99,7 +99,10 @@ in
 
           ExecStartPre = [
             "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/configuration.yml /opt/authelia/config/configuration.yml"
+            "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/users.yml /opt/authelia/config/users.yml"
+
             "${pkgs.coreutils}/bin/chmod 644 /opt/authelia/config/configuration.yml"
+            "${pkgs.coreutils}/bin/chmod 644 /opt/authelia/config/users.yml"
           ];
         };
 
