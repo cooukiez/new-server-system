@@ -80,6 +80,7 @@
     kernelPackages = pkgs.linuxPackages_latest;
     consoleLogLevel = 0;
     initrd.verbose = false;
+    initrd.systemd.network.wait-online.enable = false;
     kernelParams = [
       "quiet"
       "rd.udev.log_level=3"
@@ -102,6 +103,8 @@
     NetworkManager-wait-online.enable = false;
     plymouth-quit-wait.enable = false;
   };
+  
+  systemd.network.wait-online.enable = false; 
 
   # hostname
   networking = {

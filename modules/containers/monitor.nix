@@ -1,31 +1,24 @@
-/*
-  modules/containers/netdata.nix
-
-  part of der-home-server
-*/
-
 {
   config,
-  pkgs,
   ...
 }:
 {
   virtualisation.quadlet =
     let
-      inherit (config.virtualisation.quadlet) volumes;
+      inherit (config.virtualisation.quadlet) volumes networks pods;
     in
     {
-      volumes.netdata-config = {
+      volumes.netdata-config.volumeConfig = {
         type = "bind";
         device = "/opt/netdata/config";
       };
 
-      volumes.netdata-lib = {
+      volumes.netdata-lib.volumeConfig = {
         type = "bind";
         device = "/opt/netdata/lib";
       };
 
-      volumes.netdata-cache = {
+      volumes.netdata-cache.volumeConfig = {
         type = "bind";
         device = "/opt/netdata/cache";
       };
@@ -64,11 +57,8 @@
             "19999:19999/tcp"
           ];
 
-          securityLabelType = [
-            "apparmor=unconfined"
-            "unmask=/proc/*"
-            "unmask=/sys/*"
-          ];
+          appArmor = "unconfined";
+          unmask = "/proc/*:/sys/*";
         };
       };
     };

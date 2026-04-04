@@ -45,5 +45,7 @@ in
 
   "smtp-pw.age".publicKeys = allKeys;
 
+  "ts-auth-key.age".publicKeys = allKeys;
+
   "postgres-pw.age".publicKeys = allKeys;
 }

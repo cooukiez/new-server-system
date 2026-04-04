@@ -21,7 +21,7 @@ in
 
   virtualisation.quadlet =
     let
-      inherit (config.virtualisation.quadlet) networks volumes;
+      inherit (config.virtualisation.quadlet) volumes networks pods;
     in
     {
       networks.immich-net = {
