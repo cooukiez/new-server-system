@@ -117,9 +117,8 @@ let
     notifier = {
       smtp = {
         address = "smtp.mailbox.org:587";
-        sender = "authelia@home.lan";
+        sender = "ludwig.geyer@mailbox.org";
         username = "ludwig.geyer@mailbox.org";
-        password_file = "/run/secrets/SMTP-PW"; 
       };
     };
   };
@@ -194,6 +193,8 @@ in
             AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE = "/run/secrets/STORAGE_ENCRYPTION_KEY";
 
             AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE = "/run/secrets/OIDC_HMAC_SECRET";
+
+            AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE = "/run/secrets/SMTP-PW";
           };
 
           publishPorts = [
