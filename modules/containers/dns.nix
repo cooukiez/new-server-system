@@ -110,6 +110,7 @@ in
         containerConfig = {
           image = "docker.io/adguard/adguardhome:latest";
           name = "adguardhome";
+          addCapabilities = [ "NET_BIND_SERVICE" ];
 
           volumes = [
             "${volumes.adguard-conf.ref}:/opt/adguardhome/conf"

@@ -87,7 +87,7 @@
         containerConfig = {
           image = "docker.io/library/caddy:latest";
           name = "caddy";
-          addCapabilities = [ "NET_ADMIN" ];
+          addCapabilities = [ "NET_BIND_SERVICE" ];
 
           volumes = [
             # config files
