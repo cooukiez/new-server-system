@@ -49,4 +49,6 @@ in
   "ts-auth-key.age".publicKeys = allKeys;
 
   "postgres-pw.age".publicKeys = allKeys;
+
+  "gh-token.age".publicKeys = allKeys;
 }
