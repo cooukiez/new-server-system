@@ -40,7 +40,10 @@ let
         {
           domain = "immich.home.lan";
           policy = "one_factor";
-          subject = [ "group:admins" "group:users" ];
+          subject = [
+            "group:admins"
+            "group:users"
+          ];
         }
 
         # admin
@@ -69,7 +72,7 @@ let
       expiration = "1h";
       inactivity = "5m";
     };
-    
+
     identity_providers = {
       oidc = {
         jwks = [
@@ -78,8 +81,7 @@ let
             algorithm = "RS256";
             use = "sig";
 
-            # openssl genpkey -algorithm RSA -out rsa.2048.key -pkeyopt rsa_keygen_bits:2048
-            key = builtins.readFile ../../secrets/rsa.2048.key;
+            key = "{{ secret \"/run/secrets/OIDC_RSA_KEY\" | mindent 10 \"|\" | msquote }}";
           }
         ];
 
@@ -99,7 +101,11 @@ let
               "app.immich:///oauth-callback"
             ];
 
-            scopes = [ "openid" "profile" "email" ];
+            scopes = [
+              "openid"
+              "profile"
+              "email"
+            ];
             response_types = [ "code" ];
             grant_types = [ "authorization_code" ];
 
@@ -137,10 +143,11 @@ in
     auth-jwt = "auth-jwt";
     auth-session = "auth-session";
 
-    auth-storage-pw  = "postgres-pw";
+    auth-storage-pw = "postgres-pw";
     auth-storage-key = "auth-storage-key";
 
     auth-oidc-hmac = "auth-oidc-hmac";
+    auth-oidc-key = "auth-oidc-key";
 
     smtp-pw = "smtp-pw";
   };
@@ -183,6 +190,7 @@ in
             "${config.age.secrets.auth-storage-key.path}:/run/secrets/STORAGE_ENCRYPTION_KEY"
 
             "${config.age.secrets.auth-oidc-hmac.path}:/run/secrets/OIDC_HMAC_SECRET"
+            "${config.age.secrets.auth-oidc-key.path}:/run/secrets/OIDC_RSA_KEY"
 
             "${config.age.secrets.smtp-pw.path}:/run/secrets/SMTP-PW"
 
@@ -191,6 +199,8 @@ in
           ];
 
           environments = {
+            X_AUTHELIA_CONFIG_FILTERS = "template";
+
             AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE = "/run/secrets/JWT_SECRET";
             AUTHELIA_SESSION_SECRET_FILE = "/run/secrets/SESSION_SECRET";
 
