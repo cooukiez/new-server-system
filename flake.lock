@@ -21,21 +21,6 @@
         "type": "github"
       }
     },
-    "agenix-template": {
-      "locked": {
-        "lastModified": 1775593413,
-        "narHash": "sha256-RRaU0lbwvCA6iu0wFl2Ct8ixkuGirm0D/VaJcRgCOvQ=",
-        "owner": "cooukiez",
-        "repo": "agenix-template",
-        "rev": "a3f7514102fd2634b215dce73e00167f81e6838c",
-        "type": "github"
-      },
-      "original": {
-        "owner": "cooukiez",
-        "repo": "agenix-template",
-        "type": "github"
-      }
-    },
     "darwin": {
       "inputs": {
         "nixpkgs": [
@@ -266,14 +251,34 @@
     "root": {
       "inputs": {
         "agenix": "agenix",
-        "agenix-template": "agenix-template",
         "hardware": "hardware",
         "home-manager": "home-manager_2",
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "nixvim": "nixvim",
         "nur": "nur",
-        "quadlet-nix": "quadlet-nix"
+        "quadlet-nix": "quadlet-nix",
+        "sops-nix": "sops-nix"
+      }
+    },
+    "sops-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1775365543,
+        "narHash": "sha256-f50qrK0WwZ9z5EdaMGWOTtALgSF7yb7XwuE7LjCuDmw=",
+        "owner": "Mic92",
+        "repo": "sops-nix",
+        "rev": "a4ee2de76efb759fe8d4868c33dec9937897916f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Mic92",
+        "repo": "sops-nix",
+        "type": "github"
       }
     },
     "systems": {
