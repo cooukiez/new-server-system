@@ -33,7 +33,6 @@
         containerConfig = {
           image = "docker.io/netdata/netdata:latest";
           name = "netdata";
-          hostname = "%H";
 
           volumes = [
             "${volumes.netdata-config.ref}:/etc/netdata"
@@ -57,8 +56,14 @@
             "19999:19999/tcp"
           ];
 
-          appArmor = "unconfined";
-          unmask = "/proc/*:/sys/*";
+          addCapabilities = [ "SYS_PTRACE" "SYS_ADMIN" ];
+
+          podmanArgs = [
+            "--security-opt=apparmor=unconfined"
+          ];
+
+          # appArmor = "unconfined";
+          # unmask = "/proc/*:/sys/*";
         };
       };
     };

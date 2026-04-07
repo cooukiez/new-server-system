@@ -49,6 +49,11 @@ let
           policy = "one_factor";
           subject = [ "group:admins" ];
         }
+        {
+          domain = "monitor.home.lan";
+          policy = "one_factor";
+          subject = [ "group:admins" ];
+        }
       ];
     };
 

@@ -50,6 +50,12 @@
           reverse_proxy host.containers.internal:3000
         }
 
+        @monitor host monitor.home.lan
+        handle @monitor {
+          import auth_verify
+          reverse_proxy host.containers.internal:19999
+        }
+
         handle {
           abort
         }
