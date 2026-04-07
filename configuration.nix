@@ -103,8 +103,8 @@
     NetworkManager-wait-online.enable = false;
     plymouth-quit-wait.enable = false;
   };
-  
-  systemd.network.wait-online.enable = false; 
+
+  systemd.network.wait-online.enable = false;
 
   # hostname
   networking = {
@@ -240,6 +240,7 @@
 
           inputs.quadlet-nix.homeManagerModules.quadlet
           inputs.agenix.homeManagerModules.default
+          inputs.agenix-template.homeManagerModules.default
         ];
 
         age.identityPaths = [ "/home/squ/.ssh/id_ed25519" ];

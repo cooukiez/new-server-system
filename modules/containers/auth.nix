@@ -81,7 +81,7 @@ let
             algorithm = "RS256";
             use = "sig";
 
-            key = "{{ secret \"/run/secrets/OIDC_RSA_KEY\" }}";
+            key = "$auth-oidc-key";
           }
         ];
 
@@ -136,8 +136,16 @@ let
   };
 in
 {
-  home.file."containers/authelia/configuration.yml" = {
-    source = settingsFormat.generate "authelia-configuration.yml" autheliaSettings;
+  age-template.files."authelia-configuration.yml" = {
+    vars = {
+      auth-oidc-key = config.age.secrets.auth-oidc-key.path;
+    };
+
+    content =
+      let
+        baseConfig = settingsFormat.generate "authelia-configuration.yml" autheliaSettings;
+      in
+      builtins.readFile yamlContent;
   };
 
   age.secrets = builtins.mapAttrs (_: f: { file = ../../secrets/${f}.age; }) {
@@ -170,6 +178,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
+            "${pkgs.coreutils}/bin/cp ${config.age-template.directory}/authelia-configuration.yml ${config.home.homeDirectory}/containers/authelia/configuration.yml"
             "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/configuration.yml /opt/authelia/config/configuration.yml"
             "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/users.yml /opt/authelia/config/users.yml"
 
@@ -200,8 +209,6 @@ in
           ];
 
           environments = {
-            X_AUTHELIA_CONFIG_FILTERS = "template";
-
             AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE = "/run/secrets/JWT_SECRET";
             AUTHELIA_SESSION_SECRET_FILE = "/run/secrets/SESSION_SECRET";
 
