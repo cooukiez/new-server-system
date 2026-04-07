@@ -143,7 +143,7 @@ in
 
     content =
       let
-        baseConfig = settingsFormat.generate "authelia-configuration.yml" autheliaSettings;
+        yamlContent = settingsFormat.generate "authelia-configuration.yml" autheliaSettings;
       in
       builtins.readFile yamlContent;
   };
