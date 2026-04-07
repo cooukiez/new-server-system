@@ -13,10 +13,11 @@ let
   ports = {
     grafana = 3000;
   };
+in
 {
   imports = [
     ./services/immich.nix
-    
+
     ./auth.nix
     ./database.nix
     ./dns.nix
