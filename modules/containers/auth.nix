@@ -81,7 +81,7 @@ let
             algorithm = "RS256";
             use = "sig";
 
-            key = "$auth-oidc-key";
+            key = "PLACEHOLDER_AUTH_OIDC_KEY";
           }
         ];
 
@@ -134,10 +134,24 @@ let
       };
     };
   };
+
+  yamlConfig = builtins.toJSON autheliaSettings;
 in
 {
-  home.file."containers/authelia-configuration.yml" = {
-    source = settingsFormat.generate "authelia-configuration.yml" autheliaSettings;
+  # home.file."containers/authelia-configuration.yml" = {
+  #   source = settingsFormat.generate "authelia-configuration.yml" autheliaSettings;
+  # };
+
+  sops.secrets.auth-oidc-key = {
+    format = "yaml";
+    sopsFile = ../../secrets/auth-oidc-key.yaml;
+  };
+
+  sops.templates."authelia-configuration.yml" = {
+    content =
+      builtins.replaceStrings [ "PLACEHOLDER_AUTH_OIDC_KEY" ] [ config.sops.placeholder.auth-oidc-key ]
+        yamlConfig;
+    mode = "0644";
   };
 
   age.secrets = builtins.mapAttrs (_: f: { file = ../../secrets/${f}.age; }) {
@@ -170,6 +184,10 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
+            "${pkgs.coreutils}/bin/cp ${
+              config.sops.templates."authelia-configuration.yml".path
+            } ${config.home.homeDirectory}/containers/authelia/configuration.yml"
+
             "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/configuration.yml /opt/authelia/config/configuration.yml"
             "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/users.yml /opt/authelia/config/users.yml"
 
