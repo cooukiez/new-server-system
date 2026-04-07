@@ -11,7 +11,33 @@
 }:
 let
   ports = {
-    grafana = 3000;
+    #
+    # core
+    #
+
+    # auth
+    authelia = 9091;
+
+    # database
+    postgres = 5432;
+
+    # dns
+    dns = 53;
+    adguard = 3000;
+
+    # monitor
+    grafana = 3005;
+
+    # reverse proxy
+    caddy_http = 80;
+    caddy_https = 443;
+
+    #
+    # services
+    #
+
+    # immich
+    immich = 2283;
   };
 in
 {

@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  ports,
   ...
 }:
 let
@@ -214,7 +215,7 @@ in
           };
 
           publishPorts = [
-            "9091:9091/tcp"
+            "${toString ports.authelia}:9091/tcp"
           ];
         };
       };

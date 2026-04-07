@@ -1,4 +1,8 @@
-{ config, ... }:
+{
+  config,
+  ports,
+  ...
+}:
 {
   virtualisation.quadlet =
     let
@@ -26,7 +30,7 @@
           ];
 
           publishPorts = [
-            "3000:3000/tcp"
+            "${toString ports.grafana}:3000/tcp"
           ];
 
           environments = {

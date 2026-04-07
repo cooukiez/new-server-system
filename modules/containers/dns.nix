@@ -9,11 +9,12 @@
   config,
   pkgs,
   staticIP,
+  ports,
   ...
 }:
 let
   settingsFormat = pkgs.formats.yaml { };
-  
+
   adguardSettings = {
     http = {
       address = "0.0.0.0:3000";
@@ -32,7 +33,7 @@ let
         "149.112.112.10"
       ];
     };
-    
+
     dhcp = {
       enabled = false;
     };
@@ -118,9 +119,9 @@ in
           ];
 
           publishPorts = [
-            "53:53/tcp"
-            "53:53/udp"
-            "3000:3000/tcp"
+            "${toString ports.dns}:53/tcp"
+            "${toString ports.dns}:53/udp"
+            "${toString ports.adguard}:3000/tcp"
           ];
         };
       };

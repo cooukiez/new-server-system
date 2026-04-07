@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  ports,
   ...
 }:
 {
@@ -53,7 +54,7 @@
           ];
 
           publishPorts = [
-            "5432:5432/tcp"
+            "${toString ports.postgres}:5432/tcp"
           ];
         };
       };

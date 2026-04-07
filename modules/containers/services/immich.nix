@@ -1,6 +1,7 @@
 {
   config,
   staticIP,
+  ports,
   ...
 }:
 let
@@ -95,7 +96,7 @@ in
           image = "ghcr.io/immich-app/postgres:${immichDbVersion}";
           name = "immich-postgres";
           networks = [ "immich-net" ];
-          
+
           environments = {
             POSTGRES_USER = "admin";
             POSTGRES_PASSWORD_FILE = "/run/secrets/IMMICH_DB_PW";
@@ -126,7 +127,7 @@ in
           addHosts = [
             "auth.home.lan:host-gateway"
           ];
-          
+
           environments = {
             DB_DATABASE_NAME = "immich";
             DB_HOSTNAME = "immich-postgres";
@@ -134,7 +135,7 @@ in
 
             DB_USERNAME = "admin";
             DB_PASSWORD_FILE = "/run/secrets/IMMICH_DB_PW";
-            
+
             IMMICH_MACHINE_LEARNING_URL = "http://immich-ml:3003";
             REDIS_HOSTNAME = "immich-redis";
 
@@ -156,9 +157,9 @@ in
             "/dev/dri/renderD128"
             "/dev/dri/card0"
           ];
-          
+
           publishPorts = [
-            "2283:2283/tcp"
+            "${toString ports.immich}:2283/tcp"
           ];
         };
       };

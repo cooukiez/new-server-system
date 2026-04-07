@@ -8,6 +8,7 @@
 {
   config,
   staticIP,
+  ports,
   ...
 }:
 {
@@ -16,9 +17,9 @@
       (my_tls) {
         tls /etc/cert/home.lan.crt /etc/cert/home.lan.key
       }
-      
+
       (auth_verify) {
-        forward_auth host.containers.internal:9091 {
+        forward_auth host.containers.internal:${toString ports.authelia} {
           uri /api/verify?rd=https://auth.home.lan/
           copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
         }
@@ -35,25 +36,25 @@
 
         @auth host auth.home.lan
         handle @auth {
-          reverse_proxy host.containers.internal:9091
+          reverse_proxy host.containers.internal:${toString ports.authelia}
         }
 
         @immich host immich.home.lan
         handle @immich {
           import auth_verify
-          reverse_proxy host.containers.internal:2283
+          reverse_proxy host.containers.internal:${toString ports.immich}
         }
         
         @dns host dns.home.lan
         handle @dns {
           import auth_verify
-          reverse_proxy host.containers.internal:3000
+          reverse_proxy host.containers.internal:${toString ports.adguard}
         }
 
         @monitor host monitor.home.lan
         handle @monitor {
           import auth_verify
-          reverse_proxy host.containers.internal:19999
+          reverse_proxy host.containers.internal:${toString ports.grafana}
         }
 
         handle {
@@ -106,9 +107,9 @@
           ];
 
           publishPorts = [
-            "80:80/tcp"
-            "443:443/tcp"
-            "443:443/udp"
+            "${toString ports.caddy_http}:80/tcp"
+            "${toString ports.caddy_https}:443/tcp"
+            "${toString ports.caddy_https}:443/udp"
           ];
         };
       };
