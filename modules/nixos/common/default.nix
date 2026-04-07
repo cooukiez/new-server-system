@@ -80,6 +80,8 @@
 
     # encryption
     inputs.agenix.packages.${hostSystem}.default
+    sops
+    ssh-to-age
 
     # nixos related
     home-manager

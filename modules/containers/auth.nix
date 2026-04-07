@@ -136,16 +136,8 @@ let
   };
 in
 {
-  age-template.files."authelia-configuration.yml" = {
-    vars = {
-      auth-oidc-key = config.age.secrets.auth-oidc-key.path;
-    };
-
-    content =
-      let
-        yamlContent = settingsFormat.generate "authelia-configuration.yml" autheliaSettings;
-      in
-      builtins.readFile yamlContent;
+  home.files."containers/authelia-configuration.yml" = {
+    source = settingsFormat.generate "authelia-configuration.yml" autheliaSettings;
   };
 
   age.secrets = builtins.mapAttrs (_: f: { file = ../../secrets/${f}.age; }) {
@@ -178,7 +170,6 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "${pkgs.coreutils}/bin/cp ${config.age-template.directory}/authelia-configuration.yml ${config.home.homeDirectory}/containers/authelia/configuration.yml"
             "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/configuration.yml /opt/authelia/config/configuration.yml"
             "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/users.yml /opt/authelia/config/users.yml"
 

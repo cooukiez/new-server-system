@@ -40,7 +40,11 @@
 
     quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
     agenix.url = "github:ryantm/agenix";
-    agenix-template.url = "github:cooukiez/agenix-template";
+
+    inputs.sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
   };
 
   outputs =
