@@ -136,8 +136,8 @@ let
   };
 in
 {
-  home.file."containers/authelia-configuration.yml" = {
-    source = settingsFormat.generate "authelia-configuration.yml" autheliaSettings;
+  home.file."containers/authelia/configuration.yml" = {
+    source = settingsFormat.generate "configuration.yml" autheliaSettings;
   };
 
   age.secrets = builtins.mapAttrs (_: f: { file = ../../secrets/${f}.age; }) {
