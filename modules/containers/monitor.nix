@@ -34,7 +34,7 @@
           ];
 
           environments = {
-            GF_SERVER_ROOT_URL = "https://monitor.home.lan/";
+            # GF_SERVER_ROOT_URL = "https://monitor.home.lan/";
             GF_PLUGINS_PREINSTALL = "grafana-clock-panel,grafana-simple-json-datasource";
           };
         };
