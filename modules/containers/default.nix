@@ -9,6 +9,10 @@
   config,
   ...
 }:
+let
+  ports = {
+    grafana = 3000;
+  };
 {
   imports = [
     ./services/immich.nix
@@ -20,6 +24,8 @@
     ./reverse-proxy.nix
     ./users.nix
   ];
+
+  _module.args = { inherit ports; };
 
   virtualisation.quadlet =
     let
