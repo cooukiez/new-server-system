@@ -1,29 +1,16 @@
-{
-  config,
-  ...
-}:
+{ config, ... }:
 {
   virtualisation.quadlet =
     let
       inherit (config.virtualisation.quadlet) volumes networks pods;
     in
     {
-      volumes.netdata-config.volumeConfig = {
+      volumes.grafana-data.volumeConfig = {
         type = "bind";
-        device = "/opt/netdata/config";
+        device = "/opt/grafana";
       };
 
-      volumes.netdata-lib.volumeConfig = {
-        type = "bind";
-        device = "/opt/netdata/lib";
-      };
-
-      volumes.netdata-cache.volumeConfig = {
-        type = "bind";
-        device = "/opt/netdata/cache";
-      };
-
-      containers.netdata = {
+      containers.grafana = {
         autoStart = true;
         serviceConfig = {
           Restart = "always";
@@ -31,39 +18,21 @@
         };
 
         containerConfig = {
-          image = "docker.io/netdata/netdata:latest";
-          name = "netdata";
+          image = "docker.io/grafana/grafana-enterprise:latest";
+          name = "grafana";
 
           volumes = [
-            "${volumes.netdata-config.ref}:/etc/netdata"
-            "${volumes.netdata-lib.ref}:/var/lib/netdata"
-            "${volumes.netdata-cache.ref}:/var/cache/netdata"
-            
-            "/etc/passwd:/host/etc/passwd:ro"
-            "/etc/group:/host/etc/group:ro"
-            "/etc/localtime:/etc/localtime:ro"
-            "/proc:/host/proc:ro"
-            "/sys:/host/sys:ro"
-            "/etc/os-release:/host/etc/os-release:ro"
-
-            "/var/log/journal:/var/log/journal:ro"
-            "/run/log/journal:/run/log/journal:ro"
-            
-            "%t/podman/podman.sock:/var/run/docker.sock:ro"
+            "${volumes.grafana-data.ref}:/var/lib/grafana"
           ];
 
           publishPorts = [
-            "19999:19999/tcp"
+            "3000:3000/tcp"
           ];
 
-          addCapabilities = [ "SYS_PTRACE" "SYS_ADMIN" ];
-
-          podmanArgs = [
-            "--security-opt=apparmor=unconfined"
-          ];
-
-          # appArmor = "unconfined";
-          # unmask = "/proc/*:/sys/*";
+          environments = {
+            GF_SERVER_ROOT_URL = "https://monitor.home.lan/";
+            GF_PLUGINS_PREINSTALL = "grafana-clock-panel,grafana-simple-json-datasource";
+          };
         };
       };
     };

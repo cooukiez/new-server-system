@@ -28,11 +28,7 @@
     "d /opt/postgres/data 0755 10000 10000 -"
 
     # monitor
-    "d /opt/netdata 0755 10000 10000 -"
-    "d /opt/netdata/config 0755 10000 10000 -"
-    "d /opt/netdata/lib 0755 10000 10000 -"
-    "d /opt/netdata/cache 0755 10000 10000 -"
-
+    "d /opt/grafana 0755 10000 10000 -"
     #
     # services
     #
