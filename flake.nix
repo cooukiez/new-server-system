@@ -41,7 +41,7 @@
     quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
     agenix.url = "github:ryantm/agenix";
 
-    inputs.sops-nix = {
+    sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
