@@ -81,9 +81,7 @@ let
             algorithm = "RS256";
             use = "sig";
 
-            key = ''
-              {{ secret "/run/secrets/OIDC_RSA_KEY" | mindent 10 "" }}
-            '';
+            key = "{{ secret \"/run/secrets/OIDC_RSA_KEY\" }}";
           }
         ];
 
