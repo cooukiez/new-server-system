@@ -202,8 +202,7 @@ in
           ];
 
           environments = {
-            # X_AUTHELIA_CONFIG_FILTERS = "template";
-            AUTHELIA_IDENTITY_PROVIDERS_OIDC_JWKS_0_KEY_FILE = "/run/secrets/OIDC_RSA_KEY";
+            X_AUTHELIA_CONFIG_FILTERS = "template";
 
             AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE = "/run/secrets/JWT_SECRET";
             AUTHELIA_SESSION_SECRET_FILE = "/run/secrets/SESSION_SECRET";
