@@ -244,6 +244,7 @@
         ];
 
         age.identityPaths = [ "/home/squ/.ssh/id_ed25519" ];
+        sops.age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
 
         home.stateVersion = "25.11";
       };
