@@ -42,6 +42,7 @@ in
   "auth-storage-key.age".publicKeys = allKeys;
 
   "auth-oidc-hmac.age".publicKeys = allKeys;
+  "auth-oidc-key.age".publicKeys = allKeys;
 
   "smtp-pw.age".publicKeys = allKeys;
 
