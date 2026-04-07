@@ -23,11 +23,11 @@
     },
     "agenix-template": {
       "locked": {
-        "lastModified": 1775592694,
-        "narHash": "sha256-A+X1HJUBkpL961+6VLJCLBYc+e0ckGnXpYzEzc5Vfds=",
+        "lastModified": 1775593413,
+        "narHash": "sha256-RRaU0lbwvCA6iu0wFl2Ct8ixkuGirm0D/VaJcRgCOvQ=",
         "owner": "cooukiez",
         "repo": "agenix-template",
-        "rev": "c2faddc689d3c9b0a9067964cddc21702196d6a9",
+        "rev": "a3f7514102fd2634b215dce73e00167f81e6838c",
         "type": "github"
       },
       "original": {
