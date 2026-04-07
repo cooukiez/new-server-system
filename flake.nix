@@ -2,7 +2,7 @@
   flake.nix
 
   part of der-home-server
-  created 2026-03-30
+  created 2026-04-02
 */
 
 # der-home-server configuration
@@ -61,7 +61,7 @@
         hostSystem
       ];
 
-      staticIP = "0.0.0.0";
+      staticIP = "192.168.178.3";
       dnsServers = [
         "1.1.1.1"
         "8.8.8.8"

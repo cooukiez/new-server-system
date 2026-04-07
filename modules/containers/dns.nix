@@ -1,20 +1,98 @@
+/*
+  modules/containers/dns.nix
+
+  part of der-home-server
+  created 2026-04-02
+*/
+
 {
   config,
+  pkgs,
+  staticIP,
   ...
 }:
+let
+  settingsFormat = pkgs.formats.yaml { };
+  
+  adguardSettings = {
+    http = {
+      address = "0.0.0.0:3000";
+    };
+
+    dns = {
+      bind_hosts = [ "0.0.0.0" ];
+      port = 53;
+
+      upstream_mode = "fastest_addr";
+      upstream_timeout = "2s";
+      upstream_dns = [ "https://dns10.quad9.net/dns-query" ];
+
+      bootstrap_dns = [
+        "9.9.9.10"
+        "149.112.112.10"
+      ];
+    };
+    
+    dhcp = {
+      enabled = false;
+    };
+
+    filters = [
+      {
+        enabled = true;
+        url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt";
+        name = "AdGuard DNS filter";
+        id = 1;
+      }
+      {
+        enabled = false;
+        url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_2.txt";
+        name = "AdAway Default Blocklist";
+        id = 2;
+      }
+    ];
+
+    filtering = {
+      rewrites = [
+        {
+          enabled = true;
+          domain = "home.lan";
+          answer = "${staticIP}";
+        }
+        {
+          enabled = true;
+          domain = "*.home.lan";
+          answer = "${staticIP}";
+        }
+        {
+          enabled = true;
+          domain = "*.home.lan.fritz.box";
+          answer = "${staticIP}";
+        }
+      ];
+    };
+
+    schema_version = 33;
+  };
+in
 {
+  home.file."containers/adguardhome/AdGuardHome.yaml" = {
+    source = settingsFormat.generate "AdGuardHome.yaml" adguardSettings;
+  };
+
   virtualisation.quadlet =
     let
       inherit (config.virtualisation.quadlet) volumes networks pods;
     in
     {
-      volumes.adguard-work.volumeConfig = {
-        type = "bind";
-        device = "/opt/adguardhome/work";
-      };
       volumes.adguard-conf.volumeConfig = {
         type = "bind";
         device = "/opt/adguardhome/conf";
+      };
+
+      volumes.adguard-work.volumeConfig = {
+        type = "bind";
+        device = "/opt/adguardhome/work";
       };
 
       containers.adguardhome = {
@@ -22,29 +100,28 @@
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/adguardhome/AdGuardHome.yaml /opt/adguardhome/conf/AdGuardHome.yaml"
+            "${pkgs.coreutils}/bin/chmod 644 /opt/adguardhome/conf/AdGuardHome.yaml"
+          ];
         };
 
         containerConfig = {
           image = "docker.io/adguard/adguardhome:latest";
-
-          addCapabilities = [
-            "NET_ADMIN"
-            "NET_BIND_SERVICE"
-          ];
+          name = "adguardhome";
+          addCapabilities = [ "NET_BIND_SERVICE" ];
 
           volumes = [
-            "${volumes.adguard-work.ref}:/opt/adguardhome/work"
             "${volumes.adguard-conf.ref}:/opt/adguardhome/conf"
+            "${volumes.adguard-work.ref}:/opt/adguardhome/work"
           ];
 
           publishPorts = [
-            "127.0.0.1:53:53/tcp"
-            "127.0.0.1:53:53/udp"
-            "127.0.0.1:3000:3000/tcp"
-            "127.0.0.1:80:80/tcp"
+            "53:53/tcp"
+            "53:53/udp"
+            "3000:3000/tcp"
           ];
-
-          # userns = "keep-id";
         };
       };
     };

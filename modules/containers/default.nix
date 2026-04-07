@@ -11,7 +11,14 @@
 }:
 {
   imports = [
+    ./services/immich.nix
+    
+    ./auth.nix
+    ./database.nix
     ./dns.nix
+    ./monitor.nix
+    ./reverse-proxy.nix
+    ./users.nix
   ];
 
   virtualisation.quadlet =

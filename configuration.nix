@@ -13,6 +13,7 @@
   pkgs,
   lib,
   hostname,
+  staticIP,
   dnsServers,
   users,
   ...
@@ -79,6 +80,7 @@
     kernelPackages = pkgs.linuxPackages_latest;
     consoleLogLevel = 0;
     initrd.verbose = false;
+    initrd.systemd.network.wait-online.enable = false;
     kernelParams = [
       "quiet"
       "rd.udev.log_level=3"
@@ -101,6 +103,8 @@
     NetworkManager-wait-online.enable = false;
     plymouth-quit-wait.enable = false;
   };
+  
+  systemd.network.wait-online.enable = false; 
 
   # hostname
   networking = {
@@ -135,14 +139,16 @@
       allowedTCPPorts = [
         22 # allow openssh
         53 # allow dns
+
         80 # allow http for redirect
         443 # allow https
-        2283 # for immich
-        3000 # backup dns interface
+
+        # 2283 # for immich
       ];
 
       allowedUDPPorts = [
         53 # allow dns
+        443 # allow https quic
 
         config.services.tailscale.port
       ];
@@ -178,6 +184,7 @@
       description = user.fullName;
       isNormalUser = true;
       createHome = true;
+      linger = true;
       extraGroups = [
         "wheel"
         "networkmanager"
@@ -191,6 +198,7 @@
 
         isNormalUser = true;
         createHome = true;
+
         linger = true;
         autoSubUidGidRange = true;
 
@@ -216,13 +224,14 @@
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    extraSpecialArgs = { inherit inputs; };
+    extraSpecialArgs = { inherit inputs staticIP; };
 
     users.squ =
       {
         inputs,
         config,
         pkgs,
+        staticIP,
         ...
       }:
       {
@@ -230,7 +239,10 @@
           inputs.self.containerModules
 
           inputs.quadlet-nix.homeManagerModules.quadlet
+          inputs.agenix.homeManagerModules.default
         ];
+
+        age.identityPaths = [ "/home/squ/.ssh/id_ed25519" ];
 
         home.stateVersion = "25.11";
       };

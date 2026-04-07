@@ -13,10 +13,17 @@
 }:
 {
   imports = [
-    ./tmpfiles.nix
+    ./certificate.nix
+    ./structure.nix
   ];
 
   age.identityPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+
+  age.secrets = {
+    ts-auth-key = {
+      file = ../../../secrets/ts-auth-key.age;
+    };
+  };
 
   services.fwupd.enable = true;
   services.vnstat.enable = true;
@@ -28,7 +35,7 @@
       UseDns = true;
       X11Forwarding = false;
 
-      PermitRootLogin = "no";
+      PermitRootLogin = "yes";
       PasswordAuthentication = true;
     };
   };
@@ -36,9 +43,23 @@
   services.tailscale = {
     enable = true;
     useRoutingFeatures = "both";
+    disableUpstreamLogging = true;
+
+    authKeyFile = config.age.secrets.ts-auth-key.path;
 
     extraUpFlags = [
       "--advertise-exit-node"
+      "--advertise-routes=192.168.178.0/24"
     ];
+  };
+
+  services.networkd-dispatcher = {
+    enable = true;
+    rules."50-tailscale-optimizations" = {
+      onState = [ "routable" ];
+      script = ''
+        ${pkgs.ethtool}/bin/ethtool -K eth0 rx-udp-gro-forwarding on rx-gro-list off
+      '';
+    };
   };
 }
