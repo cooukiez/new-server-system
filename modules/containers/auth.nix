@@ -173,6 +173,8 @@ in
             "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/configuration.yml /opt/authelia/config/configuration.yml"
             "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/users.yml /opt/authelia/config/users.yml"
 
+            "${pkgs.bash}/bin/bash -c '${pkgs.gnused}/bin/sed -i \"s|PLACEHOLDER_AUTH_OIDC_KEY|$(cat ${config.age.secrets.auth-oidc-key.path})|\" /opt/authelia/config/configuration.yml'"
+
             "${pkgs.coreutils}/bin/chmod 644 /opt/authelia/config/configuration.yml"
             "${pkgs.coreutils}/bin/chmod 644 /opt/authelia/config/users.yml"
           ];
