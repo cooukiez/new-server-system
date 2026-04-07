@@ -136,7 +136,7 @@ let
   };
 in
 {
-  age-template.files."authelia-configuration.yml" = {
+  age-template.files."containers/authelia-configuration.yml" = {
     vars = {
       auth-oidc-key = config.age.secrets.auth-oidc-key.path;
     };
@@ -178,7 +178,6 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "${pkgs.coreutils}/bin/cp ${config.age-template.directory}/authelia-configuration.yml ${config.home.homeDirectory}/containers/authelia/configuration.yml"
             "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/configuration.yml /opt/authelia/config/configuration.yml"
             "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/users.yml /opt/authelia/config/users.yml"
 
