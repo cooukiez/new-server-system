@@ -1,0 +1,23 @@
+keys:
+  # laptop
+  - &ceirs_laptop age1hfkwhcm2uaandp6jxd8ck4lac7ljyn4yn7pk60u2fy9l9ycr39dsrrahnl
+  - &ludw_laptop age1rzgq2ujdyg5hsucdxqj8yt8ty8acde9gvg0ud4tf2gw0jnd5hvkqzv9sgm
+  - &redi_laptop age1fs489da4g73tp43hul3g35l97fuxcs9n9jsa4zu4nwfj78ydz5psaadn5w
+  - &root_laptop age1kyg2r3dsjh64se5muvfkx65xc3wz7526rpwvx883j9sw06wxr3tsuprsnq
+
+  # server
+  - &squ_user age1cq0cxu8pdeq3e0hy6cqnmdyul6te3keeyq4z9sqljfqsvsyuvq2q4ne3tc
+  - &admin_user age1nw070qgqt5kenpmc6q6falnug2sdgxujzv2efj9nwhmj4ygzc5mqkkt077
+  - &dhs_server age1aljck8klpmn8rfl6pwsk4swp7dml2hgv2cyrlmzsr6y0ldgngpns30jegj
+
+creation_rules:
+  - path_regex: secrets/.*\.yaml$
+    key_groups:
+      - age:
+        - *ceirs_laptop
+        - *ludw_laptop
+        - *redi_laptop
+        - *root_laptop
+        - *squ_user
+        - *admin_user
+        - *dhs_server

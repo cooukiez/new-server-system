@@ -136,16 +136,8 @@ let
   };
 in
 {
-  age-template.files."containers/authelia-configuration.yml" = {
-    vars = {
-      auth-oidc-key = config.age.secrets.auth-oidc-key.path;
-    };
-
-    content =
-      let
-        yamlContent = settingsFormat.generate "authelia-configuration.yml" autheliaSettings;
-      in
-      builtins.readFile yamlContent;
+  home.files."containers/authelia-configuration.yml" = {
+    source = settingsFormat.generate "authelia-configuration.yml" autheliaSettings;
   };
 
   age.secrets = builtins.mapAttrs (_: f: { file = ../../secrets/${f}.age; }) {

@@ -240,7 +240,7 @@
 
           inputs.quadlet-nix.homeManagerModules.quadlet
           inputs.agenix.homeManagerModules.default
-          inputs.agenix-template.homeManagerModules.default
+          inputs.sops-nix.homeManagerModules.sops
         ];
 
         age.identityPaths = [ "/home/squ/.ssh/id_ed25519" ];
