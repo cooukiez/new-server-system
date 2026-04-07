@@ -136,7 +136,7 @@ let
   };
 in
 {
-  home.files."containers/authelia-configuration.yml" = {
+  home.file."containers/authelia-configuration.yml" = {
     source = settingsFormat.generate "authelia-configuration.yml" autheliaSettings;
   };
 
