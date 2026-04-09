@@ -9,6 +9,7 @@ let
 
   # inside container
   settingsPath = "/etc/grafana/grafana.ini";
+  certPath = "/etc/grafana/root.crt";
   provisioningPath = "/etc/grafana/provisioning";
   dataPath = "/var/lib/grafana";
 
@@ -54,6 +55,8 @@ let
       use_pkce = true;
       auth_style = "InHeader";
 
+      tls_client_ca = certPath;
+
       # map authelia groups to grafana roles
       role_attribute_path = "contains(groups, 'admins') && 'Admin' || contains(groups, 'editors') && 'Editor' || 'Viewer'";
     };
@@ -63,6 +66,8 @@ in
   home.file."containers/grafana/grafana.ini" = {
     source = settingsFormat.generate "grafana.ini" grafanaSettings;
   };
+
+  home.file."containers/grafana/root.crt".source = ../../home.lan.crt;
 
   age.secrets.grafana-oauth.file = ../../secrets/grafana-oauth.age;
 
@@ -88,10 +93,15 @@ in
           name = "grafana";
 
           userns = "keep-id:uid=472,gid=472";
+          
+          addHosts = [
+            "auth.home.lan:host-gateway"
+          ];
 
           volumes = [
             # config
             "${config.home.homeDirectory}/containers/grafana/grafana.ini:${settingsPath}"
+            "${config.home.homeDirectory}/containers/grafana/root.crt:${certPath}:ro"
 
             # secrets
             "${config.age.secrets.grafana-oauth.path}:/run/secrets/OAUTH_SECRET"
