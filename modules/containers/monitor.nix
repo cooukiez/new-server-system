@@ -22,6 +22,11 @@ let
       root_url = "https://monitor.home.lan/";
     };
 
+    security = {
+      disable_initial_admin_creation = true;
+      admin_user = "admin-internal";
+    };
+
     paths = {
       data = dataPath;
       provisioning = provisioningPath;
@@ -30,6 +35,11 @@ let
     analytics = {
       reporting_enabled = false;
       check_for_updates = false;
+    };
+
+    auth = {
+      disable_login_form = true;
+      oauth_allow_insecure_email_lookup = true;
     };
 
     "auth.generic_oauth" = {
@@ -51,6 +61,7 @@ let
       login_attribute_path = "preferred_username";
       groups_attribute_path = "groups";
       name_attribute_path = "name";
+      allow_assign_grafana_admin = true;
 
       use_pkce = true;
       auth_style = "InHeader";

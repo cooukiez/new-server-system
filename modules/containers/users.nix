@@ -5,6 +5,8 @@
 let
   settingsFormat = pkgs.formats.yaml { };
 
+  # groups = [ "admins" "users" ];
+
   autheliaUsers = {
     users = {
       admin = {

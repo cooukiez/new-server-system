@@ -44,5 +44,6 @@ in
     # tools
     intel-gpu-tools
     nvtopPackages.intel
+    sqlite
   ];
 }

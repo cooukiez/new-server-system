@@ -37,24 +37,18 @@ let
           policy = "bypass";
         }
 
-        # user
+        {
+          domain = "monitor.home.lan";
+          policy = "bypass";
+        }
         {
           domain = "immich.home.lan";
-          policy = "one_factor";
-          subject = [
-            "group:admins"
-            "group:users"
-          ];
+          policy = "bypass";
         }
 
         # admin
         {
           domain = "dns.home.lan";
-          policy = "one_factor";
-          subject = [ "group:admins" ];
-        }
-        {
-          domain = "monitor.home.lan";
           policy = "one_factor";
           subject = [ "group:admins" ];
         }
