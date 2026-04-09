@@ -29,6 +29,7 @@
 
     # monitor
     "d /opt/grafana 0755 10000 10000 -"
+    "d /opt/grafana/data 0755 10000 10000 -"
     #
     # services
     #
