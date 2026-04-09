@@ -50,5 +50,7 @@ in
 
   "postgres-pw.age".publicKeys = allKeys;
 
+  "grafana-oauth.age".publicKeys = allKeys;
+
   "gh-token.age".publicKeys = allKeys;
 }
