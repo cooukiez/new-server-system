@@ -2,7 +2,7 @@
   modules/nixos/services/certificate.nix
 
   part of der-home-server
-  created 2026-04-03
+  created 2026-04-10
 */
 
 {

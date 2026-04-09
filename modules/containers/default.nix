@@ -2,7 +2,7 @@
   modules/containers/default.nix
 
   part of der-home-server
-  created 2026-04-02
+  created 2026-04-08
 */
 
 {
@@ -27,6 +27,7 @@ let
 
     # monitor
     grafana = 3005;
+    prometheus = 9090;
 
     # reverse proxy
     caddy_http = 80;

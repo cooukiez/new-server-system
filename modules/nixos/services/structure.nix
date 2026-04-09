@@ -2,7 +2,7 @@
   modules/nixos/services/structure.nix
 
   part of der-home-server
-  created 2026-04-02
+  created 2026-04-10
 */
 
 {
@@ -30,6 +30,9 @@
     # monitor
     "d /opt/grafana 0755 10000 10000 -"
     "d /opt/grafana/data 0755 10000 10000 -"
+    "d /opt/prometheus 0755 10000 10000 -"
+    "d /opt/prometheus/data 0755 10000 10000 -"
+
     #
     # services
     #

@@ -1,3 +1,10 @@
+/*
+  modules/containers/auth.nix
+
+  part of der-home-server
+  created 2026-04-10
+*/
+
 {
   config,
   pkgs,
@@ -82,7 +89,12 @@ let
 
         claims_policies = {
           grafana = {
-            id_token = [ "email" "name" "groups" "preferred_username" ];
+            id_token = [
+              "email"
+              "name"
+              "groups"
+              "preferred_username"
+            ];
           };
         };
 
@@ -141,7 +153,7 @@ let
             response_types = [ "code" ];
             grant_types = [ "authorization_code" ];
 
-            access_token_signed_response_alg = "RS256"; 
+            access_token_signed_response_alg = "RS256";
             userinfo_signed_response_alg = "none";
             token_endpoint_auth_method = "client_secret_basic";
           }

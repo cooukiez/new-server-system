@@ -1,3 +1,10 @@
+/*
+  modules/containers/services/immich.nix
+
+  part of der-home-server
+  created 2026-04-10
+*/
+
 {
   config,
   staticIP,
@@ -124,7 +131,7 @@ in
           image = "ghcr.io/immich-app/immich-server:${immichVersion}";
           name = "immich-server";
           networks = [ "immich-net" ];
-          
+
           addHosts = [
             "auth.home.lan:host-gateway"
           ];
