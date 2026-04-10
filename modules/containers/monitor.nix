@@ -14,6 +14,7 @@
 let
   grafanaSettingsFormat = pkgs.formats.ini { };
   prometheusSettingsFormat = pkgs.formats.yaml { };
+  lokiSettingsFormat = pkgs.formats.yaml { };
 
   # grafana paths inside container
   grafanaSettingsPath = "/etc/grafana/grafana.ini";
@@ -24,6 +25,9 @@ let
   # prometheus paths inside container
   prometheusConfigPath = "/etc/prometheus/prometheus.yml";
   prometheusDataPath = "/prometheus";
+
+  # loki paths inside container
+  lokiConfigPath = "/etc/loki/local-config.yaml";
 
   #
   # grafana settings
@@ -108,7 +112,44 @@ let
         job_name = "podman";
         static_configs = [ { targets = [ "podman-exporter:9882" ]; } ];
       }
+      {
+        job_name = "node";
+        static_configs = [ 
+          { targets = [ "host.containers.internal:${toString ports.nodeExporter}" ]; } 
+        ];
+      }
     ];
+  };
+
+  #
+  # loki settings
+  #
+  lokiVersion = "latest";
+  lokiSettings = {
+    auth_enabled = false;
+    server.http_listen_port = ports.loki;
+
+    common = {
+      instance_addr = "127.0.0.1";
+      path_prefix = "/loki";
+      storage.filesystem = {
+        chunks_directory = "/loki/chunks";
+        rules_directory = "/loki/rules";
+      };
+
+      replication_factor = 1;
+      ring.kvstore.store = "inmemory";
+    };
+
+    schema_config.configs = [{
+      from = "2024-04-01";
+      store = "tsdb";
+
+      object_store = "filesystem";
+      schema = "v13";
+
+      index = { prefix = "index_"; period = "24h"; };
+    }];
   };
 in
 {
@@ -127,13 +168,20 @@ in
       - name: Prometheus
         type: prometheus
         access: proxy
-        url: http://prometheus:9090
+        url: http://prometheus:${toString ports.prometheus}
         isDefault: true
+      - name: Loki
+        type: loki
+        url: http://loki:${toString ports.loki}
   '';
 
   # prometheus
   home.file."containers/prometheus/prometheus.yml".source =
     prometheusSettingsFormat.generate "prometheus.yml" prometheusSettings;
+
+  # loki
+  home.file."containers/loki/loki.yaml".source =
+    lokiSettingsFormat.generate "loki.yaml" lokiSettings;
 
   virtualisation.quadlet =
     let
@@ -159,6 +207,11 @@ in
       volumes.prometheus-data.volumeConfig = {
         type = "bind";
         device = "/opt/prometheus/data";
+      };
+
+      volumes.loki-data.volumeConfig = {
+        type = "bind";
+        device = "/opt/loki/data";
       };
 
       containers.grafana = {
@@ -271,6 +324,34 @@ in
 
           exec = [
             "--collector.enable-all" 
+          ];
+        };
+      };
+
+      containers.loki = {
+        autoStart = true;
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
+        };
+
+        containerConfig = {
+          image = "docker.io/grafana/loki:${lokiVersion}";
+          name = "loki";
+          networks = [ "monitoring.network" ];
+          
+          publishPorts = [ "${toString ports.loki}:3100/tcp" ];
+
+          volumes = [
+            # config
+            "${config.home.homeDirectory}/containers/loki/loki.yaml:${lokiConfigPath}:ro"
+
+            # volumes
+            "${volumes.loki-data.ref}:/loki"
+          ];
+
+          exec = [
+            "-config.file=${lokiConfigPath}"
           ];
         };
       };

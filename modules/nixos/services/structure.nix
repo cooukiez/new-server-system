@@ -33,6 +33,8 @@
     "d /opt/grafana/data 0755 10000 10000 -"
     "d /opt/prometheus 0755 10000 10000 -"
     "d /opt/prometheus/data 0755 10000 10000 -"
+    "d /opt/loki 0755 10000 10000 -"
+    "d /opt/loki/data 0755 10000 10000 -"
 
     #
     # services

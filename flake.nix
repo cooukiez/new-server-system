@@ -78,6 +78,8 @@
         # system level
         #
         nodeExporter = 9100;
+        promtailExporter = 9080;
+
         glances = 61208;
 
         #
@@ -97,6 +99,7 @@
         # monitor
         grafana = 3005;
         prometheus = 9090;
+        loki = 3100;
 
         # reverse proxy
         caddyHttp = 80;

@@ -60,7 +60,7 @@
         @glances host glances.home.lan
         handle @glances {
           import auth_verify
-          reverse_proxy 127.0.0.1:${toString ports.glances}
+          reverse_proxy host.containers.internal:${toString ports.glances}
         }
 
         @prometheus host prometheus.home.lan
