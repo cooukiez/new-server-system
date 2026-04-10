@@ -225,6 +225,9 @@ let
     };
 
   # imported dashboards
+  adguardDashboard = import ./adguard.nix { inherit mkDashboard mkPanel; };
+  adguardDashboardJson = builtins.toJSON adguardDashboard;
+
   immichDashboard = import ./immich.nix { inherit mkDashboard mkPanel; };
   immichDashboardJson = builtins.toJSON immichDashboard;
 
@@ -232,6 +235,7 @@ let
   # jupyterDashboardJson = builtins.toJSON jupyterDashboard;
 in
 {
+  home.file."containers/grafana/provisioning/dashboards/adguard.json".text = adguardDashboardJson;
   home.file."containers/grafana/provisioning/dashboards/immich.json".text = immichDashboardJson;
   # home.file."containers/grafana/provisioning/dashboards/jupyter.json".text = jupyterDashboardJson;
 }

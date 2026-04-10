@@ -171,7 +171,21 @@ in
   age.secrets.grafana-oauth.file = ../../secrets/grafana-oauth.age;
 
   # grafana provisioning
-  home.file."containers/grafana/provisioning/datasources/prometheus.yaml".text = ''
+
+  home.file."containers/grafana/provisioning/dashboards/dashboards.yaml".text = ''
+    apiVersion: 1
+    providers:
+      - name: 'Default'
+        orgId: 1
+        folder: ""
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /etc/grafana/provisioning/dashboards
+  '';
+  
+  home.file."containers/grafana/provisioning/datasources/datasources.yaml".text = ''
     apiVersion: 1
     datasources:
       - name: Prometheus

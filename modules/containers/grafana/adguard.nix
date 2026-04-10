@@ -10,19 +10,16 @@
   mkPanel,
 }:
 let
-  dashboardName = "Immich Container";
-  appName = "Immich";
-  containerName = "immich";
-  networkRelevantContainer = "immich-server";
-
-  immichServerName = "immich-server";
-  immichMachineLearningName = "immich-ml";
+  dashboardName = "Adguard Container";
+  appName = "Adguardhome";
+  containerName = "adguardhome";
+  networkRelevantContainer = "adguardhome";
 in
 mkDashboard {
   name = dashboardName;
   description = "${appName} container metrics";
 
-  uid = "sdhahwq";
+  uid = "grgqhwe";
 
   editable = false;
   preload = false;
@@ -146,40 +143,14 @@ mkDashboard {
         x = 12;
         y = 0;
         w = 12;
-        h = 8;
+        h = 24;
       };
 
       targets = [
         {
           editorMode = "code";
           expr = ''
-            {syslog_identifier="${immichServerName}"}
-          '';
-          direction = "backward";
-          queryType = "range";
-          refId = "A";
-        }
-      ];
-    })
-
-    (mkPanel {
-      name = "${appName} Machine Learning Logs";
-      id = 5;
-
-      datasourceType = "loki";
-
-      gridPos = {
-        x = 12;
-        y = 8;
-        w = 12;
-        h = 8;
-      };
-
-      targets = [
-        {
-          editorMode = "code";
-          expr = ''
-            {syslog_identifier="${immichMachineLearningName}"}
+            {syslog_identifier="${containerName}"}
           '';
           direction = "backward";
           queryType = "range";
