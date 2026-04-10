@@ -7,6 +7,8 @@
 
 {
   config,
+  pkgs,
+  lib,
   ...
 }:
 {
@@ -30,4 +32,13 @@
         internal.networkConfig.subnets = [ "10.1.1.1/24" ];
       };
     };
+
+  systemd.user.services."podman-user-wait-network-online" = lib.mkForce {
+    Unit.Description = "Dummy podman-user-wait-network-online to prevent quadlet hang";
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.coreutils}/bin/true";
+      RemainAfterExit = true;
+    };
+  };
 }

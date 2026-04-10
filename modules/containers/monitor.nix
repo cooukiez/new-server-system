@@ -51,6 +51,11 @@ let
       provisioning = grafanaProvisioningPath;
     };
 
+    explore.enabled = false;
+    help.enabled = false;
+    dashboards.hide_welcome_config = true;
+    news.news_feed_enabled = false;
+    
     analytics = {
       reporting_enabled = false;
       check_for_updates = false;
@@ -153,6 +158,10 @@ let
   };
 in
 {
+  imports = [
+    ./grafana
+  ];
+
   # grafana
   home.file."containers/grafana/grafana.ini" = {
     source = grafanaSettingsFormat.generate "grafana.ini" grafanaSettings;
@@ -167,11 +176,13 @@ in
     datasources:
       - name: Prometheus
         type: prometheus
+        uid: PBFA97CFB590B2093
         access: proxy
         url: http://prometheus:${toString ports.prometheus}
         isDefault: true
       - name: Loki
         type: loki
+        uid: P8E80F9AEF21F6940
         url: http://loki:${toString ports.loki}
   '';
 

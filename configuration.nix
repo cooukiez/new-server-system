@@ -105,7 +105,7 @@
     plymouth-quit-wait.enable = false;
   };
 
-  systemd.network.wait-online.enable = false;
+  systemd.targets.network-online.wantedBy = [ "multi-user.target" ];
 
   # hostname
   networking = {
