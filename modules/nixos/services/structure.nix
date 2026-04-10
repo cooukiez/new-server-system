@@ -29,6 +29,7 @@
 
     # monitor
     "d /opt/grafana 0755 10000 10000 -"
+    "d /opt/grafana/provisioning 0755 10000 10000 -"
     "d /opt/grafana/data 0755 10000 10000 -"
     "d /opt/prometheus 0755 10000 10000 -"
     "d /opt/prometheus/data 0755 10000 10000 -"

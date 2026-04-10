@@ -221,10 +221,23 @@
     };
   };
 
+  age.identityPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+  age.secrets = {
+    squ-config-key = {
+      file = ./secrets/global-agenix.age;
+      owner = "squ";
+      group = "squ";
+    };
+  };
+
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    extraSpecialArgs = { inherit inputs staticIP; };
+    extraSpecialArgs = { 
+      inherit inputs staticIP;
+
+      squConfigKeyPath = config.age.secrets.squ-config-key.path;
+    };
 
     users.squ =
       {
@@ -232,6 +245,7 @@
         config,
         pkgs,
         staticIP,
+        squConfigKeyPath,
         ...
       }:
       {
@@ -243,7 +257,7 @@
           inputs.sops-nix.homeManagerModules.sops
         ];
 
-        age.identityPaths = [ "/home/squ/.ssh/id_ed25519" ];
+        age.identityPaths = [ squConfigKeyPath ];
         sops.age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
 
         home.stateVersion = "25.11";

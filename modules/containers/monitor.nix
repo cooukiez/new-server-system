@@ -115,6 +115,7 @@ in
   home.file."containers/grafana/root.crt".source = ../../home.lan.crt;
   age.secrets.grafana-oauth.file = ../../secrets/grafana-oauth.age;
 
+  # grafana provisioning
   home.file."containers/grafana/provisioning/datasources/prometheus.yaml".text = ''
     apiVersion: 1
     datasources:
@@ -134,10 +135,15 @@ in
       inherit (config.virtualisation.quadlet) volumes networks pods;
     in
     {
-      networks.monitoring.networkConfig = {
+      networks.monitoring = {
         networkConfig = {
           internal = false;
         };
+      };
+
+      volumes.grafana-provisioning.volumeConfig = {
+        type = "bind";
+        device = "/opt/grafana/provisioning";
       };
 
       volumes.grafana-data.volumeConfig = {
@@ -155,6 +161,11 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            # copy contents of provisioning into opt
+            "${pkgs.coreutils}/bin/cp -rfL ${config.home.homeDirectory}/containers/grafana/provisioning/. /opt/grafana/provisioning/"
+          ];
         };
 
         containerConfig = {
@@ -171,14 +182,14 @@ in
           volumes = [
             # config
             "${config.home.homeDirectory}/containers/grafana/grafana.ini:${grafanaSettingsPath}:ro"
-            "${config.home.homeDirectory}/containers/grafana/provisioning:${grafanaProvisioningPath}:ro"
 
             # secrets
             "${config.age.secrets.grafana-oauth.path}:/run/secrets/OAUTH_SECRET:ro"
             "${config.home.homeDirectory}/containers/grafana/root.crt:${grafanaCertPath}:ro"
 
             # volumes
-            "${volumes.grafana-data.ref}:/var/lib/grafana"
+            "${volumes.grafana-provisioning.ref}:${grafanaProvisioningPath}"
+            "${volumes.grafana-data.ref}:${grafanaDataPath}"
           ];
 
           publishPorts = [
