@@ -13,6 +13,7 @@
 }:
 {
   imports = [
+    ./services/media
     ./services/immich.nix
 
     ./auth.nix

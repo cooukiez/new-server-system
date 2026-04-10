@@ -12,7 +12,8 @@
   ...
 }:
 let
-  mediaPath = "/media/photos";
+  photosPath = "/media/photos";
+  
   dbPath = "/opt/immich/db";
   mlCachePath = "/opt/immich/ml-cache";
 
@@ -40,7 +41,7 @@ in
 
       volumes.immich-media.volumeConfig = {
         type = "bind";
-        device = mediaPath;
+        device = photosPath;
       };
 
       volumes.immich-db.volumeConfig = {

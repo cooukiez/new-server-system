@@ -43,8 +43,21 @@
     "d /opt/immich/db 0755 10000 10000 -"
     "d /opt/immich/ml-cache 0755 10000 10000 -"
 
+    "d /opt/lidarr 0755 10000 10000 -"
+    "d /opt/lidarr/data 0755 10000 10000 -"
+
+    "d /opt/jellyfin 0755 10000 10000 -"
+    "d /opt/jellyfin/data 0755 10000 10000 -"
+    "d /opt/jellyfin/cache 0755 10000 10000 -"
+
+    #
     # media directories
+    #
     "d /media 0755 10000 10000 -"
+    "d /media/download 0755 10000 10000 -"
+    "d /media/download/deenix 0755 10000 10000 -"
+    "d /media/download/slskd 0755 10000 10000 -"
+    "d /media/music 0755 10000 10000 -"
     "d /media/photos 0755 10000 10000 -"
   ];
 }
