@@ -9,38 +9,6 @@
   config,
   ...
 }:
-let
-  ports = {
-    #
-    # core
-    #
-
-    # auth
-    authelia = 9091;
-
-    # database
-    postgres = 5432;
-
-    # dns
-    dns = 53;
-    adguard = 3000;
-
-    # monitor
-    grafana = 3005;
-    prometheus = 9090;
-
-    # reverse proxy
-    caddy_http = 80;
-    caddy_https = 443;
-
-    #
-    # services
-    #
-
-    # immich
-    immich = 2283;
-  };
-in
 {
   imports = [
     ./services/immich.nix
@@ -52,8 +20,6 @@ in
     ./reverse-proxy.nix
     ./users.nix
   ];
-
-  _module.args = { inherit ports; };
 
   virtualisation.quadlet =
     let

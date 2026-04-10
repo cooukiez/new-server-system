@@ -92,6 +92,7 @@ let
   # prometheus settings
   #
   prometheusVersion = "latest";
+  prometheusPodmanExporterVersion = "latest";
   prometheusSettings = {
     global = {
       scrape_interval = "15s";
@@ -102,6 +103,10 @@ let
       {
         job_name = "prometheus";
         static_configs = [ { targets = [ "127.0.0.1:9090" ]; } ];
+      }
+      {
+        job_name = "podman";
+        static_configs = [ { targets = [ "podman-exporter:9882" ]; } ];
       }
     ];
   };
@@ -238,6 +243,34 @@ in
 
             "--web.console.libraries=/usr/share/prometheus/console_libraries"
             "--web.console.templates=/usr/share/prometheus/consoles"
+          ];
+        };
+      };
+
+      containers.podman-exporter = {
+        autoStart = true;
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
+        };
+
+        containerConfig = {
+          image = "quay.io/navidys/prometheus-podman-exporter:${prometheusPodmanExporterVersion}";
+          name = "podman-exporter";
+          networks = [ "monitoring.network" ];
+          userns = "keep-id";
+          
+          # mount squ podman socket
+          volumes = [
+            "/run/user/10000/podman/podman.sock:/run/podman/podman.sock:ro"
+          ];
+
+          environments = {
+            CONTAINER_HOST = "unix:///run/podman/podman.sock";
+          };
+
+          exec = [
+            "--collector.enable-all" 
           ];
         };
       };

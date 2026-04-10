@@ -53,9 +53,19 @@ let
           policy = "bypass";
         }
 
-        # admin
+        # admin (without login prompt)
         {
           domain = "dns.home.lan";
+          policy = "one_factor";
+          subject = [ "group:admins" ];
+        }
+        {
+          domain = "glances.home.lan";
+          policy = "one_factor";
+          subject = [ "group:admins" ];
+        }
+        {
+          domain = "prometheus.home.lan";
           policy = "one_factor";
           subject = [ "group:admins" ];
         }

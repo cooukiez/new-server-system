@@ -15,6 +15,7 @@
   hostname,
   staticIP,
   dnsServers,
+  ports,
   users,
   ...
 }:
@@ -234,7 +235,7 @@
     useGlobalPkgs = true;
     useUserPackages = true;
     extraSpecialArgs = { 
-      inherit inputs staticIP;
+      inherit inputs staticIP ports;
 
       squConfigKeyPath = config.age.secrets.squ-config-key.path;
     };
@@ -245,6 +246,8 @@
         config,
         pkgs,
         staticIP,
+        ports,
+
         squConfigKeyPath,
         ...
       }:

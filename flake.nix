@@ -73,6 +73,43 @@
         "9.9.9.9"
       ];
 
+      ports = {
+        #
+        # system level
+        #
+        nodeExporter = 9100;
+        glances = 61208;
+
+        #
+        # core
+        #
+
+        # auth
+        authelia = 9091;
+
+        # database
+        postgres = 5432;
+
+        # dns
+        dns = 53;
+        adguard = 3000;
+
+        # monitor
+        grafana = 3005;
+        prometheus = 9090;
+
+        # reverse proxy
+        caddyHttp = 80;
+        caddyHttps = 443;
+
+        #
+        # services
+        #
+
+        # immich
+        immich = 2283;
+      };
+
       forAllSystems = nixpkgs.lib.genAttrs systems;
 
       mkNixosConfiguration =
@@ -86,6 +123,7 @@
               hostname
               staticIP
               dnsServers
+              ports
               users
               ;
             nixosModules = "${self}/modules/nixos";

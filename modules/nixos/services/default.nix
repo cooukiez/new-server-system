@@ -14,6 +14,7 @@
 {
   imports = [
     ./certificate.nix
+    ./metrics.nix
     ./structure.nix
   ];
 

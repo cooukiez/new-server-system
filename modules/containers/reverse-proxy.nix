@@ -57,6 +57,18 @@
           reverse_proxy host.containers.internal:${toString ports.grafana}
         }
 
+        @glances host glances.home.lan
+        handle @glances {
+          import auth_verify
+          reverse_proxy 127.0.0.1:${toString ports.glances}
+        }
+
+        @prometheus host prometheus.home.lan
+        handle @prometheus {
+          import auth_verify
+          reverse_proxy host.containers.internal:${toString ports.prometheus}
+        }
+
         handle {
           abort
         }
@@ -107,9 +119,9 @@
           ];
 
           publishPorts = [
-            "${toString ports.caddy_http}:80/tcp"
-            "${toString ports.caddy_https}:443/tcp"
-            "${toString ports.caddy_https}:443/udp"
+            "${toString ports.caddyHttp}:80/tcp"
+            "${toString ports.caddyHttps}:443/tcp"
+            "${toString ports.caddyHttps}:443/udp"
           ];
         };
       };
