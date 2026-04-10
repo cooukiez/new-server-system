@@ -64,6 +64,7 @@ let
           policy = "one_factor";
           subject = [ "group:admins" ];
         }
+
         {
           domain = "prometheus.home.lan";
           policy = "one_factor";

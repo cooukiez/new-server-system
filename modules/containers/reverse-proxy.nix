@@ -68,7 +68,7 @@
           import auth_verify
           reverse_proxy host.containers.internal:${toString ports.prometheus}
         }
-
+        
         handle {
           abort
         }
