@@ -107,6 +107,7 @@
 
         # vpn
         gluetun = 8888;
+        gluetunWebUI = 9888;
 
         #
         # services

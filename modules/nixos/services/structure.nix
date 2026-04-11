@@ -58,6 +58,8 @@
 
     "d /opt/lidarr 0755 10000 10000 -"
     "d /opt/lidarr/data 0755 10000 10000 -"
+    "d /opt/slskd 0755 10000 10000 -"
+    "d /opt/slskd/data 0755 10000 10000 -"
 
     "d /opt/jellyfin 0755 10000 10000 -"
     "d /opt/jellyfin/config 0755 10000 10000 -"

@@ -68,6 +68,11 @@ let
           subject = [ "group:admins" ];
         }
         {
+          domain = "vpn.home.lan";
+          policy = "one_factor";
+          subject = [ "group:admins" ];
+        }
+        {
           domain = "glances.home.lan";
           policy = "one_factor";
           subject = [ "group:admins" ];

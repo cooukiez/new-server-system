@@ -48,14 +48,13 @@ in
   "auth-oidc-key.age".publicKeys = allKeys;
 
   "smtp-pw.age".publicKeys = allKeys;
-
   "ts-auth-key.age".publicKeys = allKeys;
-
   "postgres-pw.age".publicKeys = allKeys;
-
   "grafana-oauth.age".publicKeys = allKeys;
-
   "global-agenix.age".publicKeys = allKeys;
-
   "gluetun-key.age".publicKeys = allKeys;
+
+  "slskd-pass.age".publicKeys = allKeys;
+  "slskd-user.age".publicKeys = allKeys;
+  "slskd-webui.age".publicKeys = allKeys;
 }

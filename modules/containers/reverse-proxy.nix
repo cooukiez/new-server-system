@@ -41,6 +41,18 @@ in
         handle @auth {
           reverse_proxy host.containers.internal:${toString ports.authelia}
         }
+        
+        @dns host dns.home.lan
+        handle @dns {
+          import auth_verify
+          reverse_proxy host.containers.internal:${toString ports.adguard}
+        }
+
+        @vpn host vpn.home.lan
+        handle @vpn {
+          import auth_verify
+          reverse_proxy host.containers.internal:${toString ports.gluetunWebUI}
+        }
 
         @immich host immich.home.lan
         handle @immich {
@@ -58,12 +70,6 @@ in
         handle @lidarr {
           import auth_verify
           reverse_proxy host.containers.internal:${toString ports.lidarr}
-        }
-        
-        @dns host dns.home.lan
-        handle @dns {
-          import auth_verify
-          reverse_proxy host.containers.internal:${toString ports.adguard}
         }
 
         @monitor host monitor.home.lan

@@ -12,8 +12,9 @@
   ...
 }:
 let
-  gluetunVersion = "latest";
   gluetunKey = "169qzBxFa0ET26rkTWa3akmVopysVilS";
+  gluetunVersion = "latest";
+  gluetunWebUIVersion = "latest";
 in
 {
   age.secrets = {
@@ -46,14 +47,14 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/library/caddy:latest";
+          image = "ghcr.io/qdm12/gluetun:${gluetunVersion}";
           name = "gluetun";
           networks = [ "vpn-service-net" ];
           addCapabilities = [
             "NET_ADMIN"
           ];
 
-           environments = {
+          environments = {
             VPN_SERVICE_PROVIDER = "protonvpn";
             VPN_TYPE = "wireguard";
 
@@ -69,15 +70,12 @@ in
 
             WIREGUARD_MTU = "1420";
             WIREGUARD_PERSISTENT_KEEPALIVE_INTERVAL = "25s";
+            WIREGUARD_PRIVATE_KEY_SECRETFILE = "/run/secrets/WIREGUARD_KEY";
 
             FIREWALL = "off";
 
             BORINGPOLL_GLUETUNCOM = "on";
           };
-
-          environmentFiles = [
-            "/run/secrets/WIREGUARD_KEY"
-          ];
 
           volumes = [
             # secrets
@@ -93,6 +91,30 @@ in
 
           publishPorts = [
             "${toString ports.gluetun}:8888/tcp"
+          ];
+        };
+      };
+
+      containers.gluetun-webui = {
+        autoStart = true;
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
+        };
+
+        containerConfig = {
+          image = "docker.io/scuzza/gluetun-webui:${gluetunWebUIVersion}";
+          name = "gluetun-webui";
+          networks = [ "vpn-service-net" ];
+
+          environments = {
+            GLUETUN_CONTROL_URL = "http://gluetun:8888";
+            GLUETUN_API_KEY = gluetunKey;
+            TRUST_PROXY = "true";
+          };
+
+          publishPorts = [
+            "${toString ports.gluetunWebUI}:3000/tcp"
           ];
         };
       };
