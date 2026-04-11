@@ -21,6 +21,8 @@
     ./dns.nix
     ./monitor.nix
     ./reverse-proxy.nix
+    ./vpn.nix
+
     ./users.nix
   ];
 

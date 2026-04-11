@@ -31,6 +31,10 @@
     "d /opt/postgres 0755 10000 10000 -"
     "d /opt/postgres/data 0755 10000 10000 -"
 
+    # vpn
+    "d /opt/gluetun 0755 10000 10000 -"
+    "d /opt/gluetun/data 0755 10000 10000 -"
+
     # monitor
     "d /opt/grafana 0755 10000 10000 -"
     "d /opt/grafana/provisioning 0755 10000 10000 -"

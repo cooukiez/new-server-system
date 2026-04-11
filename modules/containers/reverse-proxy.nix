@@ -11,6 +11,9 @@
   ports,
   ...
 }:
+let
+  caddyVersion = "latest";
+in
 {
   home.file."containers/caddy/Caddyfile" = {
     text = ''
@@ -116,7 +119,7 @@
         };
 
         containerConfig = {
-          image = "docker.io/library/caddy:latest";
+          image = "docker.io/library/caddy:${caddyVersion}";
           name = "caddy";
           addCapabilities = [ "NET_BIND_SERVICE" ];
 

@@ -105,6 +105,9 @@
         caddyHttp = 80;
         caddyHttps = 443;
 
+        # vpn
+        gluetun = 8888;
+
         #
         # services
         #

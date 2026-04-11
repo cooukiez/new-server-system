@@ -56,4 +56,6 @@ in
   "grafana-oauth.age".publicKeys = allKeys;
 
   "global-agenix.age".publicKeys = allKeys;
+
+  "gluetun-key.age".publicKeys = allKeys;
 }
