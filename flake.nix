@@ -118,6 +118,9 @@
         
         # music
         lidarr = 8686;
+        slskdHttp = 5030;
+        slskdHttps = 5031;
+        slskdPeer = 50300;
 
         # immich
         immich = 2283;

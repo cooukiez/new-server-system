@@ -26,6 +26,11 @@
     ./users.nix
   ];
 
+  _module.args = {
+    envPrefix = "${config.xdg.configHome}/containers/systemd/env";
+    envSecretsPrefix = "${config.xdg.configHome}/containers/systemd/secrets";
+  };
+
   virtualisation.quadlet =
     let
       inherit (config.virtualisation.quadlet) volumes networks pods;

@@ -7,7 +7,9 @@
 
 {
   config,
+  pkgs,
   ports,
+  envSecretsPrefix,
   musicPath,
   ...
 }:
@@ -21,8 +23,8 @@ let
   slskdVersion = "latest";
   slskdSettings = {
     directories = {
-      downloads = "/download/slskd";
-      incomplete = "/download/slskd/incomplete";
+      downloads = "/download/finished";
+      incomplete = "/download/incomplete";
     };
 
     shares = {
@@ -32,7 +34,7 @@ let
     web = {
       port = 5030;
       https = {
-        disabled = true;
+        disabled = false;
         port = 5031;
       };
 
@@ -77,11 +79,18 @@ in
     source = slskdSettingsFormat.generate "slskd.yml" slskdSettings;
   };
 
-  age.secrets = {
-    slskd-user.file = ../../../../secrets/slskd-user.age;
-    slskd-pass.file = ../../../../secrets/slskd-pass.age;
-    slskd-webui.file = ../../../../secrets/slskd-webui.age;
-  };
+  age.secrets = 
+    let
+      mkSecret = name: {
+        file = ../../../../secrets/${name}.age;
+        path = "${envSecretsPrefix}/${name}";
+      };
+    in
+    {
+      slskd-user  = mkSecret "slskd-user";
+      slskd-pass  = mkSecret "slskd-pass";
+      slskd-webui = mkSecret "slskd-webui";
+    };
 
   virtualisation.quadlet =
     let
@@ -96,6 +105,11 @@ in
       volumes.slskd-data.volumeConfig = {
         type = "bind";
         device = "/opt/slskd/data";
+      };
+
+      volumes.slskd-download.volumeConfig = {
+        type = "bind";
+        device = "/media/download/slskd";
       };
 
       containers.lidarr = {
@@ -140,12 +154,13 @@ in
         containerConfig = {
           image = "docker.io/slskd/slskd:${slskdVersion}";
           name = "slskd";
+          # networked through gluetun
           networks = [ "container:gluetun" ];
 
           environmentFiles = [
-            config.age.secrets.slskd-user.path
-            config.age.secrets.slskd-pass.path
-            config.age.secrets.slskd-webui.path
+            "secrets/slskd-user"
+            "secrets/slskd-pass"
+            "secrets/slskd-webui"
           ];
 
           environments = {
@@ -159,7 +174,7 @@ in
             # volumes
             "${volumes.slskd-data.ref}:/app"
 
-            "${volumes.media-download.ref}:/download"
+            "${volumes.slskd-download.ref}:/download"
             "${volumes.media-music.ref}:/music:ro"
           ];
         };

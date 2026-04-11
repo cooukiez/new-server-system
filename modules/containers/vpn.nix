@@ -91,6 +91,11 @@ in
 
           publishPorts = [
             "${toString ports.gluetun}:8888/tcp"
+
+            # slskd
+            "${toString ports.slskdHttp}:5030/tcp"
+            "${toString ports.slskdHttps}:5031/tcp"
+            "${toString ports.slskdPeer}:50300/tcp"
           ];
         };
       };

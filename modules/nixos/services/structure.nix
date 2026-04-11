@@ -74,6 +74,9 @@
     "d /media/download 0755 10000 10000 -"
     "d /media/download/deenix 0755 10000 10000 -"
     "d /media/download/slskd 0755 10000 10000 -"
+    "d /media/download/slskd/finished 0755 10000 10000 -"
+    "d /media/download/slskd/incomplete 0755 10000 10000 -"
+
     "d /media/music 0755 10000 10000 -"
     "d /media/photos 0755 10000 10000 -"
   ];

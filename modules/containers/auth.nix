@@ -60,6 +60,10 @@ let
           domain = "lidarr.home.lan";
           policy = "bypass";
         }
+        {
+          domain = "slskd.home.lan";
+          policy = "bypass";
+        }
 
         # admin (without login prompt)
         {
