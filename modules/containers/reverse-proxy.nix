@@ -44,6 +44,12 @@
           import auth_verify
           reverse_proxy host.containers.internal:${toString ports.immich}
         }
+
+        @jellyfin host jellyfin.home.lan
+        handle @jellyfin {
+          import auth_verify
+          reverse_proxy host.containers.internal:${toString ports.jellyfin}
+        }
         
         @dns host dns.home.lan
         handle @dns {
@@ -127,4 +133,3 @@
       };
     };
 }
->

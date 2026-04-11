@@ -17,17 +17,23 @@ let
   lokiSettingsFormat = pkgs.formats.yaml { };
 
   # grafana paths inside container
-  grafanaSettingsPath = "/etc/grafana/grafana.ini";
-  grafanaCertPath = "/etc/grafana/root.crt";
-  grafanaProvisioningPath = "/etc/grafana/provisioning";
-  grafanaDataPath = "/var/lib/grafana";
+  grafanaSettingsPath = "/grafana/grafana.ini";
+  grafanaCertPath = "/grafana/root.crt";
+  grafanaProvisioningPath = "/grafana/provisioning";
+
+  grafanaDataPath = "/grafana/data";
+  grafanaHomePath = "/grafana/home";
+  grafanaPluginsPath = "/grafana/plugins";
+  grafanaLogPath = "/grafana/log";
 
   # prometheus paths inside container
-  prometheusConfigPath = "/etc/prometheus/prometheus.yml";
-  prometheusDataPath = "/prometheus";
+  prometheusConfigPath = "/prometheus/prometheus.yml";
+  prometheusDataPath = "/prometheus/data";
 
   # loki paths inside container
-  lokiConfigPath = "/etc/loki/local-config.yaml";
+  lokiConfigPath = "/loki/local-config.yaml";
+  lokiChunksPath = "/loki/chunks";
+  lokiRulesPath = "/loki/rules";
 
   #
   # grafana settings
@@ -138,8 +144,8 @@ let
       instance_addr = "127.0.0.1";
       path_prefix = "/loki";
       storage.filesystem = {
-        chunks_directory = "/loki/chunks";
-        rules_directory = "/loki/rules";
+        chunks_directory = lokiChunksPath;
+        rules_directory = lokiRulesPath;
       };
 
       replication_factor = 1;
@@ -182,7 +188,7 @@ in
         disableDeletion: false
         editable: true
         options:
-          path: /etc/grafana/provisioning/dashboards
+          path: ${grafanaProvisioningPath}/dashboards
   '';
   
   home.file."containers/grafana/provisioning/datasources/datasources.yaml".text = ''
@@ -227,6 +233,21 @@ in
       volumes.grafana-data.volumeConfig = {
         type = "bind";
         device = "/opt/grafana/data";
+      };
+
+      volumes.grafana-home.volumeConfig = {
+        type = "bind";
+        device = "/opt/grafana/home";
+      };
+
+      volumes.grafana-plugins.volumeConfig = {
+        type = "bind";
+        device = "/opt/grafana/plugins";
+      };
+
+      volumes.grafana-logs.volumeConfig = {
+        type = "bind";
+        device = "/opt/grafana/logs";
       };
 
       volumes.prometheus-data.volumeConfig = {
@@ -286,6 +307,9 @@ in
             GF_PATHS_PROVISIONING = grafanaProvisioningPath;
 
             GF_PATHS_DATA = grafanaDataPath;
+            GF_PATHS_HOME = grafanaHomePath;
+            GF_PATHS_PLUGINS = grafanaPluginsPath;
+            GF_PATHS_LOGS = grafanaLogsPath;
           };
         };
       };

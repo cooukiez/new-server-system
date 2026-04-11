@@ -144,7 +144,8 @@
         80 # allow http for redirect
         443 # allow https
 
-        # 2283 # for immich
+        2283 # for immich
+        8096 # for jellyfin
       ];
 
       allowedUDPPorts = [

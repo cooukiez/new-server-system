@@ -109,6 +109,9 @@
         # services
         #
 
+        # jellyfin
+        jellyfin = 8096;
+
         # immich
         immich = 2283;
       };
