@@ -55,7 +55,5 @@ in
 
   "grafana-oauth.age".publicKeys = allKeys;
 
-  "gh-token.age".publicKeys = allKeys;
-
   "global-agenix.age".publicKeys = allKeys;
 }

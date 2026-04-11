@@ -36,7 +36,6 @@
     "d /opt/grafana/provisioning 0755 10000 10000 -"
 
     "d /opt/grafana/data 0755 10000 10000 -"
-    "d /opt/grafana/home 0755 10000 10000 -"
     "d /opt/grafana/plugins 0755 10000 10000 -"
     "d /opt/grafana/log 0755 10000 10000 -"
 

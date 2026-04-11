@@ -56,6 +56,10 @@ let
           domain = "jellyfin.home.lan";
           policy = "bypass";
         }
+        {
+          domain = "lidarr.home.lan";
+          policy = "bypass";
+        }
 
         # admin (without login prompt)
         {
@@ -142,6 +146,7 @@ let
             userinfo_signed_response_alg = "none";
             token_endpoint_auth_method = "client_secret_post";
           }
+          /*
           {
             client_id = "jellyfin";
             client_name = "Jellyfin";
@@ -170,6 +175,7 @@ let
             userinfo_signed_response_alg = "none";
             token_endpoint_auth_method = "client_secret_post";
           }
+          */
           {
             client_id = "grafana";
             client_name = "Grafana";

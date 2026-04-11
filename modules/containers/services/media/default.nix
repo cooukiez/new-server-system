@@ -11,6 +11,7 @@
   ...
 }:
 let
+  downloadPath = "/media/download";
   musicPath = "/media/music";
 
   jellyfinVersion = "latest";
@@ -37,11 +38,18 @@ in
         };
       };
 
+      # general volumes
+      volumes.media-download.volumeConfig = {
+        type = "bind";
+        device = musicPath;
+      };
+
       volumes.media-music.volumeConfig = {
         type = "bind";
         device = musicPath;
       };
 
+      # jellyfin volumes
       volumes.jellyfin-config.volumeConfig = {
         type = "bind";
         device = "/opt/jellyfin/config";

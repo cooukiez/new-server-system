@@ -109,8 +109,11 @@
         # services
         #
 
-        # jellyfin
+        # media
         jellyfin = 8096;
+        
+        # music
+        lidarr = 8686;
 
         # immich
         immich = 2283;

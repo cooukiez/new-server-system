@@ -22,7 +22,6 @@ let
   grafanaProvisioningPath = "/grafana/provisioning";
 
   grafanaDataPath = "/grafana/data";
-  grafanaHomePath = "/grafana/home";
   grafanaPluginsPath = "/grafana/plugins";
   grafanaLogPath = "/grafana/log";
 
@@ -235,19 +234,14 @@ in
         device = "/opt/grafana/data";
       };
 
-      volumes.grafana-home.volumeConfig = {
-        type = "bind";
-        device = "/opt/grafana/home";
-      };
-
       volumes.grafana-plugins.volumeConfig = {
         type = "bind";
         device = "/opt/grafana/plugins";
       };
 
-      volumes.grafana-logs.volumeConfig = {
+      volumes.grafana-log.volumeConfig = {
         type = "bind";
-        device = "/opt/grafana/logs";
+        device = "/opt/grafana/log";
       };
 
       volumes.prometheus-data.volumeConfig = {
@@ -293,7 +287,10 @@ in
 
             # volumes
             "${volumes.grafana-provisioning.ref}:${grafanaProvisioningPath}"
+
             "${volumes.grafana-data.ref}:${grafanaDataPath}"
+            "${volumes.grafana-plugins.ref}:${grafanaPluginsPath}"
+            "${volumes.grafana-log.ref}:${grafanaLogPath}"
           ];
 
           publishPorts = [
@@ -307,9 +304,8 @@ in
             GF_PATHS_PROVISIONING = grafanaProvisioningPath;
 
             GF_PATHS_DATA = grafanaDataPath;
-            GF_PATHS_HOME = grafanaHomePath;
             GF_PATHS_PLUGINS = grafanaPluginsPath;
-            GF_PATHS_LOGS = grafanaLogsPath;
+            GF_PATHS_LOGS = grafanaLogPath;
           };
         };
       };

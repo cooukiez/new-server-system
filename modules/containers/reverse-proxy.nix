@@ -50,6 +50,12 @@
           import auth_verify
           reverse_proxy host.containers.internal:${toString ports.jellyfin}
         }
+
+        @lidarr host lidarr.home.lan
+        handle @lidarr {
+          import auth_verify
+          reverse_proxy host.containers.internal:${toString ports.lidarr}
+        }
         
         @dns host dns.home.lan
         handle @dns {
