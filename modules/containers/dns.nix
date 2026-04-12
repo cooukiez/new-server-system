@@ -103,6 +103,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
+            # adguardhome requires read and write
             "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/adguardhome/AdGuardHome.yaml /opt/adguardhome/conf/AdGuardHome.yaml"
             "${pkgs.coreutils}/bin/chmod 644 /opt/adguardhome/conf/AdGuardHome.yaml"
           ];

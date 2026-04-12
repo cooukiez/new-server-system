@@ -13,6 +13,7 @@
 }:
 let
   gluetunKey = "169qzBxFa0ET26rkTWa3akmVopysVilS";
+
   gluetunVersion = "latest";
   gluetunWebUIVersion = "latest";
 in
@@ -50,6 +51,7 @@ in
           image = "ghcr.io/qdm12/gluetun:${gluetunVersion}";
           name = "gluetun";
           networks = [ "vpn-service-net" ];
+
           addCapabilities = [
             "NET_ADMIN"
           ];
@@ -61,7 +63,6 @@ in
             SERVER_COUNTRIES = "Netherlands";
 
             FREE_ONLY = "on";
-            # PORT_FORWARD_ONLY = "on";
 
             HTTP_CONTROL_SERVER_ADDRESS = ":8888";
             HTTP_CONTROL_SERVER_AUTH_DEFAULT_ROLE = "{\"auth\":\"apikey\",\"apikey\":\"${gluetunKey}\"}";
@@ -114,6 +115,7 @@ in
           environments = {
             GLUETUN_CONTROL_URL = "http://gluetun:8888";
             GLUETUN_API_KEY = gluetunKey;
+            
             TRUST_PROXY = "true";
           };
 

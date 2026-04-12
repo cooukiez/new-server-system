@@ -40,20 +40,24 @@ let
   ];
 in
 {
-  "auth-jwt.age".publicKeys = allKeys;
-  "auth-session.age".publicKeys = allKeys;
-  "auth-storage-key.age".publicKeys = allKeys;
+  # auth
+  "auth/jwt-key.age".publicKeys = allKeys;
+  "auth/session.age".publicKeys = allKeys;
+  "auth/storage-key.age".publicKeys = allKeys;
+  "auth/oidc-hmac.age".publicKeys = allKeys;
+  "auth/oidc-jwk.age".publicKeys = allKeys;
+  "auth/mail-smtp.age".publicKeys = allKeys;
 
-  "auth-oidc-hmac.age".publicKeys = allKeys;
-  "auth-oidc-key.age".publicKeys = allKeys;
+  # auth clients
+  "auth/clients/grafana-oauth.age".publicKeys = allKeys;
 
-  "smtp-pw.age".publicKeys = allKeys;
-  "ts-auth-key.age".publicKeys = allKeys;
-  "postgres-pw.age".publicKeys = allKeys;
-  "grafana-oauth.age".publicKeys = allKeys;
+  # general
   "global-agenix.age".publicKeys = allKeys;
   "gluetun-key.age".publicKeys = allKeys;
+  "postgres-pw.age".publicKeys = allKeys;
+  "tailscale-key.age".publicKeys = allKeys;
 
+  # slskd
   "slskd-pass.age".publicKeys = allKeys;
   "slskd-user.age".publicKeys = allKeys;
   "slskd-webui.age".publicKeys = allKeys;

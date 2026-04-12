@@ -97,17 +97,20 @@ let
 
   # secret mappings
   secretMap = {
-    auth-jwt = "auth-jwt";
-    auth-session = "auth-session";
+    auth-jwt-key = "auth/jwt-key";
+    auth-session = "auth/session";
+
     auth-storage-pw = "postgres-pw";
-    auth-storage-key = "auth-storage-key";
-    auth-oidc-hmac = "auth-oidc-hmac";
-    auth-oidc-jwk = "auth-oidc-key";
-    auth-mail-smtp = "smtp-pw";
+    auth-storage-key = "auth/storage-key";
+
+    auth-oidc-hmac = "auth/oidc-hmac";
+    auth-oidc-jwk = "auth/oidc-jwk";
+    
+    auth-mail-smtp = "auth/mail-smtp";
   };
 
   secretMounts = {
-    auth-jwt = "AUTH_JWT_KEY";
+    auth-jwt-key = "AUTH_JWT_KEY";
     auth-session = "AUTH_SESSION_SECRET";
     auth-storage-pw = "AUTH_STORAGE_PASSWORD";
     auth-storage-key = "AUTH_STORAGE_KEY";
@@ -117,7 +120,7 @@ let
   };
 
   envMapping = {
-    auth-jwt = "AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE";
+    auth-jwt-key = "AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE";
     auth-session = "AUTHELIA_SESSION_SECRET_FILE";
     auth-storage-pw = "AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE";
     auth-storage-key = "AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE";
@@ -135,7 +138,7 @@ in
   };
 
   age.secrets = builtins.mapAttrs (_: name: {
-    file = ../../secrets/auth/${name}.age;
+    file = ../../secrets/${name}.age;
   }) secretMap;
 
   virtualisation.quadlet =

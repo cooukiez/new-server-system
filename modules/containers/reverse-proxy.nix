@@ -188,7 +188,8 @@ in
             "${config.home.homeDirectory}/containers/caddy/Caddyfile:/etc/caddy/Caddyfile:ro"
 
             # volumes
-            "${volumes.caddy-certs.ref}:/certs"
+            "${volumes.caddy-certs.ref}:/certs:ro"
+            
             "${volumes.caddy-config.ref}:/config"
             "${volumes.caddy-data.ref}:/data"
           ];

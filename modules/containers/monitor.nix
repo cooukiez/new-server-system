@@ -266,11 +266,11 @@ in
             "${config.age.secrets.auth-grafana-oidc.path}:/run/secrets/AUTH_GRAFANA_OIDC:ro"
 
             # certs
-            "${volumes.caddy-certs.ref}:/certs"
+            "${volumes.caddy-certs.ref}:/certs:ro"
           ]
           ++ (map (n: "${volumes."grafana-${n}".ref}:${grafanaPaths.${n}}") [
             "provisioning"
-            
+
             "data"
             "plugins"
             "log"
