@@ -89,9 +89,9 @@ in
       };
     in
     {
-      slskd-user = mkSecret "slskd-user";
-      slskd-pass = mkSecret "slskd-pass";
-      slskd-webui = mkSecret "slskd-webui";
+      slskd-user = mkSecret "slskd/user";
+      slskd-pass = mkSecret "slskd/password";
+      slskd-webui = mkSecret "slskd/webui-pw";
     };
 
   virtualisation.quadlet =

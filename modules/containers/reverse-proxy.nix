@@ -30,6 +30,11 @@ let
       group = "admins";
     };
 
+    ldap = {
+      port = ports.lldapWeb;
+      policy = "bypass";
+    };
+
     glances = {
       port = ports.glances;
       policy = "one_factor";
@@ -189,7 +194,7 @@ in
 
             # volumes
             "${volumes.caddy-certs.ref}:/certs:ro"
-            
+
             "${volumes.caddy-config.ref}:/config"
             "${volumes.caddy-data.ref}:/data"
           ];

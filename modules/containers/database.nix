@@ -25,6 +25,17 @@
     '';
   };
 
+  home.file."containers/postgres/lldap-init.sql" = {
+    text = ''
+      CREATE USER lldap;
+      CREATE DATABASE lldap;
+      GRANT ALL PRIVILEGES ON DATABASE lldap TO admin;
+
+      \c lldap
+      GRANT ALL ON SCHEMA public TO lldap;
+    '';
+  };
+
   virtualisation.quadlet =
     let
       inherit (config.virtualisation.quadlet) volumes networks pods;
@@ -58,6 +69,7 @@
             "${volumes.postgres-data.ref}:/var/lib/postgresql"
 
             "${config.home.homeDirectory}/containers/postgres/authelia-init.sql:/docker-entrypoint-initdb.d/authelia-init.sql:ro"
+            "${config.home.homeDirectory}/containers/postgres/lldap-init.sql:/docker-entrypoint-initdb.d/lldap-init.sql:ro"
           ];
 
           publishPorts = [

@@ -115,7 +115,7 @@ in
           environments = {
             GLUETUN_CONTROL_URL = "http://gluetun:8888";
             GLUETUN_API_KEY = gluetunKey;
-            
+
             TRUST_PROXY = "true";
           };
 

@@ -98,7 +98,7 @@ let
 
   # secret mappings
   secretMap = {
-    auth-jwt-key = "auth/jwt-key";
+    auth-jwt = "auth/jwt-secret";
     auth-session = "auth/session";
 
     auth-storage-pw = "postgres-pw";
@@ -111,7 +111,7 @@ let
   };
 
   secretMounts = {
-    auth-jwt-key = "AUTH_JWT_KEY";
+    auth-jwt = "AUTH_JWT_SECRET";
     auth-session = "AUTH_SESSION_SECRET";
     auth-storage-pw = "AUTH_STORAGE_PASSWORD";
     auth-storage-key = "AUTH_STORAGE_KEY";
@@ -121,7 +121,7 @@ let
   };
 
   envMapping = {
-    auth-jwt-key = "AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE";
+    auth-jwt = "AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE";
     auth-session = "AUTHELIA_SESSION_SECRET_FILE";
     auth-storage-pw = "AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE";
     auth-storage-key = "AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE";

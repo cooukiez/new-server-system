@@ -16,6 +16,8 @@
     # auth
     "d /opt/authelia 0755 10000 10000 -"
     "d /opt/authelia/config 0755 10000 10000 -"
+    "d /opt/lldap 0755 10000 10000 -"
+    "d /opt/lldap/data 0755 10000 10000 -"
 
     # dns
     "d /opt/adguardhome 0755 10000 10000 -"
