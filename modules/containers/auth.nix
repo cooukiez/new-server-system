@@ -8,6 +8,7 @@
 {
   config,
   pkgs,
+  lib,
   ports,
   autheliaRules,
   ...
@@ -105,7 +106,7 @@ let
 
     auth-oidc-hmac = "auth/oidc-hmac";
     auth-oidc-jwk = "auth/oidc-jwk";
-    
+
     auth-mail-smtp = "auth/mail-smtp";
   };
 
@@ -130,7 +131,7 @@ let
 in
 {
   imports = [
-    ./auth/user.nix
+    ./auth/users.nix
   ];
 
   home.file."containers/authelia/configuration.yml" = {
