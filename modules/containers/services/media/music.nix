@@ -75,9 +75,6 @@ let
       };
     };
   };
-
-  # deemix settings
-  deemixVersion = "latest";
 in
 {
   home.file."containers/slskd/slskd.yml" = {
@@ -115,16 +112,6 @@ in
       volumes.slskd-download.volumeConfig = {
         type = "bind";
         device = "/media/download/slskd";
-      };
-
-      volumes.deemix-data.volumeConfig = {
-        type = "bind";
-        device = "/opt/deemix/data";
-      };
-
-      volumes.deemix-download.volumeConfig = {
-        type = "bind";
-        device = "/media/download/deemix";
       };
 
       containers.lidarr = {
