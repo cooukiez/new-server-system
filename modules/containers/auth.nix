@@ -87,6 +87,12 @@ let
           policy = "one_factor";
           subject = [ "group:admins" ];
         }
+
+        {
+          domain = "deemix.home.lan";
+          policy = "one_factor";
+          subject = [ "group:admins" ];
+        }
       ];
     };
 

@@ -78,6 +78,12 @@ in
           reverse_proxy host.containers.internal:${toString ports.slskdHttp}
         }
 
+        @deemix host deemix.home.lan
+        handle @deemix {
+          import auth_verify
+          reverse_proxy host.containers.internal:${toString ports.deemix}
+        }
+
         @monitor host monitor.home.lan
         handle @monitor {
           import auth_verify

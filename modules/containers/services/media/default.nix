@@ -41,7 +41,7 @@ in
       # general volumes
       volumes.media-download.volumeConfig = {
         type = "bind";
-        device = musicPath;
+        device = downloadPath;
       };
 
       volumes.media-music.volumeConfig = {

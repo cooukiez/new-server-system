@@ -60,6 +60,8 @@
     "d /opt/lidarr/data 0755 10000 10000 -"
     "d /opt/slskd 0755 10000 10000 -"
     "d /opt/slskd/data 0755 10000 10000 -"
+    "d /opt/deemix 0755 10000 10000 -"
+    "d /opt/deemix/data 0755 10000 10000 -"
 
     "d /opt/jellyfin 0755 10000 10000 -"
     "d /opt/jellyfin/config 0755 10000 10000 -"
@@ -72,10 +74,11 @@
     #
     "d /media 0755 10000 10000 -"
     "d /media/download 0755 10000 10000 -"
-    "d /media/download/deenix 0755 10000 10000 -"
     "d /media/download/slskd 0755 10000 10000 -"
     "d /media/download/slskd/finished 0755 10000 10000 -"
     "d /media/download/slskd/incomplete 0755 10000 10000 -"
+    "d /media/download/deemix 0755 10000 10000 -"
+    "d /media/download/deezer 0755 10000 10000 -"
 
     "d /media/music 0755 10000 10000 -"
     "d /media/photos 0755 10000 10000 -"
