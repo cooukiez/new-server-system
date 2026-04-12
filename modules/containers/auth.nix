@@ -162,7 +162,7 @@ in
             "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/configuration.yml /opt/authelia/config/configuration.yml"
             "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/users.yml /opt/authelia/config/users.yml"
 
-            "${pkgs.yq-go}/bin/yq -i '.identity_providers.oidc.jwks[0].key = load_str(\"${config.age.secrets.auth-oidc-key.path}\")' /opt/authelia/config/configuration.yml"
+            "${pkgs.yq-go}/bin/yq -i '.identity_providers.oidc.jwks[0].key = load_str(\"${config.age.secrets.auth-oidc-jwk.path}\")' /opt/authelia/config/configuration.yml"
 
             "${pkgs.coreutils}/bin/chmod 644 /opt/authelia/config/configuration.yml"
             "${pkgs.coreutils}/bin/chmod 644 /opt/authelia/config/users.yml"
@@ -174,7 +174,7 @@ in
           name = "authelia";
 
           volumes =
-            (builtins.mapAttrsToList (
+            (lib.mapAttrsToList (
               name: mount: "${config.age.secrets.${name}.path}:/run/secrets/${mount}"
             ) secretMounts)
             ++ [
