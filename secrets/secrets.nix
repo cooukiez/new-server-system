@@ -63,7 +63,7 @@ in
   "tailscale-key.age".publicKeys = allKeys;
 
   # slskd
-  "slskd/pass.age".publicKeys = allKeys;
+  "slskd/password.age".publicKeys = allKeys;
   "slskd/user.age".publicKeys = allKeys;
-  "slskd/webui.age".publicKeys = allKeys;
+  "slskd/webui-pw.age".publicKeys = allKeys;
 }
