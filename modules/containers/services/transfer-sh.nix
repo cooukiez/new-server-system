@@ -37,7 +37,6 @@ in
           name = "transfer-sh";
 
           exec = [
-            "--data-pagination" "10"
             "--provider" "local"
             "--basedir" "/data"
           ];

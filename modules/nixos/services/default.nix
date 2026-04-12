@@ -39,6 +39,31 @@
     };
   };
 
+  services.samba = {
+    enable = true;
+    openFirewall = true;
+    settings = {
+      global = {
+        "workgroup" = "WORKGROUP";
+        "server string" = "smbnix";
+        "netbios name" = "smbnix";
+        "security" = "user";
+
+        "guest account" = "nobody";
+        "map to guest" = "bad user";
+      };
+
+      "root-share" = {
+        "path" = "/";
+        "browseable" = "no";
+        "read only" = "no";
+        "guest ok" = "no";
+        "valid users" = "admin";
+        "force user" = "admin";
+      };
+    };
+  };
+
   services.tailscale = {
     enable = true;
     useRoutingFeatures = "both";

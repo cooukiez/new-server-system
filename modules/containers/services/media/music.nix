@@ -16,11 +16,11 @@
 let
   slskdSettingsFormat = pkgs.formats.yaml { };
 
-  # lidarr settings
   lidarrVersion = "nightly";
+  lidarrListsNginxVersion = "alpine";
+  slskdVersion = "latest";
 
   # slskd settings
-  slskdVersion = "latest";
   slskdLidarrKey = "C2h1M5wh5iNUWNLYexHuTKj5s2mu29Xk";
 
   slskdSettings = {
@@ -81,6 +81,24 @@ in
     source = slskdSettingsFormat.generate "slskd.yml" slskdSettings;
   };
 
+  home.file."containers/lidarr/lidarr-lists.conf" = {
+    text = ''
+      server {
+        listen 80;
+        server_name localhost;
+
+        location / {
+          root /lists;
+          autoindex on;
+          autoindex_exact_size off;
+          autoindex_localtime on;
+          default_type application/json;
+        }
+      }
+    '';
+  };
+
+
   age.secrets =
     let
       mkSecret = name: {
@@ -102,6 +120,11 @@ in
       volumes.lidarr-data.volumeConfig = {
         type = "bind";
         device = "/opt/lidarr/data";
+      };
+
+      volumes.lidarr-lists.volumeConfig = {
+        type = "bind";
+        device = "/opt/lidarr/lists";
       };
 
       volumes.slskd-data.volumeConfig = {
@@ -143,6 +166,30 @@ in
 
           publishPorts = [
             "${toString ports.lidarr}:8686/tcp"
+          ];
+        };
+      };
+
+      containers.lidarr-lists = {
+        autoStart = true;
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
+        };
+
+        containerConfig = {
+          image = "docker.io/nginx:${lidarrListsNginxVersion}";
+          name = "lidarr-lists";
+          networks = [ "media-net" ];
+
+          volumes = [
+            "${config.home.homeDirectory}/containers/lidarr/lidarr-lists.conf:/etc/nginx/conf.d/default.conf:ro"
+
+            "${volumes.lidarr-lists.ref}:/lists:ro"
+          ];
+
+          publishPorts = [
+            "${toString ports.lidarrLists}:80/tcp"
           ];
         };
       };

@@ -71,6 +71,11 @@ let
       policy = "bypass";
     };
 
+    ll = {
+      port = ports.lidarrLists;
+      policy = "bypass";
+    };
+
     slskd = {
       port = ports.slskdHttp;
       policy = "bypass";
