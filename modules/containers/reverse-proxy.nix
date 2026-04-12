@@ -78,12 +78,6 @@ in
           reverse_proxy host.containers.internal:${toString ports.slskdHttp}
         }
 
-        @deemix host deemix.home.lan
-        handle @deemix {
-          import auth_verify
-          reverse_proxy host.containers.internal:${toString ports.deemix}
-        }
-
         @monitor host monitor.home.lan
         handle @monitor {
           import auth_verify
@@ -106,6 +100,12 @@ in
         handle @vnstat {
           import auth_verify
           reverse_proxy host.containers.internal:${toString ports.vnstat}
+        }
+
+        @torrent host torrent.home.lan
+        handle @torrent {
+          import auth_verify
+          reverse_proxy host.containers.internal:${toString ports.qBittorrent}
         }
         
         handle {

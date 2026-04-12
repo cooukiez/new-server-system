@@ -201,41 +201,5 @@ in
           ];
         };
       };
-
-      /*
-      containers.deemix = {
-        autoStart = true;
-        serviceConfig = {
-          Restart = "always";
-          RestartSec = "10";
-        };
-
-        containerConfig = {
-          image = "ghcr.io/bambanah/deemix:${deemixVersion}";
-          name = "deemix";
-          networks = [ "media-net"];
-          userns = "keep-id:uid=10000,gid=10000";
-
-          environments = {
-            DEEMIX_SINGLE_USER = "true";
-
-            DEEMIX_SERVER_PORT = "6595";
-            DEEMIX_HOST = "0.0.0.0";
-
-            DEEMIX_DATA_DIR = "/config";
-            DEEMIX_MUSIC_DIR = "/downloads";
-          };
-
-          volumes = [
-            "${volumes.deemix-data.ref}:/config:Z"
-            "${volumes.deemix-download.ref}:/download:Z"
-          ];
-
-          publishPorts = [
-            "${toString ports.deemix}:6595/tcp"
-          ];
-        };
-      };
-      */
     };
 }

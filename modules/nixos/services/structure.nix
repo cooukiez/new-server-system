@@ -82,7 +82,6 @@
     "d /media/download/slskd/finished 0755 10000 10000 -"
     "d /media/download/slskd/incomplete 0755 10000 10000 -"
 
-    "d /media/download/deemix 0755 10000 10000 -"
     "d /media/download/deezer 0755 10000 10000 -"
 
     "d /media/download/qbittorrent 0755 10000 10000 -"

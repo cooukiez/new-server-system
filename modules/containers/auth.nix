@@ -95,7 +95,7 @@ let
         }
 
         {
-          domain = "deemix.home.lan";
+          domain = "torrent.home.lan";
           policy = "one_factor";
           subject = [ "group:admins" ];
         }

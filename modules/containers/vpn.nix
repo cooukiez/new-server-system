@@ -91,6 +91,10 @@ in
 
           publishPorts = [
             "${toString ports.gluetun}:8888/tcp"
+
+            # qbittorrent
+            "${toString ports.qBittorrent}:8080/tcp"
+            "${toString ports.qBittorrentTorrenting}:6881/tcp"
           ];
         };
       };

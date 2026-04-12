@@ -128,6 +128,10 @@
 
         # vnstat
         vnstat = 5010;
+
+        # qbittorrent
+        qBittorrent = 6880;
+        qBittorrentTorrenting = 6881;
       };
 
       forAllSystems = nixpkgs.lib.genAttrs systems;

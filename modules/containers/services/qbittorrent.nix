@@ -43,10 +43,9 @@ in
         containerConfig = {
           image = "lscr.io/linuxserver/qbittorrent:${qBittorrentVersion}";
           name = "qbittorrent";
-          userns = "keep-id:uid=10000,gid=10000";
-
+          
           # networking through gluetun
-          network = "container:gluetun";
+          networks = [ "container:gluetun" ];
 
           environments = {
             PUID = "10000";
