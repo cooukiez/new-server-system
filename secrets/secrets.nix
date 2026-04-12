@@ -41,12 +41,17 @@ let
 in
 {
   # auth
-  "auth/jwt-key.age".publicKeys = allKeys;
+  "auth/jwt-secret.age".publicKeys = allKeys;
   "auth/session.age".publicKeys = allKeys;
   "auth/storage-key.age".publicKeys = allKeys;
   "auth/oidc-hmac.age".publicKeys = allKeys;
   "auth/oidc-jwk.age".publicKeys = allKeys;
   "auth/mail-smtp.age".publicKeys = allKeys;
+
+  # ldap
+  "ldap/jwt-secret.age".publicKeys = allKeys;
+  "ldap/key-seed.age".publicKeys = allKeys;
+  "ldap/admin-pass.age".publicKeys = allKeys;
 
   # auth clients
   "auth/clients/grafana-oauth.age".publicKeys = allKeys;
@@ -58,7 +63,7 @@ in
   "tailscale-key.age".publicKeys = allKeys;
 
   # slskd
-  "slskd-pass.age".publicKeys = allKeys;
-  "slskd-user.age".publicKeys = allKeys;
-  "slskd-webui.age".publicKeys = allKeys;
+  "slskd/pass.age".publicKeys = allKeys;
+  "slskd/user.age".publicKeys = allKeys;
+  "slskd/webui.age".publicKeys = allKeys;
 }
