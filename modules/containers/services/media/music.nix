@@ -202,6 +202,7 @@ in
         };
       };
 
+      /*
       containers.deemix = {
         autoStart = true;
         serviceConfig = {
@@ -227,7 +228,7 @@ in
 
           volumes = [
             "${volumes.deemix-data.ref}:/config:Z"
-            "${volumes.deemix-download.ref}:/downloads:Z"
+            "${volumes.deemix-download.ref}:/download:Z"
           ];
 
           publishPorts = [
@@ -235,5 +236,6 @@ in
           ];
         };
       };
+      */
     };
 }

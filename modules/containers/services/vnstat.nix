@@ -1,0 +1,47 @@
+{
+  config,
+  ports,
+  ...
+}:
+let
+  vnstatDashboardVersion = "latest";
+in
+{
+  virtualisation.quadlet =
+    let
+      inherit (config.virtualisation.quadlet) volumes networks pods;
+    in
+    {
+      # vnstat database volume
+      volumes.vnstat-db.volumeConfig = {
+        type = "bind";
+        device = "/var/lib/vnstat";
+      };
+
+      containers.vnstat-dashboard = {
+        autoStart = true;
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
+        };
+
+        containerConfig = {
+          image = "docker.io/kshitizb/vnstat-dashboard:${vnstatDashboardVersion}";
+          name = "vnstat-dashboard";
+
+          environments = {
+            PORT = "80";
+            ALLOWED_PREFIXES = "enp";
+          };
+
+          volumes = [
+            "${volumes.vnstat-db.ref}:/var/lib/vnstat:ro"
+          ];
+
+          publishPorts = [
+            "${toString ports.vnstat}:80/tcp"
+          ];
+        };
+      };
+    };
+}

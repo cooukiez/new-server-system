@@ -101,6 +101,12 @@ in
           import auth_verify
           reverse_proxy host.containers.internal:${toString ports.prometheus}
         }
+
+        @vnstat host vnstat.home.lan
+        handle @vnstat {
+          import auth_verify
+          reverse_proxy host.containers.internal:${toString ports.vnstat}
+        }
         
         handle {
           abort

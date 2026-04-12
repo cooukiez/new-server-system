@@ -125,6 +125,9 @@
 
         # immich
         immich = 2283;
+
+        # vnstat
+        vnstat = 5010;
       };
 
       forAllSystems = nixpkgs.lib.genAttrs systems;

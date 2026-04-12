@@ -15,6 +15,8 @@
   imports = [
     ./services/media
     ./services/immich.nix
+    ./services/qbittorrent.nix
+    ./services/vnstat.nix
 
     ./auth.nix
     ./database.nix
