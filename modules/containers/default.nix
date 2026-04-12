@@ -24,8 +24,6 @@
     ./monitor.nix
     ./reverse-proxy.nix
     ./vpn.nix
-
-    ./users.nix
   ];
 
   _module.args = {

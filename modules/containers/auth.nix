@@ -74,96 +74,7 @@ let
           };
         };
 
-        clients = [
-          {
-            client_id = "immich";
-            client_name = "Immich";
-            client_secret = "$pbkdf2-sha512$310000$X5CgmGSCM2XEmtT0jqohVA$H8TqZ1CSfnrr8M.zzjO7VAuNQtaZf2saqVBwCrTzNeHlVpaAhuQV8nhNUJ8p8jktsvT7oJBdsHa7ftQfbGynVQ";
-
-            public = false;
-            authorization_policy = "two_factor";
-            require_pkce = false;
-
-            redirect_uris = [
-              "https://immich.home.lan/auth/login"
-              "https://immich.home.lan/user-settings"
-              "app.immich:///oauth-callback"
-            ];
-
-            scopes = [
-              "openid"
-              "profile"
-              "email"
-            ];
-
-            response_types = [ "code" ];
-            grant_types = [ "authorization_code" ];
-
-            access_token_signed_response_alg = "none";
-            userinfo_signed_response_alg = "none";
-            token_endpoint_auth_method = "client_secret_post";
-          }
-          /*
-            {
-              client_id = "jellyfin";
-              client_name = "Jellyfin";
-
-              client_secret = "$pbkdf2-sha512$310000$Je6PMm6qXhiCWQAQbndJvA$.UPCWR6HyidsVVI8hLgmDP9NYlL4pCfqcbwPuHxdbmd07dGFseLpbAunsJXvTA12Jvbn4IL/w3ZNSZVS5dAtCg";
-
-              public = false;
-              authorization_policy = "two_factor";
-              require_pkce = true;
-              pkce_challenge_method = "S256";
-
-              redirect_uris = [
-                "https://jellyfin.home.lan/sso/OID/redirect/authelia"
-              ];
-
-              scopes = [
-                "openid"
-                "profile"
-                "groups"
-              ];
-
-              response_types = [ "code" ];
-              grant_types = [ "authorization_code" ];
-
-              access_token_signed_response_alg = "none";
-              userinfo_signed_response_alg = "none";
-              token_endpoint_auth_method = "client_secret_post";
-            }
-          */
-          {
-            client_id = "grafana";
-            client_name = "Grafana";
-            client_secret = "$pbkdf2-sha512$310000$j//xOaGDVHfltGPTrdpXAg$cjNHWiElFa8S2PlanW1.5BzjgBYsev2POF.LPdPzYGgabkC.HNEUZbP4Rs2GfpONTmIS/WcVgjDpZAlIW5FtdQ";
-
-            claims_policy = "grafana";
-
-            public = false;
-            authorization_policy = "two_factor";
-            require_pkce = true;
-            pkce_challenge_method = "S256";
-
-            redirect_uris = [
-              "https://monitor.home.lan/login/generic_oauth"
-            ];
-
-            scopes = [
-              "openid"
-              "profile"
-              "groups"
-              "email"
-            ];
-
-            response_types = [ "code" ];
-            grant_types = [ "authorization_code" ];
-
-            access_token_signed_response_alg = "RS256";
-            userinfo_signed_response_alg = "none";
-            token_endpoint_auth_method = "client_secret_basic";
-          }
-        ];
+        clients = import ./auth/oidc-clients.nix;
       };
     };
 
@@ -183,24 +94,49 @@ let
       };
     };
   };
+
+  # secret mappings
+  secretMap = {
+    auth-jwt = "auth-jwt";
+    auth-session = "auth-session";
+    auth-storage-pw = "postgres-pw";
+    auth-storage-key = "auth-storage-key";
+    auth-oidc-hmac = "auth-oidc-hmac";
+    auth-oidc-jwk = "auth-oidc-key";
+    auth-mail-smtp = "smtp-pw";
+  };
+
+  secretMounts = {
+    auth-jwt = "AUTH_JWT_KEY";
+    auth-session = "AUTH_SESSION_SECRET";
+    auth-storage-pw = "AUTH_STORAGE_PASSWORD";
+    auth-storage-key = "AUTH_STORAGE_KEY";
+    auth-oidc-hmac = "AUTH_OIDC_HMAC_SECRET";
+    auth-oidc-jwk = "AUTH_OIDC_JWK_KEY";
+    auth-mail-smtp = "AUTH_MAIL_SMTP_PW";
+  };
+
+  envMapping = {
+    auth-jwt = "AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE";
+    auth-session = "AUTHELIA_SESSION_SECRET_FILE";
+    auth-storage-pw = "AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE";
+    auth-storage-key = "AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE";
+    auth-oidc-hmac = "AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE";
+    auth-mail-smtp = "AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE";
+  };
 in
 {
+  imports = [
+    ./auth/user.nix
+  ];
+
   home.file."containers/authelia/configuration.yml" = {
     source = settingsFormat.generate "configuration.yml" autheliaSettings;
   };
 
-  age.secrets = builtins.mapAttrs (_: f: { file = ../../secrets/${f}.age; }) {
-    auth-jwt = "auth-jwt";
-    auth-session = "auth-session";
-
-    auth-storage-pw = "postgres-pw";
-    auth-storage-key = "auth-storage-key";
-
-    auth-oidc-hmac = "auth-oidc-hmac";
-    auth-oidc-key = "auth-oidc-key";
-
-    smtp-pw = "smtp-pw";
-  };
+  age.secrets = builtins.mapAttrs (_: name: {
+    file = ../../secrets/auth/${name}.age;
+  }) secretMap;
 
   virtualisation.quadlet =
     let
@@ -233,34 +169,18 @@ in
           image = "docker.io/authelia/authelia:${autheliaVersion}";
           name = "authelia";
 
-          volumes = [
-            # secrets
-            "${config.age.secrets.auth-jwt.path}:/run/secrets/JWT_SECRET"
-            "${config.age.secrets.auth-session.path}:/run/secrets/SESSION_SECRET"
+          volumes =
+            (builtins.mapAttrsToList (
+              name: mount: "${config.age.secrets.${name}.path}:/run/secrets/${mount}"
+            ) secretMounts)
+            ++ [
+              "${volumes.authelia-config.ref}:/config"
+            ];
 
-            "${config.age.secrets.auth-storage-pw.path}:/run/secrets/STORAGE_PASSWORD"
-            "${config.age.secrets.auth-storage-key.path}:/run/secrets/STORAGE_ENCRYPTION_KEY"
-
-            "${config.age.secrets.auth-oidc-hmac.path}:/run/secrets/OIDC_HMAC_SECRET"
-            "${config.age.secrets.auth-oidc-key.path}:/run/secrets/OIDC_RSA_KEY"
-
-            "${config.age.secrets.smtp-pw.path}:/run/secrets/SMTP-PW"
-
-            # volumes
-            "${volumes.authelia-config.ref}:/config"
-          ];
-
-          environments = {
-            AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE = "/run/secrets/JWT_SECRET";
-            AUTHELIA_SESSION_SECRET_FILE = "/run/secrets/SESSION_SECRET";
-
-            AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE = "/run/secrets/STORAGE_PASSWORD";
-            AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE = "/run/secrets/STORAGE_ENCRYPTION_KEY";
-
-            AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE = "/run/secrets/OIDC_HMAC_SECRET";
-
-            AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE = "/run/secrets/SMTP-PW";
-          };
+          environments = lib.mapAttrs' (name: envVar: {
+            name = envVar;
+            value = "/run/secrets/${secretMounts.${name}}";
+          }) envMapping;
 
           publishPorts = [
             "${toString ports.authelia}:9091/tcp"

@@ -15,51 +15,67 @@ let
   caddyVersion = "latest";
 
   services = {
+    #
+    # administration
+    #
     dns = {
       port = ports.adguard;
       policy = "one_factor";
       group = "admins";
     };
+
     vpn = {
       port = ports.gluetunWebUI;
       policy = "one_factor";
       group = "admins";
     };
-    immich = {
-      port = ports.immich;
-      policy = "bypass";
-    };
-    jellyfin = {
-      port = ports.jellyfin;
-      policy = "bypass";
-    };
-    lidarr = {
-      port = ports.lidarr;
-      policy = "bypass";
-    };
-    slskd = {
-      port = ports.slskdHttp;
-      policy = "bypass";
-    };
-    monitor = {
-      port = ports.grafana;
-      policy = "bypass";
-    };
+
     glances = {
       port = ports.glances;
       policy = "one_factor";
       group = "admins";
     };
+
+    monitor = {
+      port = ports.grafana;
+      policy = "bypass";
+    };
+
     prometheus = {
       port = ports.prometheus;
       policy = "one_factor";
       group = "admins";
     };
+
     vnstat = {
       port = ports.vnstat;
       policy = "one_factor";
       group = "admins";
     };
+
+    #
+    # services
+    #
+    immich = {
+      port = ports.immich;
+      policy = "bypass";
+    };
+
+    jellyfin = {
+      port = ports.jellyfin;
+      policy = "bypass";
+    };
+
+    lidarr = {
+      port = ports.lidarr;
+      policy = "bypass";
+    };
+
+    slskd = {
+      port = ports.slskdHttp;
+      policy = "bypass";
+    };
+
     torrent = {
       port = ports.qBittorrent;
       policy = "bypass";
@@ -103,7 +119,7 @@ in
 
   home.file."containers/caddy/Caddyfile".text = ''
     (my_tls) {
-      tls /etc/cert/home.lan.crt /etc/cert/home.lan.key
+      tls /certs/home.lan.crt /certs/home.lan.key
     }
 
     (auth_verify) {
@@ -172,7 +188,7 @@ in
             "${config.home.homeDirectory}/containers/caddy/Caddyfile:/etc/caddy/Caddyfile:ro"
 
             # volumes
-            "${volumes.caddy-certs.ref}:/etc/cert"
+            "${volumes.caddy-certs.ref}:/certs"
             "${volumes.caddy-config.ref}:/config"
             "${volumes.caddy-data.ref}:/data"
           ];
