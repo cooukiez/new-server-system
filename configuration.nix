@@ -235,7 +235,7 @@
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    extraSpecialArgs = { 
+    extraSpecialArgs = {
       inherit inputs staticIP ports;
 
       squConfigKeyPath = config.age.secrets.squ-config-key.path;

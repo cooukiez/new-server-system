@@ -1,8 +1,8 @@
 /*
-  modules/containers/reverse-proxy.nix
+  modules/containers/vpn.nix
 
   part of der-home-server
-  created 2026-04-08
+  created 2026-04-11
 */
 
 {

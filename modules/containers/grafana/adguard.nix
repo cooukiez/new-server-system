@@ -1,8 +1,8 @@
 /*
-  modules/nixos/services/grafana-dashboards/immich.nix
+  modules/containers/grafana/adguard.nix
 
   part of der-home-server
-  created 2026-03-20
+  created 2026-04-10
 */
 
 {

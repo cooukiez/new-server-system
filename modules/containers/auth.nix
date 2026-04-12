@@ -9,6 +9,7 @@
   config,
   pkgs,
   ports,
+  autheliaRules,
   ...
 }:
 let
@@ -34,72 +35,7 @@ let
 
     access_control = {
       default_policy = "deny";
-      rules = [
-        {
-          domain = "auth.home.lan";
-          policy = "bypass";
-        }
-        {
-          domain = "home.lan";
-          policy = "bypass";
-        }
-
-        {
-          domain = "monitor.home.lan";
-          policy = "bypass";
-        }
-        {
-          domain = "immich.home.lan";
-          policy = "bypass";
-        }
-        {
-          domain = "jellyfin.home.lan";
-          policy = "bypass";
-        }
-        {
-          domain = "lidarr.home.lan";
-          policy = "bypass";
-        }
-        {
-          domain = "slskd.home.lan";
-          policy = "bypass";
-        }
-
-        # admin (without login prompt)
-        {
-          domain = "dns.home.lan";
-          policy = "one_factor";
-          subject = [ "group:admins" ];
-        }
-        {
-          domain = "vpn.home.lan";
-          policy = "one_factor";
-          subject = [ "group:admins" ];
-        }
-        {
-          domain = "glances.home.lan";
-          policy = "one_factor";
-          subject = [ "group:admins" ];
-        }
-
-        {
-          domain = "prometheus.home.lan";
-          policy = "one_factor";
-          subject = [ "group:admins" ];
-        }
-
-        {
-          domain = "vnstat.home.lan";
-          policy = "one_factor";
-          subject = [ "group:admins" ];
-        }
-
-        {
-          domain = "torrent.home.lan";
-          policy = "one_factor";
-          subject = [ "group:admins" ];
-        }
-      ];
+      rules = autheliaRules;
     };
 
     session = {
@@ -168,34 +104,34 @@ let
             token_endpoint_auth_method = "client_secret_post";
           }
           /*
-          {
-            client_id = "jellyfin";
-            client_name = "Jellyfin";
+            {
+              client_id = "jellyfin";
+              client_name = "Jellyfin";
 
-            client_secret = "$pbkdf2-sha512$310000$Je6PMm6qXhiCWQAQbndJvA$.UPCWR6HyidsVVI8hLgmDP9NYlL4pCfqcbwPuHxdbmd07dGFseLpbAunsJXvTA12Jvbn4IL/w3ZNSZVS5dAtCg";
+              client_secret = "$pbkdf2-sha512$310000$Je6PMm6qXhiCWQAQbndJvA$.UPCWR6HyidsVVI8hLgmDP9NYlL4pCfqcbwPuHxdbmd07dGFseLpbAunsJXvTA12Jvbn4IL/w3ZNSZVS5dAtCg";
 
-            public = false;
-            authorization_policy = "two_factor";
-            require_pkce = true;
-            pkce_challenge_method = "S256";
+              public = false;
+              authorization_policy = "two_factor";
+              require_pkce = true;
+              pkce_challenge_method = "S256";
 
-            redirect_uris = [
-              "https://jellyfin.home.lan/sso/OID/redirect/authelia"
-            ];
+              redirect_uris = [
+                "https://jellyfin.home.lan/sso/OID/redirect/authelia"
+              ];
 
-            scopes = [
-              "openid"
-              "profile"
-              "groups"
-            ];
+              scopes = [
+                "openid"
+                "profile"
+                "groups"
+              ];
 
-            response_types = [ "code" ];
-            grant_types = [ "authorization_code" ];
+              response_types = [ "code" ];
+              grant_types = [ "authorization_code" ];
 
-            access_token_signed_response_alg = "none";
-            userinfo_signed_response_alg = "none";
-            token_endpoint_auth_method = "client_secret_post";
-          }
+              access_token_signed_response_alg = "none";
+              userinfo_signed_response_alg = "none";
+              token_endpoint_auth_method = "client_secret_post";
+            }
           */
           {
             client_id = "grafana";

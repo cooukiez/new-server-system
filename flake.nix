@@ -115,7 +115,7 @@
 
         # media
         jellyfin = 8096;
-        
+
         # music
         lidarr = 8686;
         slskdHttp = 5030;

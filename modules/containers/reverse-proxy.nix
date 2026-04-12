@@ -13,107 +13,127 @@
 }:
 let
   caddyVersion = "latest";
+
+  services = {
+    dns = {
+      port = ports.adguard;
+      policy = "one_factor";
+      group = "admins";
+    };
+    vpn = {
+      port = ports.gluetunWebUI;
+      policy = "one_factor";
+      group = "admins";
+    };
+    immich = {
+      port = ports.immich;
+      policy = "bypass";
+    };
+    jellyfin = {
+      port = ports.jellyfin;
+      policy = "bypass";
+    };
+    lidarr = {
+      port = ports.lidarr;
+      policy = "bypass";
+    };
+    slskd = {
+      port = ports.slskdHttp;
+      policy = "bypass";
+    };
+    monitor = {
+      port = ports.grafana;
+      policy = "bypass";
+    };
+    glances = {
+      port = ports.glances;
+      policy = "one_factor";
+      group = "admins";
+    };
+    prometheus = {
+      port = ports.prometheus;
+      policy = "one_factor";
+      group = "admins";
+    };
+    vnstat = {
+      port = ports.vnstat;
+      policy = "one_factor";
+      group = "admins";
+    };
+    torrent = {
+      port = ports.qBittorrent;
+      policy = "bypass";
+    };
+  };
+
+  autheliaRules = [
+    {
+      domain = "auth.home.lan";
+      policy = "bypass";
+    }
+    {
+      domain = "home.lan";
+      policy = "bypass";
+    }
+  ]
+  ++ (map (
+    name:
+    let
+      svc = services.${name};
+    in
+    {
+      domain = "${name}.home.lan";
+      policy = svc.policy;
+    }
+    // (if svc ? group then { subject = [ "group:${svc.group}" ]; } else { })
+  ) (builtins.attrNames services));
+
+  serviceHandlers = builtins.concatStringsSep "\n" (
+    map (name: ''
+      @${name} host ${name}.home.lan
+      handle @${name} {
+        import auth_verify
+        reverse_proxy host.containers.internal:${toString services.${name}.port}
+      }
+    '') (builtins.attrNames services)
+  );
 in
 {
-  home.file."containers/caddy/Caddyfile" = {
-    text = ''
-      (my_tls) {
-        tls /etc/cert/home.lan.crt /etc/cert/home.lan.key
+  _module.args.autheliaRules = autheliaRules;
+
+  home.file."containers/caddy/Caddyfile".text = ''
+    (my_tls) {
+      tls /etc/cert/home.lan.crt /etc/cert/home.lan.key
+    }
+
+    (auth_verify) {
+      forward_auth host.containers.internal:${toString ports.authelia} {
+        uri /api/verify?rd=https://auth.home.lan/
+        copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+      }
+    }
+
+    home.lan {
+      import my_tls
+      root * /var/www/home
+      file_server
+    }
+
+    *.home.lan {
+      import my_tls
+
+      @auth host auth.home.lan
+      handle @auth {
+        reverse_proxy host.containers.internal:${toString ports.authelia}
       }
 
-      (auth_verify) {
-        forward_auth host.containers.internal:${toString ports.authelia} {
-          uri /api/verify?rd=https://auth.home.lan/
-          copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
-        }
+      ${serviceHandlers}
+      
+      handle {
+        abort
       }
-
-      home.lan {
-        import my_tls
-        root * /var/www/home
-        file_server
-      }
-
-      *.home.lan {
-        import my_tls
-
-        @auth host auth.home.lan
-        handle @auth {
-          reverse_proxy host.containers.internal:${toString ports.authelia}
-        }
-        
-        @dns host dns.home.lan
-        handle @dns {
-          import auth_verify
-          reverse_proxy host.containers.internal:${toString ports.adguard}
-        }
-
-        @vpn host vpn.home.lan
-        handle @vpn {
-          import auth_verify
-          reverse_proxy host.containers.internal:${toString ports.gluetunWebUI}
-        }
-
-        @immich host immich.home.lan
-        handle @immich {
-          import auth_verify
-          reverse_proxy host.containers.internal:${toString ports.immich}
-        }
-
-        @jellyfin host jellyfin.home.lan
-        handle @jellyfin {
-          import auth_verify
-          reverse_proxy host.containers.internal:${toString ports.jellyfin}
-        }
-
-        @lidarr host lidarr.home.lan
-        handle @lidarr {
-          import auth_verify
-          reverse_proxy host.containers.internal:${toString ports.lidarr}
-        }
-
-        @slskd host slskd.home.lan
-        handle @slskd {
-          import auth_verify
-          reverse_proxy host.containers.internal:${toString ports.slskdHttp}
-        }
-
-        @monitor host monitor.home.lan
-        handle @monitor {
-          import auth_verify
-          reverse_proxy host.containers.internal:${toString ports.grafana}
-        }
-
-        @glances host glances.home.lan
-        handle @glances {
-          import auth_verify
-          reverse_proxy host.containers.internal:${toString ports.glances}
-        }
-
-        @prometheus host prometheus.home.lan
-        handle @prometheus {
-          import auth_verify
-          reverse_proxy host.containers.internal:${toString ports.prometheus}
-        }
-
-        @vnstat host vnstat.home.lan
-        handle @vnstat {
-          import auth_verify
-          reverse_proxy host.containers.internal:${toString ports.vnstat}
-        }
-
-        @torrent host torrent.home.lan
-        handle @torrent {
-          import auth_verify
-          reverse_proxy host.containers.internal:${toString ports.qBittorrent}
-        }
-        
-        handle {
-          abort
-        }
-      }
-    '';
-  };
+    }
+  '';
 
   virtualisation.quadlet =
     let

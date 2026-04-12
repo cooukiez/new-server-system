@@ -60,7 +60,7 @@ let
     help.enabled = false;
     dashboards.hide_welcome_config = true;
     news.news_feed_enabled = false;
-    
+
     analytics = {
       reporting_enabled = false;
       check_for_updates = false;
@@ -124,8 +124,8 @@ let
       }
       {
         job_name = "node";
-        static_configs = [ 
-          { targets = [ "host.containers.internal:${toString ports.nodeExporter}" ]; } 
+        static_configs = [
+          { targets = [ "host.containers.internal:${toString ports.nodeExporter}" ]; }
         ];
       }
     ];
@@ -151,15 +151,20 @@ let
       ring.kvstore.store = "inmemory";
     };
 
-    schema_config.configs = [{
-      from = "2024-04-01";
-      store = "tsdb";
+    schema_config.configs = [
+      {
+        from = "2024-04-01";
+        store = "tsdb";
 
-      object_store = "filesystem";
-      schema = "v13";
+        object_store = "filesystem";
+        schema = "v13";
 
-      index = { prefix = "index_"; period = "24h"; };
-    }];
+        index = {
+          prefix = "index_";
+          period = "24h";
+        };
+      }
+    ];
   };
 in
 {
@@ -189,7 +194,7 @@ in
         options:
           path: ${grafanaProvisioningPath}/dashboards
   '';
-  
+
   home.file."containers/grafana/provisioning/datasources/datasources.yaml".text = ''
     apiVersion: 1
     datasources:
@@ -210,8 +215,7 @@ in
     prometheusSettingsFormat.generate "prometheus.yml" prometheusSettings;
 
   # loki
-  home.file."containers/loki/loki.yaml".source =
-    lokiSettingsFormat.generate "loki.yaml" lokiSettings;
+  home.file."containers/loki/loki.yaml".source = lokiSettingsFormat.generate "loki.yaml" lokiSettings;
 
   virtualisation.quadlet =
     let
@@ -357,7 +361,7 @@ in
           name = "podman-exporter";
           networks = [ "monitoring.network" ];
           userns = "keep-id";
-          
+
           # mount squ podman socket
           volumes = [
             "/run/user/10000/podman/podman.sock:/run/podman/podman.sock:ro"
@@ -368,7 +372,7 @@ in
           };
 
           exec = [
-            "--collector.enable-all" 
+            "--collector.enable-all"
           ];
         };
       };
@@ -384,7 +388,7 @@ in
           image = "docker.io/grafana/loki:${lokiVersion}";
           name = "loki";
           networks = [ "monitoring.network" ];
-          
+
           publishPorts = [ "${toString ports.loki}:3100/tcp" ];
 
           volumes = [

@@ -13,7 +13,7 @@
 }:
 let
   photosPath = "/media/photos";
-  
+
   dbPath = "/opt/immich/db";
   mlCachePath = "/opt/immich/ml-cache";
 

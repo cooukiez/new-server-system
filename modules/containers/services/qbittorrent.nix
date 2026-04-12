@@ -31,7 +31,7 @@ in
 
       containers.qbittorrent = {
         autoStart = true;
-        
+
         unitConfig.After = [ "gluetun.service" ];
         unitConfig.Requires = [ "gluetun.service" ];
 
@@ -43,7 +43,7 @@ in
         containerConfig = {
           image = "lscr.io/linuxserver/qbittorrent:${qBittorrentVersion}";
           name = "qbittorrent";
-          
+
           # networking through gluetun
           networks = [ "container:gluetun" ];
 

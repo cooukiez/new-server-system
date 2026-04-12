@@ -1,3 +1,10 @@
+/*
+  modules/containers/services/vnstat.nix
+
+  part of der-home-server
+  created 2026-04-11
+*/
+
 {
   config,
   ports,

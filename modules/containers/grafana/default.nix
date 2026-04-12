@@ -1,8 +1,8 @@
 /*
-  modules/nixos/services/grafana-dashboards/default.nix
+  modules/containers/grafana/default.nix
 
   part of der-home-server
-  created 2026-03-20
+  created 2026-04-10
 */
 
 {
@@ -44,7 +44,7 @@ let
               tags = [ ];
               type = "dashboard";
             };
-            
+
             type = "dashboard";
           }
         ];

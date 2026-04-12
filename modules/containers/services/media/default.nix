@@ -1,5 +1,5 @@
 /*
-  modules/containers/services/immich.nix
+  modules/containers/services/media/default.nix
 
   part of der-home-server
   created 2026-04-10
@@ -54,7 +54,7 @@ in
         type = "bind";
         device = "/opt/jellyfin/config";
       };
-      
+
       volumes.jellyfin-data.volumeConfig = {
         type = "bind";
         device = "/opt/jellyfin/data";
@@ -104,7 +104,7 @@ in
             "${volumes.jellyfin-data.ref}:/jellyfin/data"
             "${volumes.jellyfin-cache.ref}:/jellyfin/cache"
             "${volumes.jellyfin-log.ref}:/jellyfin/log"
-            
+
             "${volumes.media-music.ref}:/media/music:ro"
           ];
 

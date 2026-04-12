@@ -1,5 +1,5 @@
 /*
-  modules/containers/services/immich.nix
+  modules/containers/services/media/music.nix
 
   part of der-home-server
   created 2026-04-10
@@ -81,7 +81,7 @@ in
     source = slskdSettingsFormat.generate "slskd.yml" slskdSettings;
   };
 
-  age.secrets = 
+  age.secrets =
     let
       mkSecret = name: {
         file = ../../../../secrets/${name}.age;
@@ -89,8 +89,8 @@ in
       };
     in
     {
-      slskd-user  = mkSecret "slskd-user";
-      slskd-pass  = mkSecret "slskd-pass";
+      slskd-user = mkSecret "slskd-user";
+      slskd-pass = mkSecret "slskd-pass";
       slskd-webui = mkSecret "slskd-webui";
     };
 
@@ -126,7 +126,7 @@ in
           name = "lidarr";
           networks = [ "media-net" ];
           userns = "keep-id:uid=10000,gid=10000";
-          
+
           environments = {
             PUID = "10000";
             PGID = "10000";
@@ -135,7 +135,7 @@ in
 
           volumes = [
             "${volumes.lidarr-data.ref}:/config"
-            
+
             # media volumes
             "${volumes.media-download.ref}:/download"
             "${volumes.media-music.ref}:/music"
@@ -157,7 +157,10 @@ in
         containerConfig = {
           image = "docker.io/slskd/slskd:${slskdVersion}";
           name = "slskd";
-          networks = [ "media-net" "vpn-service-net" ];
+          networks = [
+            "media-net"
+            "vpn-service-net"
+          ];
           userns = "keep-id:uid=10000,gid=10000";
 
           environmentFiles = [
