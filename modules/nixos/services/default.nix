@@ -19,8 +19,8 @@
   ];
 
   age.secrets = {
-    ts-auth-key = {
-      file = ../../../secrets/ts-auth-key.age;
+    tailscale-key = {
+      file = ../../../secrets/tailscale-key.age;
     };
   };
 
@@ -44,7 +44,7 @@
     useRoutingFeatures = "both";
     disableUpstreamLogging = true;
 
-    authKeyFile = config.age.secrets.ts-auth-key.path;
+    authKeyFile = config.age.secrets.tailscale-key.path;
 
     extraUpFlags = [
       "--advertise-exit-node"

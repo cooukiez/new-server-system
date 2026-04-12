@@ -13,7 +13,6 @@
   #
   # exporters
   #
-
   services.prometheus.exporters.node = {
     enable = true;
     enabledCollectors = [
@@ -63,7 +62,6 @@
   #
   # metrics
   #
-
   services.glances = {
     enable = true;
 
