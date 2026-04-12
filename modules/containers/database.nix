@@ -28,11 +28,12 @@
   home.file."containers/postgres/lldap-init.sql" = {
     text = ''
       CREATE USER lldap;
-      CREATE DATABASE lldap;
-      GRANT ALL PRIVILEGES ON DATABASE lldap TO admin;
+      ALTER USER lldap WITH PASSWORD 'lldap';
 
-      \c lldap
-      GRANT ALL ON SCHEMA public TO lldap;
+      CREATE DATABASE lldap;
+
+      GRANT ALL PRIVILEGES ON DATABASE lldap TO admin;
+      GRANT ALL PRIVILEGES ON DATABASE lldap TO lldap;
     '';
   };
 

@@ -16,11 +16,13 @@
     ./services/media
     ./services/immich.nix
     ./services/qbittorrent.nix
+    ./services/transfer-sh.nix
     ./services/vnstat.nix
 
     ./auth.nix
     ./database.nix
     ./dns.nix
+    ./ldap.nix
     ./monitor.nix
     ./reverse-proxy.nix
     ./vpn.nix

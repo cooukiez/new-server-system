@@ -58,4 +58,7 @@
   # qbittorrent
   qBittorrent = 6880;
   qBittorrentTorrenting = 6881;
+
+  # transfer-sh
+  transferSH = 8010;
 }

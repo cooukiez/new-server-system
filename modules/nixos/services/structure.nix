@@ -72,6 +72,9 @@
     "d /opt/qbittorrent 0755 10000 10000 -"
     "d /opt/qbittorrent/data 0755 10000 10000 -"
 
+    "d /opt/transfer-sh 0755 10000 10000 -"
+    "d /opt/transfer-sh/data 0755 10000 10000 -"
+
     #
     # media directories
     #

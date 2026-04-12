@@ -30,11 +30,6 @@ let
       group = "admins";
     };
 
-    ldap = {
-      port = ports.lldapWeb;
-      policy = "bypass";
-    };
-
     glances = {
       port = ports.glances;
       policy = "one_factor";
@@ -85,11 +80,20 @@ let
       port = ports.qBittorrent;
       policy = "bypass";
     };
+
+    transfer = {
+      port = ports.transferSH;
+      policy = "bypass";
+    };
   };
 
   autheliaRules = [
     {
       domain = "auth.home.lan";
+      policy = "bypass";
+    }
+    {
+      domain = "ldap.home.lan";
       policy = "bypass";
     }
     {
@@ -146,6 +150,11 @@ in
       @auth host auth.home.lan
       handle @auth {
         reverse_proxy host.containers.internal:${toString ports.authelia}
+      }
+
+      @ldap host ldap.home.lan
+      handle @ldap {
+        reverse_proxy host.containers.internal:${toString ports.lldapWeb}
       }
 
       ${serviceHandlers}

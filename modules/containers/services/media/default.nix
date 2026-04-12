@@ -25,8 +25,6 @@ in
     musicPath = musicPath;
   };
 
-  home.file."containers/jellyfin/root.crt".source = ../../../../home.lan.crt;
-
   virtualisation.quadlet =
     let
       inherit (config.virtualisation.quadlet) volumes networks pods;
@@ -81,12 +79,13 @@ in
           image = "docker.io/jellyfin/jellyfin:${jellyfinVersion}";
           name = "jellyfin";
           networks = [ "media-net" ];
+          userns = "keep-id:uid=10000,gid=10000";
 
           addHosts = [
             "auth.home.lan:host-gateway"
           ];
 
-          exec = "/bin/bash -c 'update-ca-certificates && exec /jellyfin/jellyfin'";
+          # exec = "/bin/bash -c 'update-ca-certificates && exec /jellyfin/jellyfin'";
 
           environments = {
             JELLYFIN_CONFIG_DIR = "/jellyfin/config";
@@ -96,8 +95,8 @@ in
           };
 
           volumes = [
-            # secrets
-            "${config.home.homeDirectory}/containers/jellyfin/root.crt:/usr/local/share/ca-certificates/root.crt:ro"
+            # certs
+            "${volumes.caddy-certs.ref}:/usr/local/share/ca-certificates:ro"
 
             # volumes
             "${volumes.jellyfin-config.ref}:/jellyfin/config"

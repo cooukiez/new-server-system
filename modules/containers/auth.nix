@@ -28,9 +28,15 @@ let
       level = "info";
     };
 
+    # password_reset.disable = false;
+    # password_change.disable = false;
     authentication_backend = {
-      file = {
-        path = "/config/users.yml";
+      refresh_interval = "1m";
+      ldap = {
+        implementation = "lldap";
+        address = "ldap://lldap:3890"; 
+        base_dn = "dc=ldap,dc=home,dc=lan";
+        user = "uid=admin,ou=people,dc=ldap,dc=home,dc=lan";
       };
     };
 
@@ -98,6 +104,8 @@ let
 
   # secret mappings
   secretMap = {
+    auth-ldap-pw = "ldap/admin-pass";
+
     auth-jwt = "auth/jwt-secret";
     auth-session = "auth/session";
 
@@ -111,6 +119,7 @@ let
   };
 
   secretMounts = {
+    auth-ldap-pw = "AUTH_LDAP_PASSWORD";
     auth-jwt = "AUTH_JWT_SECRET";
     auth-session = "AUTH_SESSION_SECRET";
     auth-storage-pw = "AUTH_STORAGE_PASSWORD";
@@ -121,6 +130,7 @@ let
   };
 
   envMapping = {
+    auth-ldap-pw = "AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE";
     auth-jwt = "AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE";
     auth-session = "AUTHELIA_SESSION_SECRET_FILE";
     auth-storage-pw = "AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE";
@@ -147,6 +157,12 @@ in
       inherit (config.virtualisation.quadlet) volumes networks pods;
     in
     {
+      networks.auth-net = {
+        networkConfig = {
+          internal = false;
+        };
+      };
+
       volumes.authelia-config.volumeConfig = {
         type = "bind";
         device = "/opt/authelia/config";
@@ -172,6 +188,7 @@ in
         containerConfig = {
           image = "docker.io/authelia/authelia:${autheliaVersion}";
           name = "authelia";
+          networks = [ "auth-net" ];
 
           volumes =
             (lib.mapAttrsToList (

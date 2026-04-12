@@ -42,22 +42,28 @@ in
         containerConfig = {
           image = "docker.io/lldap/lldap:${lldapVersion}";
           name = "lldap";
+          networks = [ "auth-net" ];
 
           environments = {
-            LLDAP_LDAP_BASE_DN = "dc=example,dc=com";
+            LLDAP_LDAP_BASE_DN = "dc=ldap,dc=home,dc=lan";
             TZ = "Europe/Berlin";
+
+            UID = "0";
+            GID = "0";
 
             LLDAP_JWT_SECRET_FILE = "/run/secrets/LLDAP_JWT_SECRET";
             LLDAP_KEY_SEED_FILE = "/run/secrets/LLDAP_KEY_SEED";
             LLDAP_LDAP_USER_PASS_FILE = "/run/secrets/LLDAP_ADMIN_PASS";
 
-            LLDAP_DATABASE_URL = "postgres://lldap@host.containers.internal:5432/lldap";
+            LLDAP_KEY_FILE = "";
+
+            LLDAP_DATABASE_URL = "postgres://lldap:lldap@host.containers.internal:5432/lldap";
           };
 
           volumes = [
-            "${config.age.secrets.lldap-jwt-secret.path}:/run/secrets/LLDAP_JWT_SECRET:ro"
-            "${config.age.secrets.lldap-key-seed.path}:/run/secrets/LLDAP_KEY_SEED:ro"
-            "${config.age.secrets.lldap-admin-pass.path}:/run/secrets/LLDAP_ADMIN_PASS:ro"
+            "${config.age.secrets.lldap-jwt.path}:/run/secrets/LLDAP_JWT_SECRET:ro"
+            "${config.age.secrets.lldap-seed.path}:/run/secrets/LLDAP_KEY_SEED:ro"
+            "${config.age.secrets.lldap-admin.path}:/run/secrets/LLDAP_ADMIN_PASS:ro"
 
             "${volumes.lldap-data.ref}:/data"
           ];
