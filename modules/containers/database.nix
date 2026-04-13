@@ -16,17 +16,13 @@
     postgres-pw = {
       file = ../../secrets/postgres-pw.age;
     };
-  };CREATE DATABASE lidarr-main;
+  };
 
   home.file."containers/postgres/authelia-init.sql" = {
     text = ''
-      CREATE USER authelia;
-      ALTER USER authelia WITH PASSWORD 'authelia';
-
       CREATE DATABASE authelia;
-
+      ALTER DATABASE authelia OWNER TO admin;
       GRANT ALL PRIVILEGES ON DATABASE authelia TO admin;
-      GRANT ALL PRIVILEGES ON DATABASE authelia TO authelia;
     '';
   };
 
@@ -36,9 +32,9 @@
       ALTER USER lldap WITH PASSWORD 'lldap';
 
       CREATE DATABASE lldap;
+      ALTER DATABASE lldap OWNER TO lldap;
 
       GRANT ALL PRIVILEGES ON DATABASE lldap TO admin;
-      GRANT ALL PRIVILEGES ON DATABASE lldap TO lldap;
     '';
   };
 
@@ -48,9 +44,9 @@
       ALTER USER gitea WITH PASSWORD 'gitea';
 
       CREATE DATABASE gitea;
+      ALTER DATABASE gitea OWNER TO gitea;
 
       GRANT ALL PRIVILEGES ON DATABASE gitea TO admin;
-      GRANT ALL PRIVILEGES ON DATABASE gitea TO gitea;
     '';
   };
 
@@ -59,14 +55,14 @@
       CREATE USER lidarr;
       ALTER USER lidarr WITH PASSWORD 'lidarr';
 
-      CREATE DATABASE lidarrMain;
-      CREATE DATABASE lidarrLog;
+      CREATE DATABASE "lidarr-main";
+      ALTER DATABASE "lidarr-main" OWNER TO lidarr;
+      
+      CREATE DATABASE "lidarr-log";
+      ALTER DATABASE "lidarr-log" OWNER TO lidarr;
 
-      GRANT ALL PRIVILEGES ON DATABASE lidarrMain TO admin;
-      GRANT ALL PRIVILEGES ON DATABASE lidarrLog TO admin;
-
-      GRANT ALL PRIVILEGES ON DATABASE lidarrMain TO gitea;
-      GRANT ALL PRIVILEGES ON DATABASE lidarrLog TO gitea;
+      GRANT ALL PRIVILEGES ON DATABASE "lidarr-main" TO admin;
+      GRANT ALL PRIVILEGES ON DATABASE "lidarr-log" TO admin;
     '';
   };
 

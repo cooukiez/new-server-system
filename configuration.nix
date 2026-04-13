@@ -159,6 +159,7 @@
 
   # timezone
   time.timeZone = "Europe/Berlin";
+  environment.etc."timezone".text = "Europe/Berlin\n";
   services.timesyncd.enable = true;
 
   # locales / language

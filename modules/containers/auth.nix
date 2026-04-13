@@ -89,8 +89,7 @@ let
       postgres = {
         address = "tcp://host.containers.internal:5432";
         database = "authelia";
-        username = "authelia";
-        password = "authelia";
+        username = "admin";
       };
     };
 
@@ -110,6 +109,7 @@ let
     auth-jwt = "auth/jwt-secret";
     auth-session = "auth/session";
 
+    auth-postgres-pw = "postgres-pw";
     auth-storage-key = "auth/storage-key";
 
     auth-oidc-hmac = "auth/oidc-hmac";
@@ -122,6 +122,7 @@ let
     auth-ldap-pw = "AUTH_LDAP_PASSWORD";
     auth-jwt = "AUTH_JWT_SECRET";
     auth-session = "AUTH_SESSION_SECRET";
+    auth-postgres-pw = "AUTH_POSTGRES_PASSWORD";
     auth-storage-key = "AUTH_STORAGE_KEY";
     auth-oidc-hmac = "AUTH_OIDC_HMAC_SECRET";
     auth-oidc-jwk = "AUTH_OIDC_JWK_KEY";
@@ -132,6 +133,7 @@ let
     auth-ldap-pw = "AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE";
     auth-jwt = "AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE";
     auth-session = "AUTHELIA_SESSION_SECRET_FILE";
+    auth-postgres-pw = "AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE";
     auth-storage-key = "AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE";
     auth-oidc-hmac = "AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE";
     auth-mail-smtp = "AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE";

@@ -33,7 +33,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.gitea.com/gitea:${transferSHVersion}";
+          image = "docker.gitea.com/gitea:${giteaVersion}";
           name = "gitea";
           userns = "keep-id:uid=10000,gid=10000";
 

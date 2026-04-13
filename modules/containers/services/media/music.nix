@@ -16,9 +16,54 @@
 let
   slskdSettingsFormat = pkgs.formats.yaml { };
 
+  mkLidarrXml = attrs: ''
+    <Config>
+      ${builtins.concatStringsSep "\n  " (
+        pkgs.lib.mapAttrsToList (k: v: "<${k}>${toString v}</${k}>") attrs
+      )}
+    </Config>
+  '';
+
   lidarrVersion = "nightly";
   lidarrListsNginxVersion = "alpine";
   slskdVersion = "latest";
+
+  # lidarr settings
+  lidarrSettings = {
+    InstanceName = "Lidarr";
+
+    BindAddress = "*";
+    Port = "8686";
+    SslPort = "6868";
+
+    UrlBase = "";
+
+    EnableSsl = "False";
+    SslCertPath = "";
+    SslCertPassword = "";
+
+    LaunchBrowser = "True";
+    ApiKey = "d854c071ad1b4b47ba6afca9a10e5049";
+
+    AuthenticationMethod = "Forms";
+    AuthenticationRequired = "Enabled";
+    
+    Branch = "nightly";
+    UpdateMechanism = "Docker";
+
+    # postgres configuration
+    PostgresUser = "lidarr";
+    PostgresPassword = "lidarr";
+
+    PostgresHost = "host.containers.internal";
+    PostgresPort = "5432";
+
+    PostgresMainDb = "lidarr-main";
+    PostgresLogDb = "lidarr-log";
+
+    LogLevel = "debug";
+    AnalyticsEnabled = "False";
+  };
 
   # slskd settings
   slskdLidarrKey = "C2h1M5wh5iNUWNLYexHuTKj5s2mu29Xk";
@@ -77,6 +122,10 @@ let
   };
 in
 {
+  home.file."containers/lidarr/config.xml" = {
+    text = mkLidarrXml lidarrSettings;
+  };
+
   home.file."containers/slskd/slskd.yml" = {
     source = slskdSettingsFormat.generate "slskd.yml" slskdSettings;
   };
@@ -147,6 +196,11 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/lidarr/config.xml /opt/lidarr/data/config.xml"
+             "${pkgs.coreutils}/bin/chmod 644 /opt/lidarr/data/config.xml"
+          ];
         };
 
         containerConfig = {
