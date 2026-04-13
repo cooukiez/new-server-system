@@ -197,9 +197,12 @@ in
           Restart = "always";
           RestartSec = "10";
 
+          Requires = [ "postgres.service" ];
+          After = [ "postgres.service" ];
+
           ExecStartPre = [
             "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/lidarr/config.xml /opt/lidarr/data/config.xml"
-             "${pkgs.coreutils}/bin/chmod 644 /opt/lidarr/data/config.xml"
+            "${pkgs.coreutils}/bin/chmod 644 /opt/lidarr/data/config.xml"
           ];
         };
 
@@ -291,6 +294,9 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          Requires = [ "gluetun.service" ];
+          After = [ "gluetun.service" ];
         };
 
         containerConfig = {
@@ -300,6 +306,7 @@ in
             "media-net"
             "vpn-service-net"
           ];
+
           userns = "keep-id:uid=10000,gid=10000";
 
           environmentFiles = [

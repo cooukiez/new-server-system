@@ -32,12 +32,12 @@ in
       containers.qbittorrent = {
         autoStart = true;
 
-        unitConfig.After = [ "gluetun.service" ];
-        unitConfig.Requires = [ "gluetun.service" ];
-
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          Requires = [ "gluetun.service" ];
+          After = [ "gluetun.service" ];
         };
 
         containerConfig = {

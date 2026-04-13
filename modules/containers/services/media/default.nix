@@ -79,12 +79,11 @@ in
           image = "docker.io/jellyfin/jellyfin:${jellyfinVersion}";
           name = "jellyfin";
           networks = [ "media-net" ];
+          userns = "keep-id:uid=10000,gid=10000";
 
           addHosts = [
             "auth.home.lan:host-gateway"
           ];
-
-          user = "0:0";
 
           environments = {
             JELLYFIN_CONFIG_DIR = "/jellyfin/config";

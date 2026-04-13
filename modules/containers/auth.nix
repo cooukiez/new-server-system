@@ -174,6 +174,9 @@ in
           Restart = "always";
           RestartSec = "10";
 
+          Requires = [ "postgres.service" ];
+          After = [ "postgres.service" ];
+
           ExecStartPre = [
             "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/configuration.yml /opt/authelia/config/configuration.yml"
             "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/users.yml /opt/authelia/config/users.yml"

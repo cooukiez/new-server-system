@@ -37,6 +37,9 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          Requires = [ "postgres.service" ];
+          After = [ "postgres.service" ];
         };
 
         containerConfig = {
