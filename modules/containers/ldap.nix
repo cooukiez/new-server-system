@@ -1,7 +1,8 @@
 /*
-  modules/containers/lldap.nix
+  modules/containers/ldap.nix
 
   part of der-home-server
+  created 2026-04-14
 */
 
 {
@@ -34,12 +35,15 @@ in
 
       containers.lldap = {
         autoStart = true;
+
+        unitConfig = {
+          Requires = [ "postgres.service" ];
+          After = [ "postgres.service" ];
+        };
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
 
-          Requires = [ "postgres.service" ];
-          After = [ "postgres.service" ];
         };
 
         containerConfig = {

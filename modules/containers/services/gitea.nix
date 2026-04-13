@@ -1,8 +1,8 @@
 /*
-  modules/containers/services/qbittorrent.nix
+  modules/containers/services/gitea.nix
 
   part of der-home-server
-  created 2026-04-12
+  created 2026-04-14
 */
 
 {
@@ -27,12 +27,15 @@ in
       containers.gitea = {
         autoStart = true;
 
+        unitConfig = {
+          Requires = [ "postgres.service" ];
+          After = [ "postgres.service" ];
+        };
+
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-          
-          Requires = [ "postgres.service" ];
-          After = [ "postgres.service" ];
+
         };
 
         containerConfig = {

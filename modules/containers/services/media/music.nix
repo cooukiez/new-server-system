@@ -2,7 +2,7 @@
   modules/containers/services/media/music.nix
 
   part of der-home-server
-  created 2026-04-10
+  created 2026-04-14
 */
 
 {
@@ -47,7 +47,7 @@ let
 
     AuthenticationMethod = "Forms";
     AuthenticationRequired = "Enabled";
-    
+
     Branch = "nightly";
     UpdateMechanism = "Docker";
 
@@ -147,7 +147,6 @@ in
     '';
   };
 
-
   age.secrets =
     let
       mkSecret = name: {
@@ -193,13 +192,14 @@ in
 
       containers.lidarr = {
         autoStart = true;
+
+        unitConfig = {
+          Requires = [ "postgres.service" ];
+          After = [ "postgres.service" ];
+        };
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
-          Requires = [ "postgres.service" ];
-          After = [ "postgres.service" ];
-
           ExecStartPre = [
             "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/lidarr/config.xml /opt/lidarr/data/config.xml"
             "${pkgs.coreutils}/bin/chmod 644 /opt/lidarr/data/config.xml"
@@ -257,46 +257,48 @@ in
       };
 
       /*
-      containers.cmdarr = {
-        autoStart = true;
-        serviceConfig = {
-          Restart = "always";
-          RestartSec = "10";
-        };
-
-        containerConfig = {
-          image = "docker.io/nginx:${lidarrListsNginxVersion}";
-          name = "cmdarr";
-          networks = [ "media-net" ];
-          userns = "keep-id:uid=10000,gid=10000";
-
-          environments = {
-            PUID = "10000";
-            PGID = "10000";
-            TZ = "Europe/Berlin";
-
-            LIDARR_URL = "http://lidarr:8686";
+        containers.cmdarr = {
+          autoStart = true;
+          serviceConfig = {
+            Restart = "always";
+            RestartSec = "10";
           };
-          
-          volumes = [
-            "${volumes.cmdarr-data.ref}:/app/data:ro"
-          ];
 
-          publishPorts = [
-            "${toString ports.cmdarr}:8080/tcp"
-          ];
+          containerConfig = {
+            image = "docker.io/nginx:${lidarrListsNginxVersion}";
+            name = "cmdarr";
+            networks = [ "media-net" ];
+            userns = "keep-id:uid=10000,gid=10000";
+
+            environments = {
+              PUID = "10000";
+              PGID = "10000";
+              TZ = "Europe/Berlin";
+
+              LIDARR_URL = "http://lidarr:8686";
+            };
+
+            volumes = [
+              "${volumes.cmdarr-data.ref}:/app/data:ro"
+            ];
+
+            publishPorts = [
+              "${toString ports.cmdarr}:8080/tcp"
+            ];
+          };
         };
-      };
       */
 
       containers.slskd = {
         autoStart = true;
+
+        unitConfig = {
+          Requires = [ "gluetun.service" ];
+          After = [ "gluetun.service" ];
+        };
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
-          Requires = [ "gluetun.service" ];
-          After = [ "gluetun.service" ];
         };
 
         containerConfig = {

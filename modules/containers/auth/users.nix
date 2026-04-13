@@ -1,5 +1,5 @@
 /*
-  modules/containers/users.nix
+  modules/containers/auth/users.nix
 
   part of der-home-server
   created 2026-04-08

@@ -2,7 +2,7 @@
   flake.nix
 
   part of der-home-server
-  created 2026-04-07
+  created 2026-04-12
 */
 
 # der-home-server configuration

@@ -2,7 +2,7 @@
   modules/containers/reverse-proxy.nix
 
   part of der-home-server
-  created 2026-04-08
+  created 2026-04-12
 */
 
 {

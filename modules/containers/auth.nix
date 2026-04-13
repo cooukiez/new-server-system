@@ -2,7 +2,7 @@
   modules/containers/auth.nix
 
   part of der-home-server
-  created 2026-04-10
+  created 2026-04-14
 */
 
 {
@@ -34,7 +34,7 @@ let
       refresh_interval = "1m";
       ldap = {
         implementation = "lldap";
-        address = "ldap://lldap:3890"; 
+        address = "ldap://lldap:3890";
         base_dn = "dc=ldap,dc=home,dc=lan";
         user = "uid=admin,ou=people,dc=ldap,dc=home,dc=lan";
       };
@@ -170,12 +170,14 @@ in
 
       containers.authelia = {
         autoStart = true;
+
+        unitConfig = {
+          Requires = [ "postgres.service" ];
+          After = [ "postgres.service" ];
+        };
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
-          Requires = [ "postgres.service" ];
-          After = [ "postgres.service" ];
 
           ExecStartPre = [
             "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/configuration.yml /opt/authelia/config/configuration.yml"

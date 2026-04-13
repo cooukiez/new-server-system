@@ -2,7 +2,7 @@
   modules/containers/database.nix
 
   part of der-home-server
-  created 2026-04-08
+  created 2026-04-14
 */
 
 {
@@ -57,7 +57,7 @@
 
       CREATE DATABASE "lidarr-main";
       ALTER DATABASE "lidarr-main" OWNER TO lidarr;
-      
+
       CREATE DATABASE "lidarr-log";
       ALTER DATABASE "lidarr-log" OWNER TO lidarr;
 

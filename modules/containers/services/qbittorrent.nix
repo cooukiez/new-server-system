@@ -2,7 +2,7 @@
   modules/containers/services/qbittorrent.nix
 
   part of der-home-server
-  created 2026-04-12
+  created 2026-04-14
 */
 
 {
@@ -32,12 +32,15 @@ in
       containers.qbittorrent = {
         autoStart = true;
 
+        unitConfig = {
+          Requires = [ "gluetun.service" ];
+          After = [ "gluetun.service" ];
+        };
+
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
 
-          Requires = [ "gluetun.service" ];
-          After = [ "gluetun.service" ];
         };
 
         containerConfig = {

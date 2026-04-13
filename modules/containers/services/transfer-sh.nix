@@ -1,8 +1,8 @@
 /*
-  modules/containers/services/qbittorrent.nix
+  modules/containers/services/transfer-sh.nix
 
   part of der-home-server
-  created 2026-04-12
+  created 2026-04-14
 */
 
 {
@@ -37,8 +37,10 @@ in
           name = "transfer-sh";
 
           exec = [
-            "--provider" "local"
-            "--basedir" "/data"
+            "--provider"
+            "local"
+            "--basedir"
+            "/data"
           ];
 
           environments = {
