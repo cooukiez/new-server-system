@@ -90,6 +90,11 @@ let
       port = ports.transferSH;
       policy = "bypass";
     };
+
+    git = {
+      port = ports.giteaHttp;
+      policy = "bypass";
+    };
   };
 
   autheliaRules = [

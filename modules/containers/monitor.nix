@@ -339,7 +339,7 @@ in
           image = "quay.io/navidys/prometheus-podman-exporter:${prometheusPodmanExporterVersion}";
           name = "podman-exporter";
           networks = [ "monitoring.network" ];
-          userns = "keep-id";
+          userns = "keep-id:uid=10000,gid=10000";
 
           # mount squ podman socket
           volumes = [
