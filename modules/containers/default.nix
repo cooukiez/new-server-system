@@ -14,6 +14,7 @@
 {
   imports = [
     ./services/media
+    ./services/gitea.nix
     ./services/immich.nix
     ./services/qbittorrent.nix
     ./services/transfer-sh.nix

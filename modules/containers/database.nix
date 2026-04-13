@@ -16,12 +16,17 @@
     postgres-pw = {
       file = ../../secrets/postgres-pw.age;
     };
-  };
+  };CREATE DATABASE lidarr-main;
 
   home.file."containers/postgres/authelia-init.sql" = {
     text = ''
+      CREATE USER authelia;
+      ALTER USER authelia WITH PASSWORD 'authelia';
+
       CREATE DATABASE authelia;
+
       GRANT ALL PRIVILEGES ON DATABASE authelia TO admin;
+      GRANT ALL PRIVILEGES ON DATABASE authelia TO authelia;
     '';
   };
 
@@ -40,7 +45,7 @@
   home.file."containers/postgres/gitea-init.sql" = {
     text = ''
       CREATE USER gitea;
-      ALTER USER lldap WITH PASSWORD 'gitea';
+      ALTER USER gitea WITH PASSWORD 'gitea';
 
       CREATE DATABASE gitea;
 
@@ -48,6 +53,24 @@
       GRANT ALL PRIVILEGES ON DATABASE gitea TO gitea;
     '';
   };
+
+  home.file."containers/postgres/lidarr-init.sql" = {
+    text = ''
+      CREATE USER lidarr;
+      ALTER USER lidarr WITH PASSWORD 'lidarr';
+
+      CREATE DATABASE lidarrMain;
+      CREATE DATABASE lidarrLog;
+
+      GRANT ALL PRIVILEGES ON DATABASE lidarrMain TO admin;
+      GRANT ALL PRIVILEGES ON DATABASE lidarrLog TO admin;
+
+      GRANT ALL PRIVILEGES ON DATABASE lidarrMain TO gitea;
+      GRANT ALL PRIVILEGES ON DATABASE lidarrLog TO gitea;
+    '';
+  };
+
+  # podman exec -it postgres psql -U admin -d app_db
 
   virtualisation.quadlet =
     let
@@ -83,6 +106,8 @@
 
             "${config.home.homeDirectory}/containers/postgres/authelia-init.sql:/docker-entrypoint-initdb.d/authelia-init.sql:ro"
             "${config.home.homeDirectory}/containers/postgres/lldap-init.sql:/docker-entrypoint-initdb.d/lldap-init.sql:ro"
+            "${config.home.homeDirectory}/containers/postgres/gitea-init.sql:/docker-entrypoint-initdb.d/gitea-init.sql:ro"
+            "${config.home.homeDirectory}/containers/postgres/lidarr-init.sql:/docker-entrypoint-initdb.d/lidarr-init.sql:ro"
           ];
 
           publishPorts = [
