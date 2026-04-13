@@ -127,6 +127,11 @@ in
         device = "/opt/lidarr/lists";
       };
 
+      volumes.cmdarr-data.volumeConfig = {
+        type = "bind";
+        device = "/opt/cmdarr/data";
+      };
+
       volumes.slskd-data.volumeConfig = {
         type = "bind";
         device = "/opt/slskd/data";
@@ -190,6 +195,37 @@ in
 
           publishPorts = [
             "${toString ports.lidarrLists}:80/tcp"
+          ];
+        };
+      };
+
+      containers.cmdarr = {
+        autoStart = true;
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
+        };
+
+        containerConfig = {
+          image = "docker.io/nginx:${lidarrListsNginxVersion}";
+          name = "lidarr-lists";
+          networks = [ "media-net" ];
+          userns = "keep-id:uid=10000,gid=10000";
+
+          environments = {
+            PUID = "10000";
+            PGID = "10000";
+            TZ = "Europe/Berlin";
+
+            LIDARR_URL = "http://lidarr:8686";
+          };
+          
+          volumes = [
+            "${volumes.cmdarr-data.ref}:/app/data:ro"
+          ];
+
+          publishPorts = [
+            "${toString ports.cmdarr}:8080/tcp"
           ];
         };
       };

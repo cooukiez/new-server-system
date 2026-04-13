@@ -59,7 +59,7 @@
         "read only" = "no";
         "guest ok" = "no";
         "valid users" = "admin";
-        "force user" = "admin";
+        "force user" = "root";
       };
     };
   };

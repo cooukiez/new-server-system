@@ -61,6 +61,10 @@
     "d /opt/lidarr 0755 10000 10000 -"
     "d /opt/lidarr/data 0755 10000 10000 -"
     "d /opt/lidarr/lists 0755 10000 10000 -"
+
+    "d /opt/cmdarr 0755 10000 10000 -"
+    "d /opt/cmdarr/data 0755 10000 10000 -"
+
     "d /opt/slskd 0755 10000 10000 -"
     "d /opt/slskd/data 0755 10000 10000 -"
 

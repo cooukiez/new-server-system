@@ -45,7 +45,8 @@
 
   # music
   lidarr = 8686;
-  lidarrLists = 8688;
+  lidarrLists = 86860;
+  cmdarr = 8688;
   slskdHttp = 5030;
   slskdHttps = 5031;
   slskdPeer = 50300;
