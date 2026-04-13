@@ -79,13 +79,12 @@ in
           image = "docker.io/jellyfin/jellyfin:${jellyfinVersion}";
           name = "jellyfin";
           networks = [ "media-net" ];
-          userns = "keep-id:uid=10000,gid=10000";
 
           addHosts = [
             "auth.home.lan:host-gateway"
           ];
 
-          # exec = "/bin/bash -c 'update-ca-certificates && exec /jellyfin/jellyfin'";
+          user = "0:0";
 
           environments = {
             JELLYFIN_CONFIG_DIR = "/jellyfin/config";
@@ -95,8 +94,8 @@ in
           };
 
           volumes = [
-            # certs
-            "${volumes.caddy-certs.ref}:/usr/local/share/ca-certificates:ro"
+            # certificates
+            "/etc/cert/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
 
             # volumes
             "${volumes.jellyfin-config.ref}:/jellyfin/config"

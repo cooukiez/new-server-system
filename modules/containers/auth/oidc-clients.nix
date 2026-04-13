@@ -60,7 +60,7 @@
   {
     client_id = "gitea";
     client_name = "Gitea";
-    client_secret = "$pbkdf2-sha512$310000$6Jkj5q/W48sCg8ZUFoAlWQ$2INpYddG8oxYX0nrvKQ2w.siUbj5qOlolvGs9NiK9GKFSx56CRYWR7E9qpisjOUtGyBCxZwboseUSh2ki6isig";
+    client_secret = "$pbkdf2-sha512$310000$PFdvvf6wivFGVmYmQULNUQ$i1jEXENP/h.xlx6pYYT4czQr7G4oqFVgf3hqJUBiNlqvty9cs5DdwufgvGDtesxkAUT7hKX4NaLSAAv6RJCKmQ";
 
     public = false;
     authorization_policy = "two_factor";
