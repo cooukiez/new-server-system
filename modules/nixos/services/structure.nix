@@ -80,6 +80,9 @@
     "d /opt/transfer-sh 0755 10000 10000 -"
     "d /opt/transfer-sh/data 0755 10000 10000 -"
 
+    "d /opt/gitea 0755 10000 10000 -"
+    "d /opt/gitea/data 0755 10000 10000 -"
+
     #
     # media directories
     #

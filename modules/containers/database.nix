@@ -37,6 +37,18 @@
     '';
   };
 
+  home.file."containers/postgres/gitea-init.sql" = {
+    text = ''
+      CREATE USER gitea;
+      ALTER USER lldap WITH PASSWORD 'gitea';
+
+      CREATE DATABASE gitea;
+
+      GRANT ALL PRIVILEGES ON DATABASE gitea TO admin;
+      GRANT ALL PRIVILEGES ON DATABASE gitea TO gitea;
+    '';
+  };
+
   virtualisation.quadlet =
     let
       inherit (config.virtualisation.quadlet) volumes networks pods;

@@ -199,6 +199,7 @@ in
         };
       };
 
+      /*
       containers.cmdarr = {
         autoStart = true;
         serviceConfig = {
@@ -208,7 +209,7 @@ in
 
         containerConfig = {
           image = "docker.io/nginx:${lidarrListsNginxVersion}";
-          name = "lidarr-lists";
+          name = "cmdarr";
           networks = [ "media-net" ];
           userns = "keep-id:uid=10000,gid=10000";
 
@@ -229,6 +230,7 @@ in
           ];
         };
       };
+      */
 
       containers.slskd = {
         autoStart = true;

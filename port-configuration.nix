@@ -43,9 +43,13 @@
   # media
   jellyfin = 8096;
 
+  # git
+  giteaHttp = 3030;
+  gitea = 222;
+
   # music
   lidarr = 8686;
-  lidarrLists = 86860;
+  lidarrLists = 18686;
   cmdarr = 8688;
   slskdHttp = 5030;
   slskdHttps = 5031;
