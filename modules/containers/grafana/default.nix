@@ -224,18 +224,20 @@ let
           };
     };
 
-  # imported dashboards
-  adguardDashboard = import ./adguard.nix { inherit mkDashboard mkPanel; };
-  adguardDashboardJson = builtins.toJSON adguardDashboard;
+  dashboards = [ 
+    "adguard"
+    "immich"
+    "lidarr"
+    "slskd"
+  ];
 
-  immichDashboard = import ./immich.nix { inherit mkDashboard mkPanel; };
-  immichDashboardJson = builtins.toJSON immichDashboard;
-
-  # jupyterDashboard = import ./jupyter.nix { inherit mkDashboard mkPanel; };
-  # jupyterDashboardJson = builtins.toJSON jupyterDashboard;
+  dashboardFiles = builtins.listToAttrs (map (name: {
+    name = "containers/grafana/provisioning/dashboards/${name}.json";
+    value = {
+      text = builtins.toJSON (import ./${name}.nix { inherit mkDashboard mkPanel; });
+    };
+  }) dashboards);
 in
 {
-  home.file."containers/grafana/provisioning/dashboards/adguard.json".text = adguardDashboardJson;
-  home.file."containers/grafana/provisioning/dashboards/immich.json".text = immichDashboardJson;
-  # home.file."containers/grafana/provisioning/dashboards/jupyter.json".text = jupyterDashboardJson;
+  home.file = dashboardFiles;
 }

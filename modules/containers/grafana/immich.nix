@@ -10,7 +10,7 @@
   mkPanel,
 }:
 let
-  dashboardName = "Immich Container";
+  dashboardName = "Immich";
   appName = "Immich";
   containerName = "immich";
   networkRelevantContainer = "immich-server";
@@ -47,11 +47,13 @@ mkDashboard {
         {
           editorMode = "code";
           expr = ''
-            sum(
-              rate(podman_container_cpu_seconds_total[5m]) 
-              * on(id) group_left(name) 
-              podman_container_info{name=~".*${containerName}.*"}
-            ) by (name) * 100
+            (
+              sum(
+                rate(podman_container_cpu_seconds_total[5m]) 
+                * on(id) group_left(name) 
+                podman_container_info{name=~".*${containerName}.*"}
+              ) by (name) * 100
+            ) / 8
           '';
           legendFormat = "__auto";
           range = true;

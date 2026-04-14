@@ -10,10 +10,10 @@
   mkPanel,
 }:
 let
-  dashboardName = "Adguard";
-  appName = "Adguardhome";
-  containerName = "adguardhome";
-  networkRelevantContainer = "adguardhome";
+  dashboardName = "Lidarr";
+  appName = "Lidarr";
+  containerName = "lidarr";
+  networkRelevantContainer = "lidarr";
 in
 mkDashboard {
   name = dashboardName;
