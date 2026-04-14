@@ -312,9 +312,9 @@ in
           userns = "keep-id:uid=10000,gid=10000";
 
           environmentFiles = [
-            "secrets/slskd-user"
-            "secrets/slskd-pass"
-            "secrets/slskd-webui"
+            "secrets/slskd/user"
+            "secrets/slskd/password"
+            "secrets/slskd/webui-pw"
           ];
 
           environments = {
