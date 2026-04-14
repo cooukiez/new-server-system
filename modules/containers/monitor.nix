@@ -169,7 +169,7 @@ in
     source = grafanaSettingsFormat.generate "grafana.ini" grafanaSettings;
   };
 
-  age.secrets.grafana-client-key.file = ../../secrets/auth/clients/grafana-client-key.age;
+  age.secrets.grafana-client-key.file = ../../secrets/grafana-client-key.age;
 
   # grafana provisioning
   home.file."containers/grafana/provisioning/datasources/datasources.yaml".text = ''
