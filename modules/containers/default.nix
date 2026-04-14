@@ -16,6 +16,7 @@
     ./services/media
     ./services/gitea.nix
     ./services/immich.nix
+    ./services/papra.nix
     ./services/qbittorrent.nix
     ./services/transfer-sh.nix
     ./services/vnstat.nix

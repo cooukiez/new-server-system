@@ -50,6 +50,18 @@
     '';
   };
 
+  home.file."containers/postgres/papra-init.sql" = {
+    text = ''
+      CREATE USER papra;
+      ALTER USER papra WITH PASSWORD 'papra';
+
+      CREATE DATABASE papra;
+      ALTER DATABASE papra OWNER TO papra;
+
+      GRANT ALL PRIVILEGES ON DATABASE papra TO admin;
+    '';
+  };
+
   home.file."containers/postgres/lidarr-init.sql" = {
     text = ''
       CREATE USER lidarr;
@@ -103,6 +115,7 @@
             "${config.home.homeDirectory}/containers/postgres/authelia-init.sql:/docker-entrypoint-initdb.d/authelia-init.sql:ro"
             "${config.home.homeDirectory}/containers/postgres/lldap-init.sql:/docker-entrypoint-initdb.d/lldap-init.sql:ro"
             "${config.home.homeDirectory}/containers/postgres/gitea-init.sql:/docker-entrypoint-initdb.d/gitea-init.sql:ro"
+            "${config.home.homeDirectory}/containers/postgres/papra-init.sql:/docker-entrypoint-initdb.d/papra-init.sql:ro"
             "${config.home.homeDirectory}/containers/postgres/lidarr-init.sql:/docker-entrypoint-initdb.d/lidarr-init.sql:ro"
           ];
 

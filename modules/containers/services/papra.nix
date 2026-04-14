@@ -8,6 +8,7 @@
 {
   config,
   ports,
+  envSecretsPrefix,
   ...
 }:
 let
