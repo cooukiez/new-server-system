@@ -64,8 +64,8 @@ in
             "/etc/localtime:/etc/localtime:ro"
 
             # certificates
-            "/etc/cert/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
-            "${volumes.caddy-certs.ref}:/certs"
+            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
+            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # volumes
             "${volumes.gitea-data.ref}:/data"

@@ -53,4 +53,7 @@
       RemainAfterExit = true;
     };
   };
+
+  # get exec command
+  # podman inspect --format '{{.Config.Entrypoint}} {{.Config.Cmd}}' <container_name_or_id>
 }

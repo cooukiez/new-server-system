@@ -257,7 +257,8 @@ in
             "${config.age.secrets.auth-grafana-oidc.path}:/run/secrets/AUTH_GRAFANA_OIDC:ro"
 
             # certs
-            "${volumes.caddy-certs.ref}:/certs:ro"
+            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
+            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
           ]
           ++ (map (n: "${volumes."grafana-${n}".ref}:${grafanaPaths.${n}}") [
             "provisioning"

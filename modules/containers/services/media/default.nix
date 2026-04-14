@@ -94,7 +94,8 @@ in
 
           volumes = [
             # certificates
-            # "/etc/cert/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
+            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
+            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # volumes
             "${volumes.jellyfin-config.ref}:/jellyfin/config"

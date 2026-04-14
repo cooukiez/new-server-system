@@ -6,7 +6,7 @@
 */
 
 {
-  environment.etc."cert/req.conf" = {
+  environment.etc."certs/req.conf" = {
     text = ''
       [req]
       distinguished_name = req_distinguished_name
@@ -28,7 +28,7 @@
   };
 
   /*
-    cd /etc/cert &&
+    cd /etc/certs &&
     openssl req -x509 -nodes -days 365 -newkey rsa:4096 \
     -keyout home.lan.key \
     -out home.lan.crt \

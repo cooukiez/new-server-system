@@ -153,10 +153,13 @@ in
 
           volumes = [
             "/etc/localtime:/etc/localtime:ro"
-            "${volumes.caddy-certs.ref}:/certs:ro"
 
             # secrets
             "${config.age.secrets.immich-db-pw.path}:/run/secrets/IMMICH_DB_PW"
+
+            # certificates
+            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
+            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # volumes
             "${volumes.immich-media.ref}:/data"

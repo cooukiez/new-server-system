@@ -18,7 +18,7 @@ in
   age.secrets =
     let
       mkSecret = name: {
-        file = ../../../../secrets/${name}.age;
+        file = ../../../secrets/${name}.age;
         path = "${envSecretsPrefix}/${name}";
       };
     in
@@ -58,6 +58,8 @@ in
           name = "papra";
           userns = "keep-id:uid=10000,gid=10000";
 
+          # exec = "/bin/sh -c 'update-ca-certificates && pnpm start:with-migrations'";
+
           environments = {
             TZ = "Europa/Berlin";
 
@@ -66,11 +68,13 @@ in
             PORT = "1221";
             SERVER_HOSTNAME = "0.0.0.0";
 
-            DATABASE_URL = "postgres://papra:papra@host.containers.internal:5432/papra";
+            # DATABASE_URL = "postgres://papra:papra@host.containers.internal:5432/papra";
 
             DOCUMENT_STORAGE_FILESYSTEM_ROOT = "/data";
             DOCUMENTS_CONTENT_EXTRACTION_ENABLED = "true";
             DOCUMENTS_OCR_LANGUAGES = "eng";
+
+            NODE_EXTRA_CA_CERTS = "/certs/home.lan.crt";
           };
 
           environmentFiles = [
@@ -83,6 +87,11 @@ in
           volumes = [
             "/etc/localtime:/etc/localtime:ro"
 
+            # certificates
+            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
+            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+
+            # volumes
             "${volumes.data-documents.ref}:/data"
             "${volumes.papra-data.ref}:/app/app-data"
           ];
@@ -97,17 +106,6 @@ in
 
 /*
 
-echo -n 'AUTH_PROVIDERS_CUSTOMS='\''[
-  {
-    "providerId": "authelia",
-    "providerName": "Authelia",
-    "providerIconUrl": "https://www.authelia.com/images/branding/logo-cropped.png",
-    "clientId": "papra",
-    "clientSecret": "",
-    "type": "oidc",
-    "discoveryUrl": "https://auth.home.lan/.well-known/openid-configuration",
-    "scopes": ["openid", "profile", "email"]
-  }
-]'\''' | agenix -e papra/auth-client.age
+echo -n 'AUTH_PROVIDERS_CUSTOMS=[{"providerId":"authelia","providerName":"Authelia","providerIconUrl":"https://www.authelia.com/images/branding/logo-cropped.png","clientId":"papra","clientSecret":"","type":"oidc","discoveryUrl":"https://auth.home.lan/.well-known/openid-configuration","scopes":["openid","profile","email"]}]' | agenix -e papra/auth-client.age
 
 */

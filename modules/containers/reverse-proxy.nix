@@ -187,7 +187,7 @@ in
     {
       volumes.caddy-certs.volumeConfig = {
         type = "bind";
-        device = "/etc/cert";
+        device = "/etc/certs";
       };
 
       volumes.caddy-config.volumeConfig = {
