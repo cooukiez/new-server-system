@@ -83,10 +83,18 @@
     "d /opt/gitea 0755 10000 10000 -"
     "d /opt/gitea/data 0755 10000 10000 -"
 
+    "d /opt/papra 0755 10000 10000 -"
+    "d /opt/papra/data 0755 10000 10000 -"
+
     #
     # media directories
     #
     "d /media 0755 10000 10000 -"
+
+    "d /media/music 0755 10000 10000 -"
+    "d /media/photos 0755 10000 10000 -"
+    
+    # download folder structure
     "d /media/download 0755 10000 10000 -"
 
     "d /media/download/slskd 0755 10000 10000 -"
@@ -94,11 +102,13 @@
     "d /media/download/slskd/incomplete 0755 10000 10000 -"
 
     "d /media/download/deezer 0755 10000 10000 -"
-
     "d /media/download/qbittorrent 0755 10000 10000 -"
 
-    "d /media/music 0755 10000 10000 -"
-    "d /media/photos 0755 10000 10000 -"
+    #
+    # data directories
+    #
+    "d /data 0755 10000 10000 -"
+    "d /data/documents 0755 10000 10000 -"
   ];
 
   # old server mount

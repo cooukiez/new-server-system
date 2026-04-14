@@ -54,13 +54,18 @@ in
   "ldap/admin-pass.age".publicKeys = allKeys;
 
   # auth clients
-  "auth/clients/grafana-oauth.age".publicKeys = allKeys;
+  "auth/clients/grafana-oidc.age".publicKeys = allKeys;
 
   # general
   "global-agenix.age".publicKeys = allKeys;
   "gluetun-key.age".publicKeys = allKeys;
   "postgres-pw.age".publicKeys = allKeys;
   "tailscale-key.age".publicKeys = allKeys;
+
+  # papra
+  "papra/storage-key.age".publicKeys = allKeys;
+  "papra/auth-secret.age".publicKeys = allKeys;
+  "papra/auth-client.age".publicKeys = allKeys;
 
   # slskd
   "slskd/password.age".publicKeys = allKeys;

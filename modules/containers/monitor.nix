@@ -160,6 +160,10 @@ in
     ./grafana
   ];
 
+  _module.args = {
+    grafanaPaths = grafanaPaths;
+  };
+
   # grafana
   home.file."containers/grafana/grafana.ini" = {
     source = grafanaSettingsFormat.generate "grafana.ini" grafanaSettings;
@@ -168,19 +172,6 @@ in
   age.secrets.auth-grafana-oidc.file = ../../secrets/auth/clients/grafana-oidc.age;
 
   # grafana provisioning
-  home.file."containers/grafana/provisioning/dashboards/dashboards.yaml".text = ''
-    apiVersion: 1
-    providers:
-      - name: 'Default'
-        orgId: 1
-        folder: ""
-        type: file
-        disableDeletion: false
-        editable: true
-        options:
-          path: ${grafanaPaths.provisioning}/dashboards
-  '';
-
   home.file."containers/grafana/provisioning/datasources/datasources.yaml".text = ''
     apiVersion: 1
     datasources:

@@ -54,6 +54,9 @@
   giteaHttp = 3030;
   gitea = 222;
 
+  # documents
+  papra = 1221;
+
   # music
   lidarr = 8686;
   lidarrLists = 18686;

@@ -95,6 +95,11 @@ let
       port = ports.giteaHttp;
       policy = "bypass";
     };
+
+    papra = {
+      port = ports.papra;
+      policy = "bypass";
+    };
   };
 
   autheliaRules = [

@@ -11,6 +11,8 @@
 }:
 let
   dashboardName = "Slskd";
+  dashboardUid = "duewqas";
+
   appName = "Slskd";
   containerName = "slskd";
   networkRelevantContainer = "slskd";
@@ -19,7 +21,7 @@ mkDashboard {
   name = dashboardName;
   description = "${appName} container metrics";
 
-  uid = "grgqhwe";
+  uid = dashboardUid;
 
   editable = false;
   preload = false;
