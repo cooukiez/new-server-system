@@ -58,6 +58,10 @@ in
           name = "papra";
           userns = "keep-id:uid=10000,gid=10000";
 
+          addHosts = [
+            "auth.home.lan:host-gateway"
+          ];
+
           # exec = "/bin/sh -c 'update-ca-certificates && pnpm start:with-migrations'";
 
           environments = {
@@ -75,6 +79,9 @@ in
             DOCUMENTS_OCR_LANGUAGES = "eng";
 
             NODE_EXTRA_CA_CERTS = "/certs/home.lan.crt";
+
+            AUTH_FIRST_USER_AS_ADMIN = "true";
+            AUTH_PROVIDERS_EMAIL_IS_ENABLED = "false";
           };
 
           environmentFiles = [

@@ -169,7 +169,7 @@ in
     source = grafanaSettingsFormat.generate "grafana.ini" grafanaSettings;
   };
 
-  age.secrets.auth-grafana-oidc.file = ../../secrets/auth/clients/grafana-oidc.age;
+  age.secrets.grafana-client-key.file = ../../secrets/auth/clients/grafana-client-key.age;
 
   # grafana provisioning
   home.file."containers/grafana/provisioning/datasources/datasources.yaml".text = ''
@@ -254,7 +254,7 @@ in
             "${config.home.homeDirectory}/containers/grafana/grafana.ini:${grafanaPaths.config}:ro"
 
             # secrets
-            "${config.age.secrets.auth-grafana-oidc.path}:/run/secrets/AUTH_GRAFANA_OIDC:ro"
+            "${config.age.secrets.grafana-client-key.path}:/run/secrets/AUTH_GRAFANA_OIDC:ro"
 
             # certs
             "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"

@@ -57,6 +57,8 @@
   # documents
   papra = 1221;
 
+  ebk = 8040;
+
   # music
   lidarr = 8686;
   lidarrLists = 18686;

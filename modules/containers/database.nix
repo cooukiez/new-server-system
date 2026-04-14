@@ -50,19 +50,17 @@
     '';
   };
 
-  /*
-  home.file."containers/postgres/papra-init.sql" = {
+  home.file."containers/postgres/ebk-init.sql" = {
     text = ''
-      CREATE USER papra;
-      ALTER USER papra WITH PASSWORD 'papra';
+      CREATE USER ebk;
+      ALTER USER ebk WITH PASSWORD 'ebk';
 
-      CREATE DATABASE papra;
-      ALTER DATABASE papra OWNER TO papra;
+      CREATE DATABASE ebk;
+      ALTER DATABASE ebk OWNER TO ebk;
 
-      GRANT ALL PRIVILEGES ON DATABASE papra TO admin;
+      GRANT ALL PRIVILEGES ON DATABASE ebk TO admin;
     '';
   };
-  */
 
   home.file."containers/postgres/lidarr-init.sql" = {
     text = ''
@@ -79,6 +77,20 @@
       GRANT ALL PRIVILEGES ON DATABASE "lidarr-log" TO admin;
     '';
   };
+
+  /*
+  home.file."containers/postgres/papra-init.sql" = {
+    text = ''
+      CREATE USER papra;
+      ALTER USER papra WITH PASSWORD 'papra';
+
+      CREATE DATABASE papra;
+      ALTER DATABASE papra OWNER TO papra;
+
+      GRANT ALL PRIVILEGES ON DATABASE papra TO admin;
+    '';
+  };
+  */
 
   # podman exec -it postgres psql -U admin -d app_db
 
@@ -117,8 +129,10 @@
             "${config.home.homeDirectory}/containers/postgres/authelia-init.sql:/docker-entrypoint-initdb.d/authelia-init.sql:ro"
             "${config.home.homeDirectory}/containers/postgres/lldap-init.sql:/docker-entrypoint-initdb.d/lldap-init.sql:ro"
             "${config.home.homeDirectory}/containers/postgres/gitea-init.sql:/docker-entrypoint-initdb.d/gitea-init.sql:ro"
-            # "${config.home.homeDirectory}/containers/postgres/papra-init.sql:/docker-entrypoint-initdb.d/papra-init.sql:ro"
+            "${config.home.homeDirectory}/containers/postgres/ebk-init.sql:/docker-entrypoint-initdb.d/ebk-init.sql:ro"
             "${config.home.homeDirectory}/containers/postgres/lidarr-init.sql:/docker-entrypoint-initdb.d/lidarr-init.sql:ro"
+
+            # "${config.home.homeDirectory}/containers/postgres/papra-init.sql:/docker-entrypoint-initdb.d/papra-init.sql:ro"
           ];
 
           publishPorts = [

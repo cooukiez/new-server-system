@@ -100,6 +100,11 @@ let
       port = ports.papra;
       policy = "bypass";
     };
+
+    finance = {
+      port = ports.ebk;
+      policy = "bypass";
+    };
   };
 
   autheliaRules = [
