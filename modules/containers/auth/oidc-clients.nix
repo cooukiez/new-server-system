@@ -121,7 +121,7 @@
   {
     client_id = "ezbookkeeping";
     client_name = "ezBookkeeping";
-    client_secret = "$pbkdf2-sha512$310000$iZcRHLNCaLQRucCZQiaSpQ$uxJSCJi1ZmpwwVUjA2BCjSbLvl34KVFnv2N11wWSTUupDkucRGnXbIvNU/v00ln9cogBVl2DMiWcicYa7IeS3w";
+    client_secret = "$pbkdf2-sha512$310000$W7MPEUwmQzHXWrMF3IAN/A$PqcNQkyzkLHFbqeNQmglL13dVKGqv5VAocgcb/w2VXYrojUB7tKPqA6QvqmIFzkQ9RmVfzrRXEQZaHjqTiLGnw";
 
     public = false;
     authorization_policy = "two_factor";

@@ -14,6 +14,8 @@
 {
   imports = [
     ./services/media
+
+    ./services/ebk.nix
     ./services/gitea.nix
     ./services/immich.nix
     ./services/papra.nix
