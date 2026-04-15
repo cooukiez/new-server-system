@@ -21,6 +21,7 @@ let
     grafana = "https://monitor.home.lan";
     vnstat = "https://vnstat.home.lan";
     immich = "https://immich.home.lan";
+    papra = "https://papra.home.lan";
   };
 
   # homepage settings
@@ -42,7 +43,7 @@ let
     disableUpdateCheck = true;
 
     layout = {
-      "Administration" = {
+      "Monitoring" = {
         style = "row";
         columns = 5;
       };
@@ -95,19 +96,19 @@ let
 
   homepageServices = [
     {
-      "Administration" = [
+      "Monitoring" = [
         {
           "Grafana" = {
             icon = "grafana";
             href = globalAddress.grafana;
-            description = "Container Monitoring Dashboard";
-            widget = {
-              type = "grafana";
-              url = grafanaLocalAddress;
-              username = "admin";
-              password = "{{HOMEPAGE_VAR_GRAFANA_PW}}";
-              version = 2;
-            };
+            description = "Container / Monitoring Dashboard";
+          };
+        }
+        {
+          "VNStat" = {
+            icon = "mdi-chart-timeline-variant";
+            href = globalAddress.vnstat;
+            description = "VNStat Dashboard";
           };
         }
       ];
@@ -117,21 +118,12 @@ let
         {
           "AdGuard Home" = {
             icon = "adguard-home";
-            href = adguardGlobalAddress;
+            href = globalAddress.adguard;
             description = "Private DNS Server";
             widget = {
               type = "adguard";
-              url = adguardLocalAddress;
-              username = "admin";
-              password = "{{HOMEPAGE_VAR_ADGUARD_PW}}";
+              url = "http://host.containers.internal:${toString ports.adguard}";
             };
-          };
-        }
-        {
-          "VNStat" = {
-            icon = "mdi-chart-timeline-variant";
-            href = vnstatGlobalAddress;
-            description = "VNStat Dashboard";
           };
         }
       ];
@@ -139,28 +131,17 @@ let
     {
       "Services" = [
         {
-          "Paperless (Admin)" = {
-            icon = "paperless";
-            href = paperlessGlobalAddress;
+          "Papra" = {
+            icon = "papra";
+            href = globalAddress.papra;
             description = "Document Management System";
-            widget = {
-              type = "paperlessngx";
-              url = paperlessLocalAddress;
-              key = "{{HOMEPAGE_VAR_PAPERLESS_KEY}}";
-            };
           };
         }
         {
-          "Immich (Admin)" = {
+          "Immich" = {
             icon = "immich";
-            href = immichGlobalAddress;
+            href = globalAddress.immich;
             description = "Photo Management System";
-            widget = {
-              type = "immich";
-              url = immichLocalAddress;
-              key = "{{HOMEPAGE_VAR_IMMICH_KEY}}";
-              version = 2;
-            };
           };
         }
       ];
@@ -171,7 +152,7 @@ let
           "CPU Usage" = {
             widget = {
               type = "glances";
-              url = glancesLocalAddress;
+              url = "http://127.0.0.1:${toString ports.glances}";
               version = 4;
               metric = "cpu";
             };
@@ -181,7 +162,7 @@ let
           "Memory Usage" = {
             widget = {
               type = "glances";
-              url = glancesLocalAddress;
+              url = "http://127.0.0.1:${toString ports.glances}";
               version = 4;
               metric = "memory";
             };
@@ -191,7 +172,7 @@ let
           "Network Usage" = {
             widget = {
               type = "glances";
-              url = glancesLocalAddress;
+              url = "http://127.0.0.1:${toString ports.glances}";
               version = 4;
               metric = "network:eth0";
             };
@@ -201,9 +182,9 @@ let
           "Disk I/O" = {
             widget = {
               type = "glances";
-              url = glancesLocalAddress;
+              url = "http://127.0.0.1:${toString ports.glances}";
               version = 4;
-              metric = "disk:sda1";
+              metric = "disk:nvme0n1";
             };
           };
         }
@@ -226,10 +207,7 @@ in
       };
     in
     {
-      homepage-grafana = mkSecret "grafana-admin";
-      homepage-adguard = mkSecret "adguard-admin";
-      homepage-paperless = mkSecret "paperless-key";
-      homepage-immich = mkSecret "immich-key";
+      # homepage-adguard = mkSecret "homepage/adguard-pw";
     };
 
   virtualisation.quadlet =
@@ -256,21 +234,23 @@ in
 
           environments = {
             HOMEPAGE_ALLOWED_HOSTS = "home.lan,${staticIP}";
-            # Map file paths from age secrets to Homepage vars
-            HOMEPAGE_VAR_GRAFANA_PW = "file://${config.age.secrets.homepage-grafana.path}";
-            HOMEPAGE_VAR_ADGUARD_PW = "file://${config.age.secrets.homepage-adguard.path}";
-            HOMEPAGE_VAR_PAPERLESS_KEY = "file://${config.age.secrets.homepage-paperless.path}";
-            HOMEPAGE_VAR_IMMICH_KEY = "file://${config.age.secrets.homepage-immich.path}";
+
+            # HOMEPAGE_FILE_ADGUARD_PW = "/run/secrets/HOMEPAGE_ADGUARD_PW";
           };
 
           volumes = [
             "/run/user/10000/podman/podman.sock:/run/podman/podman.sock:ro"
-            # Mount the generated configs
+
+            # config
             "${config.home.homeDirectory}/containers/homepage/settings.yaml:/app/config/settings.yaml:ro"
             "${config.home.homeDirectory}/containers/homepage/widgets.yaml:/app/config/widgets.yaml:ro"
             "${config.home.homeDirectory}/containers/homepage/services.yaml:/app/config/services.yaml:ro"
-            # Mount background image
-            "${./background.png}:/app/public/images/background.png:ro"
+
+            # background
+            "${./assets/background-fullres.png}:/app/public/images/background.png:ro"
+
+            # secrets
+            # "${config.age.secrets.homepage-adguard.path}:/run/secrets/HOMEPAGE_ADGUARD_PW:ro"
           ];
 
           publishPorts = [

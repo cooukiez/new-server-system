@@ -160,8 +160,7 @@ in
 
     home.lan {
       import my_tls
-      root * /var/www/home
-      file_server
+      reverse_proxy host.containers.internal:${toString ports.homepage}
     }
 
     *.home.lan {
