@@ -12,6 +12,17 @@ let
   nodeRedVersion = "latest";
 in
 {
+  age.secrets =
+    let
+      mkSecret = name: {
+        file = ../../../secrets/${name}.age;
+        path = "${envSecretsPrefix}/${name}";
+      };
+    in
+    {
+      node-red-secret = mkSecret "node-red-secret";
+    };
+
   virtualisation.quadlet =
     let
       inherit (config.virtualisation.quadlet) volumes;
@@ -44,6 +55,10 @@ in
             NODE_RED_ENABLE_PROJECTS = "true";
             NODE_RED_ENABLE_SAFE_MODE = "false";
           };
+
+          environmentFiles = [
+            "secrets/node-red-secret"
+          ];
 
           volumes = [
             "/etc/localtime:/etc/localtime:ro"

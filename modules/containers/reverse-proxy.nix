@@ -66,7 +66,7 @@ let
       policy = "bypass";
     };
 
-    node-red = {
+    flow = {
       port = ports.node-red;
       policy = "bypass";
     };
