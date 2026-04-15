@@ -147,6 +147,11 @@ in
   _module.args.autheliaRules = autheliaRules;
 
   home.file."containers/caddy/Caddyfile".text = ''
+    {
+      # enable admin API
+      admin 0.0.0.0:2019
+    }
+
     (my_tls) {
       tls /certs/home.lan.crt /certs/home.lan.key
     }
@@ -231,6 +236,9 @@ in
             "${toString ports.caddyHttp}:80/tcp"
             "${toString ports.caddyHttps}:443/tcp"
             "${toString ports.caddyHttps}:443/udp"
+
+            # admin port
+            "${toString ports.caddyAdmin}:2019/tcp"
           ];
         };
       };

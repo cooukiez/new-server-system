@@ -41,6 +41,7 @@
   # reverse proxy
   caddyHttp = 80;
   caddyHttps = 443;
+  caddyAdmin = 2019;
 
   # vpn
   gluetun = 8888;

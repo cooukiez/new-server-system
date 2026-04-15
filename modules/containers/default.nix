@@ -26,6 +26,7 @@
     ./auth.nix
     ./database.nix
     ./dns.nix
+    ./homepage.nix
     ./ldap.nix
     ./monitor.nix
     ./reverse-proxy.nix

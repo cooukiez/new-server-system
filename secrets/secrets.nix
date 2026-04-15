@@ -58,7 +58,9 @@ in
   # general
   "global-agenix.age".publicKeys = allKeys;
   "gluetun-key.age".publicKeys = allKeys;
+
   "tailscale-key.age".publicKeys = allKeys;
+  "tailscale-api.age".publicKeys = allKeys;
 
   "postgres-pw.age".publicKeys = allKeys;
   "grafana-client-key.age".publicKeys = allKeys;

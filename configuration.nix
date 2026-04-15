@@ -135,7 +135,10 @@
       # for vpn connections
       checkReversePath = "loose";
 
-      trustedInterfaces = [ "tailscale0" ];
+      trustedInterfaces = [
+        "tailscale0"
+        "podman0"
+      ];
 
       allowedTCPPorts = [
         22 # allow openssh
@@ -146,6 +149,8 @@
 
         1221 # for papra
         2283 # for immich
+        # 3000 # for adguard
+        # 8000 # for homepage
         8096 # for jellyfin
       ];
 

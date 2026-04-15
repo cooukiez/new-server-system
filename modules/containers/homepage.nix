@@ -7,6 +7,7 @@
 
 {
   config,
+  pkgs,
   staticIP,
   ports,
   ...
@@ -16,12 +17,30 @@ let
 
   homepageVersion = "latest";
 
-  globalAdress = {
+  globalAddress = {
+    fritzbox = "http://192.168.178.1";
+
+    homepage = "https://home.lan";
+
     adguard = "https://dns.home.lan";
+    gluetun = "https://vpn.home.lan";
+
     grafana = "https://monitor.home.lan";
+    glances = "https://glances.home.lan";
     vnstat = "https://vnstat.home.lan";
+
+    transfer-sh = "https://transfer.home.lan";
+
     immich = "https://immich.home.lan";
+    jellyfin = "https://jellyfin.home.lan";
+
+    lidarr = "https://lidarr.home.lan";
+    slskd = "https://slskd.home.lan";
+    qbittorrent = "https://torrent.home.lan";
+
     papra = "https://papra.home.lan";
+    gitea = "https://git.home.lan";
+    ebk = "https://finance.home.lan";
   };
 
   # homepage settings
@@ -42,22 +61,26 @@ let
 
     disableUpdateCheck = true;
 
+    maxGroupColumns = 5;
     layout = {
-      "Monitoring" = {
-        style = "row";
-        columns = 5;
-      };
-      "Networking" = {
-        style = "row";
-        columns = 5;
-      };
-      "Services" = {
-        style = "row";
-        columns = 5;
-      };
-      "System Monitor" = {
-        style = "row";
-        columns = 4;
+      "Groups" = {
+        style = "column";
+          columns = 5;
+
+        "Networking" = {
+          style = "column";
+        };
+        "Monitoring" = {
+          style = "column";
+        };
+        "Services" = {
+          style = "column";
+          columns = 2;
+        };
+
+        "System Monitor" = {
+          style = "column";
+        };
       };
     };
   };
@@ -96,12 +119,70 @@ let
 
   homepageServices = [
     {
+      "Networking" = [
+        {
+          "Caddy" = {
+            icon = "caddy";
+            href = globalAddress.homepage;
+            description = "Server Reverse Proxy";
+            widget = {
+              type = "caddy";
+              url = "http://host.containers.internal:${toString ports.caddyAdmin}";
+            };
+          };
+        }
+        {
+          "AdGuard Home" = {
+            icon = "adguard-home";
+            href = globalAddress.adguard;
+            description = "Private DNS Server";
+            widget = {
+              type = "adguard";
+              url = "http://host.containers.internal:${toString ports.adguard}";
+            };
+          };
+        }
+        {
+          "Tailscale" = {
+            icon = "gluetun";
+            href = "https://login.tailscale.com/admin/machines";
+            description = "Bridge Internal Network";
+            widget = {
+              type = "tailscale";
+              deviceid = "nB49HQJyWv11CNTRL";
+              key = "{{HOMEPAGE_FILE_TAILSCALE_KEY}}";
+            };
+          };
+        }
+        {
+          "Gluetun / VPN" = {
+            icon = "gluetun";
+            href = globalAddress.gluetun;
+            description = "Server VPN Provider";
+            widget = {
+              type = "gluetun";
+              url = "http://host.containers.internal:${toString ports.gluetun}";
+              version = 2;
+              key = "169qzBxFa0ET26rkTWa3akmVopysVilS";
+            };
+          };
+        }
+      ];
+    }
+    {
       "Monitoring" = [
         {
           "Grafana" = {
             icon = "grafana";
             href = globalAddress.grafana;
             description = "Container / Monitoring Dashboard";
+          };
+        }
+        {
+          "Glances" = {
+            icon = "glances";
+            href = globalAddress.glances;
+            description = "Server Usage Statistics";
           };
         }
         {
@@ -114,22 +195,48 @@ let
       ];
     }
     {
-      "Networking" = [
+      "Services" = [
+        #
+        # media
+        #
         {
-          "AdGuard Home" = {
-            icon = "adguard-home";
-            href = globalAddress.adguard;
-            description = "Private DNS Server";
-            widget = {
-              type = "adguard";
-              url = "http://host.containers.internal:${toString ports.adguard}";
-            };
+          "Immich" = {
+            icon = "immich";
+            href = globalAddress.immich;
+            description = "Photo Management System";
           };
         }
-      ];
-    }
-    {
-      "Services" = [
+        {
+          "Jellyfin" = {
+            icon = "jellyfin";
+            href = globalAddress.jellyfin;
+            description = "Universal Media Server";
+          };
+        }
+        {
+          "Lidarr" = {
+            icon = "lidarr";
+            href = globalAddress.lidarr;
+            description = "Music Tracker / Downloader";
+          };
+        }
+        {
+          "Slskd" = {
+            icon = "slskd";
+            href = globalAddress.slskd;
+            description = "Soulseek Network Integration";
+          };
+        }
+        {
+          "qBittorrent" = {
+            icon = "qbittorrent";
+            href = globalAddress.qbittorrent;
+            description = "Torrent / Magnet Downloader";
+          };
+        }
+        #
+        # organisation
+        #
         {
           "Papra" = {
             icon = "papra";
@@ -138,10 +245,28 @@ let
           };
         }
         {
-          "Immich" = {
-            icon = "immich";
-            href = globalAddress.immich;
-            description = "Photo Management System";
+          "Gitea" = {
+            icon = "gitea";
+            href = globalAddress.gitea;
+            description = "Selfhosted DevOps Platform";
+          };
+        }
+        {
+          "ezBookkeeping" = {
+            icon = "ezbookkeeping";
+            href = globalAddress.ebk;
+            description = "Personal Finance Management";
+          };
+        }
+        #
+        # other
+        #
+        {
+          "transfer.sh" = {
+            # logo not included
+            icon = "https://avatars.githubusercontent.com/u/5444419?s=48&v=4";
+            href = globalAddress.transfer-sh;
+            description = "Convenient File Transfer";
           };
         }
       ];
@@ -149,12 +274,23 @@ let
     {
       "System Monitor" = [
         {
+          "Info" = {
+            widget = {
+              type = "glances";
+              url = "http://host.containers.internal:${toString ports.glances}";
+              version = 4;
+              metric = "info";
+            };
+          };
+        }
+        {
           "CPU Usage" = {
             widget = {
               type = "glances";
-              url = "http://127.0.0.1:${toString ports.glances}";
+              url = "http://host.containers.internal:${toString ports.glances}";
               version = 4;
               metric = "cpu";
+              chart = false;
             };
           };
         }
@@ -162,9 +298,10 @@ let
           "Memory Usage" = {
             widget = {
               type = "glances";
-              url = "http://127.0.0.1:${toString ports.glances}";
+              url = "http://host.containers.internal:${toString ports.glances}";
               version = 4;
               metric = "memory";
+              chart = false;
             };
           };
         }
@@ -172,21 +309,39 @@ let
           "Network Usage" = {
             widget = {
               type = "glances";
-              url = "http://127.0.0.1:${toString ports.glances}";
+              url = "http://host.containers.internal:${toString ports.glances}";
               version = 4;
-              metric = "network:eth0";
+              metric = "network:enp0s20f0u4";
+              chart = false;
             };
           };
         }
         {
-          "Disk I/O" = {
+          "Disk SSD" = {
             widget = {
               type = "glances";
-              url = "http://127.0.0.1:${toString ports.glances}";
+              url = "http://host.containers.internal:${toString ports.glances}";
               version = 4;
               metric = "disk:nvme0n1";
+              chart = false;
             };
           };
+        }
+      ];
+    }
+  ];
+
+  homepageBookmarks = [
+    {
+      "General" = [
+        {
+          "NixOS Search" = [
+            {
+              abbr = "NX";
+              href = "https://search.nixos.org/packages";
+              icon = "nixos";
+            }
+          ];
         }
       ];
     }
@@ -194,20 +349,20 @@ let
 in
 {
   home.file = {
-    "containers/homepage/settings.yaml".source = yamlFormat.generate "settings.yaml" homepageSettings;
-    "containers/homepage/widgets.yaml".source = yamlFormat.generate "widgets.yaml" homepageWidgets;
-    "containers/homepage/services.yaml".source = yamlFormat.generate "services.yaml" homepageServices;
+    "containers/homepage/settings.yaml".source = settingsFormat.generate "settings.yaml" homepageSettings;
+    "containers/homepage/widgets.yaml".source = settingsFormat.generate "widgets.yaml" homepageWidgets;
+    "containers/homepage/services.yaml".source = settingsFormat.generate "services.yaml" homepageServices;
+    "containers/homepage/bookmarks.yaml".source = settingsFormat.generate "bookmarks.yaml" homepageBookmarks;
   };
 
   age.secrets =
     let
       mkSecret = name: {
         file = ../../../secrets/${name}.age;
-        path = "${envSecretsPrefix}/${name}";
       };
     in
     {
-      # homepage-adguard = mkSecret "homepage/adguard-pw";
+      homepage-tailscale = mkSecret "tailscale-api";
     };
 
   virtualisation.quadlet =
@@ -228,14 +383,10 @@ in
           name = "homepage";
           userns = "keep-id:uid=0,gid=0";
 
-          addHosts = [
-            "home.lan:host-gateway"
-          ];
-
           environments = {
             HOMEPAGE_ALLOWED_HOSTS = "home.lan,${staticIP}";
 
-            # HOMEPAGE_FILE_ADGUARD_PW = "/run/secrets/HOMEPAGE_ADGUARD_PW";
+            HOMEPAGE_FILE_TAILSCALE_KEY = "/run/secrets/HOMEPAGE_TAILSCALE_KEY";
           };
 
           volumes = [
@@ -245,12 +396,13 @@ in
             "${config.home.homeDirectory}/containers/homepage/settings.yaml:/app/config/settings.yaml:ro"
             "${config.home.homeDirectory}/containers/homepage/widgets.yaml:/app/config/widgets.yaml:ro"
             "${config.home.homeDirectory}/containers/homepage/services.yaml:/app/config/services.yaml:ro"
+            "${config.home.homeDirectory}/containers/homepage/bookmarks.yaml:/app/config/bookmarks.yaml:ro"
 
             # background
             "${./assets/background-fullres.png}:/app/public/images/background.png:ro"
 
             # secrets
-            # "${config.age.secrets.homepage-adguard.path}:/run/secrets/HOMEPAGE_ADGUARD_PW:ro"
+            "${config.age.secrets.homepage-tailscale.path}:/run/secrets/HOMEPAGE_TAILSCALE_KEY:ro"
           ];
 
           publishPorts = [
