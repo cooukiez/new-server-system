@@ -30,6 +30,9 @@
   dns = 53;
   adguard = 3000;
 
+  # homepage
+  homepage = 8000;
+
   # monitor
   grafana = 3005;
   prometheus = 9090;

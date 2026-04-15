@@ -79,17 +79,17 @@
   };
 
   /*
-  home.file."containers/postgres/papra-init.sql" = {
-    text = ''
-      CREATE USER papra;
-      ALTER USER papra WITH PASSWORD 'papra';
+    home.file."containers/postgres/papra-init.sql" = {
+      text = ''
+        CREATE USER papra;
+        ALTER USER papra WITH PASSWORD 'papra';
 
-      CREATE DATABASE papra;
-      ALTER DATABASE papra OWNER TO papra;
+        CREATE DATABASE papra;
+        ALTER DATABASE papra OWNER TO papra;
 
-      GRANT ALL PRIVILEGES ON DATABASE papra TO admin;
-    '';
-  };
+        GRANT ALL PRIVILEGES ON DATABASE papra TO admin;
+      '';
+    };
   */
 
   # podman exec -it postgres psql -U admin -d app_db

@@ -111,8 +111,4 @@ in
     };
 }
 
-/*
-
-echo -n 'AUTH_PROVIDERS_CUSTOMS=[{"providerId":"authelia","providerName":"Authelia","providerIconUrl":"https://www.authelia.com/images/branding/logo-cropped.png","clientId":"papra","clientSecret":"","type":"oidc","discoveryUrl":"https://auth.home.lan/.well-known/openid-configuration","scopes":["openid","profile","email"]}]' | agenix -e papra/auth-client.age
-
-*/
+# echo -n 'AUTH_PROVIDERS_CUSTOMS=[{"providerId":"authelia","providerName":"Authelia","providerIconUrl":"https://www.authelia.com/images/branding/logo-cropped.png","clientId":"papra","clientSecret":"","type":"oidc","discoveryUrl":"https://auth.home.lan/.well-known/openid-configuration","scopes":["openid","profile","email"]}]' | agenix -e papra/auth-client.age

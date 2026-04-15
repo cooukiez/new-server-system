@@ -94,7 +94,7 @@ let
       log_file_max_size = 104857600;
       log_file_max_days = 7;
     };
-      
+
     llm = {
       transaction_from_ai_image_recognition = false;
       max_ai_recognition_picture_size = 10485760;

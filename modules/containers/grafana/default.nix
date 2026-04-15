@@ -225,19 +225,21 @@ let
           };
     };
 
-  dashboards = [ 
+  dashboards = [
     "adguard"
     "immich"
     "lidarr"
     "slskd"
   ];
 
-  dashboardFiles = builtins.listToAttrs (map (name: {
-    name = "containers/grafana/provisioning/dashboards/${name}.json";
-    value = {
-      text = builtins.toJSON (import ./${name}.nix { inherit mkDashboard mkPanel; });
-    };
-  }) dashboards);
+  dashboardFiles = builtins.listToAttrs (
+    map (name: {
+      name = "containers/grafana/provisioning/dashboards/${name}.json";
+      value = {
+        text = builtins.toJSON (import ./${name}.nix { inherit mkDashboard mkPanel; });
+      };
+    }) dashboards
+  );
 in
 {
   home.file = dashboardFiles // {

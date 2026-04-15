@@ -97,7 +97,7 @@
 
     "d /media/music 0755 10000 10000 -"
     "d /media/photos 0755 10000 10000 -"
-    
+
     # download folder structure
     "d /media/download 0755 10000 10000 -"
 
