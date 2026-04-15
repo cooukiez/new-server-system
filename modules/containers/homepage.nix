@@ -144,7 +144,7 @@ let
         }
         {
           "Tailscale" = {
-            icon = "gluetun";
+            icon = "tailscale";
             href = "https://login.tailscale.com/admin/machines";
             description = "Bridge Internal Network";
             widget = {
@@ -358,7 +358,7 @@ in
   age.secrets =
     let
       mkSecret = name: {
-        file = ../../../secrets/${name}.age;
+        file = ../../secrets/${name}.age;
       };
     in
     {

@@ -58,6 +58,9 @@
     "d /opt/immich/db 0755 10000 10000 -"
     "d /opt/immich/ml-cache 0755 10000 10000 -"
 
+    "d /opt/node-red 0755 10000 10000 -"
+    "d /opt/node-red/data 0755 10000 10000 -"
+
     "d /opt/lidarr 0755 10000 10000 -"
     "d /opt/lidarr/data 0755 10000 10000 -"
     "d /opt/lidarr/lists 0755 10000 10000 -"

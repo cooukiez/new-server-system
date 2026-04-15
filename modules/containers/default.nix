@@ -18,6 +18,7 @@
     ./services/ebk.nix
     ./services/gitea.nix
     ./services/immich.nix
+    ./services/node-red.nix
     ./services/papra.nix
     ./services/qbittorrent.nix
     ./services/transfer-sh.nix

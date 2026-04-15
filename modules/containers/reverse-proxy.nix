@@ -66,6 +66,11 @@ let
       policy = "bypass";
     };
 
+    node-red = {
+      port = ports.node-red;
+      policy = "bypass";
+    };
+
     lidarr = {
       port = ports.lidarr;
       policy = "bypass";

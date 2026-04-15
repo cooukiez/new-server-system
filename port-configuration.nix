@@ -58,6 +58,9 @@
   giteaHttp = 3030;
   gitea = 222;
 
+  # automization
+  node-red = 1880;
+
   # documents
   papra = 1221;
 
