@@ -11,10 +11,18 @@
   ports,
   ...
 }:
+let
+  postgresVersion = "alpine";
+  pgadminVersion = "latest";
+in
 {
   age.secrets = {
     postgres-pw = {
       file = ../../secrets/postgres-pw.age;
+    };
+
+    pgadmin-pw = {
+      file = ../../secrets/pgadmin-pw.age;
     };
   };
 
@@ -99,9 +107,20 @@
       inherit (config.virtualisation.quadlet) volumes networks pods;
     in
     {
+      networks.postgres-net = {
+        networkConfig = {
+          internal = false;
+        };
+      };
+
       volumes.postgres-data.volumeConfig = {
         type = "bind";
         device = "/opt/postgres/data";
+      };
+
+      volumes.pgadmin-data.volumeConfig = {
+        type = "bind";
+        device = "/opt/postgres/pgadmin";
       };
 
       containers.postgres = {
@@ -112,8 +131,9 @@
         };
 
         containerConfig = {
-          image = "docker.io/library/postgres:alpine";
+          image = "docker.io/library/postgres:${postgresVersion}";
           name = "postgres";
+          networks = [ "postgres-net" ];
 
           environments = {
             POSTGRES_USER = "admin";
@@ -137,6 +157,37 @@
 
           publishPorts = [
             "${toString ports.postgres}:5432/tcp"
+          ];
+        };
+      };
+
+      containers.pgadmin = {
+        autoStart = true;
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
+        };
+
+        containerConfig = {
+          image = "docker.io/dpage/pgadmin4:${pgadminVersion}";
+          name = "pgadmin";
+          networks = [ "postgres-net" ];
+
+          environments = {
+            PGADMIN_DEFAULT_EMAIL = "management.homeserver@mailbox.org";
+            PGADMIN_PASSWORD_FILE = "/run/secrets/PGADMIN_PASSWORD";
+
+            PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION = "True";
+            PGADMIN_CONFIG_CONSOLE_LOG_LEVEL = "10";
+          };
+
+          volumes = [
+            "${config.age.secrets.pgadmin-pw.path}:/run/secrets/PGADMIN_PASSWORD:ro"
+            "${volumes.pgadmin-data.ref}:/var/lib/pgadmin"
+          ];
+
+          publishPorts = [
+            "${toString ports.pgadmin}:80/tcp"
           ];
         };
       };

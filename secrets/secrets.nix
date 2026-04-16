@@ -63,6 +63,7 @@ in
   "tailscale-api.age".publicKeys = allKeys;
 
   "postgres-pw.age".publicKeys = allKeys;
+  "pgadmin-pw.age".publicKeys = allKeys;
   "node-red-secret.age".publicKeys = allKeys;
   "grafana-client-key.age".publicKeys = allKeys;
 

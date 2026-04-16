@@ -56,7 +56,7 @@ in
         containerConfig = {
           image = "ghcr.io/papra-hq/papra:${papraVersion}";
           name = "papra";
-          userns = "keep-id:uid=10000,gid=10000";
+          user = "0:0"; # run as root
 
           addHosts = [
             "auth.home.lan:host-gateway"
@@ -76,12 +76,16 @@ in
 
             DOCUMENT_STORAGE_FILESYSTEM_ROOT = "/data";
             DOCUMENTS_CONTENT_EXTRACTION_ENABLED = "true";
-            DOCUMENTS_OCR_LANGUAGES = "eng";
+            DOCUMENTS_OCR_LANGUAGES = "deu,eng";
 
             NODE_EXTRA_CA_CERTS = "/certs/home.lan.crt";
 
             AUTH_FIRST_USER_AS_ADMIN = "true";
             AUTH_PROVIDERS_EMAIL_IS_ENABLED = "false";
+
+            INTAKE_EMAILS_IS_ENABLED = "true";
+            INTAKE_EMAILS_DRIVER = "catch-all";
+            INTAKE_EMAILS_WEBHOOK_SECRET = "JmNtFvWILKGALzaSTcebXtwFmOgbXiYO";
           };
 
           environmentFiles = [

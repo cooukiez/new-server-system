@@ -32,6 +32,7 @@
     # database
     "d /opt/postgres 0755 10000 10000 -"
     "d /opt/postgres/data 0755 10000 10000 -"
+    "d /opt/postgres/pgadmin 0755 10000 10000 -"
 
     # vpn
     "d /opt/gluetun 0755 10000 10000 -"

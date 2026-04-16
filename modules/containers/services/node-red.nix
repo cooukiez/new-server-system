@@ -6,6 +6,7 @@
 {
   config,
   ports,
+  envSecretsPrefix,
   ...
 }:
 let
@@ -20,7 +21,7 @@ in
       };
     in
     {
-      node-red-secret = mkSecret "node-red-secret";
+      # node-red-secret = mkSecret "node-red-secret";
     };
 
   virtualisation.quadlet =
@@ -49,19 +50,30 @@ in
           uidMaps = [ "1000:0:1" ];
           gidMaps = [ "1000:0:1" ];
 
+          addHosts = [
+            "papra.home.lan:host-gateway"
+          ];
+
+
           environments = {
             TZ = "Europe/Berlin";
+
+            NODE_EXTRA_CA_CERTS = "/certs/home.lan.crt";
 
             NODE_RED_ENABLE_PROJECTS = "true";
             NODE_RED_ENABLE_SAFE_MODE = "false";
           };
 
           environmentFiles = [
-            "secrets/node-red-secret"
+            # "secrets/node-red-secret"
           ];
 
           volumes = [
             "/etc/localtime:/etc/localtime:ro"
+
+            # certificates
+            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
+            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             "${volumes.nodered-data.ref}:/data"
           ];
