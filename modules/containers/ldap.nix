@@ -40,23 +40,26 @@ in
           Requires = [ "postgres.service" ];
           After = [ "postgres.service" ];
         };
+
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
         };
 
         containerConfig = {
           image = "docker.io/lldap/lldap:${lldapVersion}";
           name = "lldap";
+          user = "0:0";
           networks = [ "auth-net" ];
 
           environments = {
-            LLDAP_LDAP_BASE_DN = "dc=ldap,dc=home,dc=lan";
             TZ = "Europe/Berlin";
 
             UID = "0";
             GID = "0";
+
+            # settings
+            LLDAP_LDAP_BASE_DN = "dc=ldap,dc=home,dc=lan";
 
             LLDAP_JWT_SECRET_FILE = "/run/secrets/LLDAP_JWT_SECRET";
             LLDAP_KEY_SEED_FILE = "/run/secrets/LLDAP_KEY_SEED";
@@ -68,10 +71,19 @@ in
           };
 
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # certificates
+            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
+            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+
+            # secrets
             "${config.age.secrets.lldap-jwt.path}:/run/secrets/LLDAP_JWT_SECRET:ro"
             "${config.age.secrets.lldap-seed.path}:/run/secrets/LLDAP_KEY_SEED:ro"
             "${config.age.secrets.lldap-admin.path}:/run/secrets/LLDAP_ADMIN_PASS:ro"
 
+            # volumes
             "${volumes.lldap-data.ref}:/data"
           ];
 

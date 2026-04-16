@@ -50,6 +50,7 @@ in
         containerConfig = {
           image = "ghcr.io/qdm12/gluetun:${gluetunVersion}";
           name = "gluetun";
+          user = "0:0";
           networks = [ "vpn-service-net" ];
 
           addCapabilities = [
@@ -57,6 +58,8 @@ in
           ];
 
           environments = {
+            TZ = "Europe/Berlin";
+
             VPN_SERVICE_PROVIDER = "protonvpn";
             VPN_TYPE = "wireguard";
 
@@ -79,6 +82,9 @@ in
           };
 
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
             # secrets
             "${config.age.secrets.gluetun-key.path}:/run/secrets/WIREGUARD_KEY"
 
@@ -110,14 +116,26 @@ in
         containerConfig = {
           image = "docker.io/scuzza/gluetun-webui:${gluetunWebUIVersion}";
           name = "gluetun-webui";
+          user = "0:0";
           networks = [ "vpn-service-net" ];
 
           environments = {
+            TZ = "Europe/Berlin";
+
             GLUETUN_CONTROL_URL = "http://gluetun:8888";
             GLUETUN_API_KEY = gluetunKey;
 
             TRUST_PROXY = "true";
           };
+
+          volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # certificates
+            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
+            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+          ];
 
           publishPorts = [
             "${toString ports.gluetunWebUI}:3000/tcp"

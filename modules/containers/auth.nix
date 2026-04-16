@@ -210,10 +210,12 @@ in
               "${volumes.authelia-config.ref}:/config"
             ];
 
-          environments = lib.mapAttrs' (name: envVar: {
+          environments = (lib.mapAttrs' (name: envVar: {
             name = envVar;
             value = "/run/secrets/${secretMounts.${name}}";
-          }) envMapping;
+          }) envMapping) // {
+            TZ = "Europe/Berlin";
+          };
 
           publishPorts = [
             "${toString ports.authelia}:9091/tcp"

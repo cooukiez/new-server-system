@@ -112,9 +112,18 @@ in
         containerConfig = {
           image = "docker.io/adguard/adguardhome:latest";
           name = "adguardhome";
+          user = "0:0";
           addCapabilities = [ "NET_BIND_SERVICE" ];
 
+          enivornments = {
+            TZ = "Europe/Berlin";
+          };
+
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # volumes
             "${volumes.adguard-conf.ref}:/opt/adguardhome/conf"
             "${volumes.adguard-work.ref}:/opt/adguardhome/work"
           ];

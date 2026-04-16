@@ -86,6 +86,7 @@ in
     '';
   };
 
+  # access postgres database
   # podman exec -it postgres psql -U admin -d app_db
 
   virtualisation.quadlet =
@@ -119,9 +120,12 @@ in
         containerConfig = {
           image = "docker.io/library/postgres:${postgresVersion}";
           name = "postgres";
+          user = "0:0";
           networks = [ "postgres-net" ];
 
           environments = {
+            TZ = "Europe/Berlin";
+
             POSTGRES_USER = "admin";
             POSTGRES_PASSWORD_FILE = "/run/secrets/POSTGRES_PASSWORD";
 
@@ -129,9 +133,20 @@ in
           };
 
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # certificates
+            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
+            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+            
+            # secrets
             "${config.age.secrets.postgres-pw.path}:/run/secrets/POSTGRES_PASSWORD:ro"
+
+            # volumes
             "${volumes.postgres-data.ref}:/var/lib/postgresql"
 
+            # startup scripts
             "${config.home.homeDirectory}/containers/postgres/authelia-init.sql:/docker-entrypoint-initdb.d/authelia-init.sql:ro"
             "${config.home.homeDirectory}/containers/postgres/lldap-init.sql:/docker-entrypoint-initdb.d/lldap-init.sql:ro"
             "${config.home.homeDirectory}/containers/postgres/gitea-init.sql:/docker-entrypoint-initdb.d/gitea-init.sql:ro"
@@ -157,10 +172,11 @@ in
           image = "docker.io/dpage/pgadmin4:${pgadminVersion}";
           name = "pgadmin";
           user = "0:0";
-
           networks = [ "postgres-net" ];
 
           environments = {
+            TZ = "Europe/Berlin";
+            
             PGADMIN_DEFAULT_EMAIL = "management.homeserver@mailbox.org";
             PGADMIN_DEFAULT_PASSWORD_FILE = "/run/secrets/PGADMIN_PASSWORD";
 
@@ -172,7 +188,17 @@ in
           };
 
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # certificates
+            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
+            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+
+            # secrets
             "${config.age.secrets.pgadmin-pw.path}:/run/secrets/PGADMIN_PASSWORD:ro"
+
+            # volumes
             "${volumes.pgadmin-data.ref}:/var/lib/pgadmin"
           ];
 

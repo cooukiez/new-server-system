@@ -69,6 +69,9 @@ in
           networks = [ "immich-net" ];
 
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
             "${volumes.immich-ml-cache.ref}:/cache"
           ];
 
@@ -91,6 +94,11 @@ in
           name = "immich-redis";
           user = "0:0";
           networks = [ "immich-net" ];
+
+          volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+          ];
         };
       };
 
@@ -117,6 +125,9 @@ in
           };
 
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
             "${volumes.immich-db.ref}:/var/lib/postgresql/data"
             "${config.age.secrets.immich-db-pw.path}:/run/secrets/IMMICH_DB_PW"
           ];

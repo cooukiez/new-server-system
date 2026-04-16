@@ -358,9 +358,12 @@ in
   home.file = {
     "containers/homepage/settings.yaml".source =
       settingsFormat.generate "settings.yaml" homepageSettings;
+
     "containers/homepage/widgets.yaml".source = settingsFormat.generate "widgets.yaml" homepageWidgets;
+
     "containers/homepage/services.yaml".source =
       settingsFormat.generate "services.yaml" homepageServices;
+
     "containers/homepage/bookmarks.yaml".source =
       settingsFormat.generate "bookmarks.yaml" homepageBookmarks;
   };
@@ -382,7 +385,6 @@ in
     {
       containers.homepage = {
         autoStart = true;
-
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
@@ -391,15 +393,24 @@ in
         containerConfig = {
           image = "ghcr.io/gethomepage/homepage:${homepageVersion}";
           name = "homepage";
-          userns = "keep-id:uid=0,gid=0";
+          user = "0:0";
 
           environments = {
+            TZ = "Europe/Berlin";
+            
             HOMEPAGE_ALLOWED_HOSTS = "home.lan,${staticIP}";
-
             HOMEPAGE_FILE_TAILSCALE_KEY = "/run/secrets/HOMEPAGE_TAILSCALE_KEY";
           };
 
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # certificates
+            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
+            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+
+            # podman socket (not used currently)
             "/run/user/10000/podman/podman.sock:/run/podman/podman.sock:ro"
 
             # config

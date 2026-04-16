@@ -241,24 +241,41 @@ in
         containerConfig = {
           image = "docker.io/grafana/grafana-enterprise:${grafanaVersion}";
           name = "grafana";
-
+          user = "0:0";
           networks = [ "monitoring.network" ];
-          userns = "keep-id:uid=472,gid=472";
+
+          # userns = "keep-id:uid=472,gid=472";
 
           addHosts = [
             "auth.home.lan:host-gateway"
           ];
+          
+          environments = {
+            TZ = "Europe/Berlin";
+            
+            GF_PLUGINS_PREINSTALL = "grafana-clock-panel,grafana-simple-json-datasource";
+
+            GF_PATHS_CONFIG = grafanaPaths.config;
+            GF_PATHS_PROVISIONING = grafanaPaths.provisioning;
+
+            GF_PATHS_DATA = grafanaPaths.data;
+            GF_PATHS_PLUGINS = grafanaPaths.plugins;
+            GF_PATHS_LOGS = grafanaPaths.log;
+          };
 
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # certificates
+            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
+            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+
             # config
             "${config.home.homeDirectory}/containers/grafana/grafana.ini:${grafanaPaths.config}:ro"
 
             # secrets
             "${config.age.secrets.grafana-client-key.path}:/run/secrets/AUTH_GRAFANA_OIDC:ro"
-
-            # certs
-            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
-            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
           ]
           ++ (map (n: "${volumes."grafana-${n}".ref}:${grafanaPaths.${n}}") [
             "provisioning"
@@ -271,17 +288,6 @@ in
           publishPorts = [
             "${toString ports.grafana}:3000/tcp"
           ];
-
-          environments = {
-            GF_PLUGINS_PREINSTALL = "grafana-clock-panel,grafana-simple-json-datasource";
-
-            GF_PATHS_CONFIG = grafanaPaths.config;
-            GF_PATHS_PROVISIONING = grafanaPaths.provisioning;
-
-            GF_PATHS_DATA = grafanaPaths.data;
-            GF_PATHS_PLUGINS = grafanaPaths.plugins;
-            GF_PATHS_LOGS = grafanaPaths.log;
-          };
         };
       };
 
@@ -295,10 +301,23 @@ in
         containerConfig = {
           image = "docker.io/prom/prometheus:${prometheusVersion}";
           name = "prometheus";
+          user = "0:0";
           networks = [ "monitoring.network" ];
-          userns = "keep-id:uid=65534,gid=65534";
+
+          # userns = "keep-id:uid=65534,gid=65534";
+
+          environments = {
+            TZ = "Europe/Berlin";
+          };
 
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # certificates
+            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
+            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+
             # config
             "${config.home.homeDirectory}/containers/prometheus/prometheus.yml:${prometheusPaths.config}:ro"
 
@@ -330,11 +349,20 @@ in
         containerConfig = {
           image = "quay.io/navidys/prometheus-podman-exporter:${prometheusPodmanExporterVersion}";
           name = "podman-exporter";
+          user = "0:0";
           networks = [ "monitoring.network" ];
-          userns = "keep-id:uid=10000,gid=10000";
 
-          # mount squ podman socket
+          # userns = "keep-id:uid=10000,gid=10000";
+
+          environments = {
+            TZ = "Europe/Berlin";
+          };
+
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # mount squ podman socket
             "/run/user/10000/podman/podman.sock:/run/podman/podman.sock:ro"
           ];
 
@@ -358,11 +386,17 @@ in
         containerConfig = {
           image = "docker.io/grafana/loki:${lokiVersion}";
           name = "loki";
+          user = "0:0";
           networks = [ "monitoring.network" ];
 
-          publishPorts = [ "${toString ports.loki}:3100/tcp" ];
+          environments = {
+            TZ = "Europe/Berlin";
+          };
 
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
             # config
             "${config.home.homeDirectory}/containers/loki/loki.yaml:${lokiPaths.config}:ro"
 
@@ -373,6 +407,8 @@ in
           exec = [
             "-config.file=${lokiPaths.config}"
           ];
+
+          publishPorts = [ "${toString ports.loki}:3100/tcp" ];
         };
       };
     };

@@ -236,7 +236,14 @@ in
           name = "caddy";
           addCapabilities = [ "NET_BIND_SERVICE" ];
 
+          environments = {
+            TZ = "Europe/Berlin";
+          };
+
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
             # config files
             "${config.home.homeDirectory}/containers/caddy/Caddyfile:/etc/caddy/Caddyfile:ro"
 
