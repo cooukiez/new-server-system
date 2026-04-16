@@ -12,11 +12,11 @@
   ...
 }:
 let
-  envSuffix = "containers/systemd/env";
-  envSecretsSuffix = "containers/systemd/secrets";
+  envSuffix = ".config/containers/systemd/env";
+  envSecretsSuffix = ".config/containers/systemd/secrets";
 
-  envPrefix = "${config.xdg.configHome}/${envSuffix}";
-  envSecretsPrefix = "${config.xdg.configHome}/${envSecretsSuffix}";
+  envPrefix = "${config.home.homeDirectory}/${envSuffix}";
+  envSecretsPrefix = "${config.home.homeDirectory}/${envSecretsSuffix}";
 in
 {
   imports = [

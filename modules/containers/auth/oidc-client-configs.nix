@@ -61,4 +61,17 @@
     enable_oidc_display_name = true;
     oidc_custom_display_name = "Authelia";
   };
+
+  papra = {
+    providerId = "authelia";
+    providerName = "Authelia";
+    providerIconUrl = "https://www.authelia.com/images/branding/logo-cropped.png";
+
+    clientId = "papra";
+    clientSecret = "PLACEHOLDER_CLIENT_SECRET";
+    
+    type = "oidc";
+    discoveryUrl = "https://auth.home.lan/.well-known/openid-configuration";
+    scopes = [ "openid" "profile" "email" ];
+  };
 }

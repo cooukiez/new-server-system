@@ -122,21 +122,4 @@
     "d /data 0755 10000 10000 -"
     "d /data/documents 0755 10000 10000 -"
   ];
-
-  # old server mount
-  environment.systemPackages = [ pkgs.cifs-utils ];
-
-  fileSystems."/mnt/dhs-alt" = {
-    device = "//192.168.178.137/root-share";
-    fsType = "cifs";
-    options = [
-      "username=smbusr"
-      "password=filetransfer123"
-      "uid=10000"
-      "gid=10000"
-      "ro"
-      "x-systemd.automount"
-      "noauto"
-    ];
-  };
 }

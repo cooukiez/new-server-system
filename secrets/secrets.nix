@@ -40,44 +40,56 @@ let
   ];
 in
 {
-  # auth
-  "auth/jwt-secret.age".publicKeys = allKeys;
-  "auth/session.age".publicKeys = allKeys;
-  "auth/storage-key.age".publicKeys = allKeys;
-  "auth/oidc-hmac.age".publicKeys = allKeys;
-  "auth/oidc-jwk.age".publicKeys = allKeys;
-  "auth/mail-smtp.age".publicKeys = allKeys;
+  /*
+    s_ = normal secret
+    e_ = secret combined with environment variable
+  */
 
-  # ldap
-  "ldap/jwt-secret.age".publicKeys = allKeys;
-  "ldap/key-seed.age".publicKeys = allKeys;
-  "ldap/admin-pass.age".publicKeys = allKeys;
+  # auth
+  "auth/s_jwt-secret.age".publicKeys = allKeys;
+  "auth/s_mail-smtp.age".publicKeys = allKeys;
+  "auth/s_oidc-hmac.age".publicKeys = allKeys;
+  "auth/s_oidc-jwk.age".publicKeys = allKeys;
+  "auth/s_session.age".publicKeys = allKeys;
+  "auth/s_storage-key.age".publicKeys = allKeys;
+
+  # auth clients
+  "auth/clients/e_ebk.age".publicKeys = allKeys;
+  "auth/clients/s_grafana.age".publicKeys = allKeys;
+  "auth/clients/s_papra.age".publicKeys = allKeys;
+
+  # ebk
+  "ebk/e_secret-key.age".publicKeys = allKeys;
 
   # homepage
 
-  # general
-  "global-agenix.age".publicKeys = allKeys;
-  "gluetun-key.age".publicKeys = allKeys;
-
-  "tailscale-key.age".publicKeys = allKeys;
-  "tailscale-api.age".publicKeys = allKeys;
-
-  "postgres-pw.age".publicKeys = allKeys;
-  "pgadmin-pw.age".publicKeys = allKeys;
-  "node-red-secret.age".publicKeys = allKeys;
-  "grafana-client-key.age".publicKeys = allKeys;
+  # ldap
+  "ldap/s_admin-pass.age".publicKeys = allKeys;
+  "ldap/s_jwt-secret.age".publicKeys = allKeys;
+  "ldap/s_key-seed.age".publicKeys = allKeys;
 
   # papra
-  "papra/storage-key.age".publicKeys = allKeys;
-  "papra/auth-secret.age".publicKeys = allKeys;
-  "papra/client-secret.age".publicKeys = allKeys;
-
-  # ebk
-  "ebk/secret-key.age".publicKeys = allKeys;
-  "ebk/client-key.age".publicKeys = allKeys;
+  "papra/e_storage-key.age".publicKeys = allKeys;
+  "papra/e_auth-secret.age".publicKeys = allKeys;
 
   # slskd
-  "slskd/password.age".publicKeys = allKeys;
-  "slskd/user.age".publicKeys = allKeys;
-  "slskd/webui-pw.age".publicKeys = allKeys;
+  "slskd/s_password.age".publicKeys = allKeys;
+  "slskd/s_user.age".publicKeys = allKeys;
+  "slskd/s_webui-pw.age".publicKeys = allKeys;
+
+  #
+  # unsorted
+  #
+
+  # general
+  "s_global-agenix.age".publicKeys = allKeys;
+  "s_gluetun-key.age".publicKeys = allKeys;
+
+  # database
+  "s_pgadmin-pw.age".publicKeys = allKeys;
+  "s_postgres-pw.age".publicKeys = allKeys;
+
+  # tailscale
+  "s_tailscale-key.age".publicKeys = allKeys;
+  "s_tailscale-api.age".publicKeys = allKeys;
 }

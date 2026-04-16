@@ -16,21 +16,17 @@
 let
   papraVersion = "latest-rootless";
 
-  papraAuthSettings = {
-    providerId = "authelia";
-    providerName = "Authelia";
-    providerIconUrl = "https://www.authelia.com/images/branding/logo-cropped.png";
-    clientId = "papra";
-    clientSecret = "PLACEHOLDER_AUTH_CLIENT_SECRET";
-    type = "oidc";
-    discoveryUrl = "https://auth.home.lan/.well-known/openid-configuration";
-    scopes = [ "openid" "profile" "email" ];
-  };
+  papraAuthSettings = (import ../auth/oidc-client-configs.nix).papra;
 
   papraAuthJson = builtins.toJSON [ papraAuthSettings ];
+
+  papraAuthUnpatchedPath = "${envSecretsSuffix}/papra/auth-client-config";
+  papraAuthPatchedPath = "${envSecretsSuffix}/papra/auth-client-config-patched";
+
+  patchCommand = "${pkgs.gnused}/bin/sed -i \"s|PLACEHOLDER_CLIENT_SECRET|$(cat ${config.age.secrets.papra-client-secret.path})|g\"";
 in
 {
-  home.file."${envSecretsSuffix}/papra/auth-client-config" = {
+  home.file."${papraAuthUnpatchedPath}" = {
     text = ''
       AUTH_PROVIDERS_CUSTOMS=${papraAuthJson}
     '';
@@ -47,7 +43,7 @@ in
       papra-storage-key = mkSecret "papra/storage-key";
       papra-auth-secret = mkSecret "papra/auth-secret";
 
-      papra-client-secret.file = "../../../secrets/papra/client-secret";
+      papra-client-secret.file = ../../../secrets/papra/client-secret.age;
     };
 
   virtualisation.quadlet =
@@ -73,14 +69,15 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "${pkgs.coreutils}/bin/cp ${envSecretsPrefix}/papra/auth-client-config ${envSecretsPrefix}/papra/auth-client-config-patched"
-            
-            ''
-            ${pkgs.gnused}/bin/sed -i -e "/PLACEHOLDER_AUTH_CLIENT_SECRET/ {
-              r ${config.age.secrets.papra-client-secret.path}
-              d
-            }" ${envSecretsPrefix}/papra/auth-client-config-patched
-            ''
+            "-${pkgs.coreutils}/bin/rm -f ${papraAuthPatchedPath}"
+
+            (pkgs.writeShellScript "patch-papra-auth" ''
+              SECRET_VAL=$(${pkgs.coreutils}/bin/cat ${config.age.secrets.papra-client-secret.path})
+
+              ${pkgs.gnused}/bin/sed "s|PLACEHOLDER_CLIENT_SECRET|$SECRET_VAL|g" \
+                ${papraAuthUnpatchedPath} > ${papraAuthPatchedPath}
+              ${pkgs.coreutils}/bin/chmod 644 ${papraAuthPatchedPath}
+            '')
           ];
         };
 
@@ -93,8 +90,6 @@ in
             "auth.home.lan:host-gateway"
           ];
 
-          # exec = "/bin/sh -c 'update-ca-certificates && pnpm start:with-migrations'";
-
           environments = {
             TZ = "Europa/Berlin";
 
@@ -102,8 +97,6 @@ in
 
             PORT = "1221";
             SERVER_HOSTNAME = "0.0.0.0";
-
-            # DATABASE_URL = "postgres://papra:papra@host.containers.internal:5432/papra";
 
             DOCUMENT_STORAGE_FILESYSTEM_ROOT = "/data";
             DOCUMENTS_CONTENT_EXTRACTION_ENABLED = "true";
