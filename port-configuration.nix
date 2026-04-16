@@ -67,6 +67,8 @@
 
   ebk = 8040;
 
+  radicale = 5232;
+
   # music
   lidarr = 8686;
   lidarrLists = 18686;

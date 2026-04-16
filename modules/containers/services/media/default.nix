@@ -82,7 +82,7 @@ in
           userns = "keep-id:uid=10000,gid=10000";
 
           addHosts = [
-            "auth.home.lan:host-gateway"
+            "ldap.home.lan:host-gateway"
           ];
 
           environments = {

@@ -29,7 +29,7 @@ in
       inherit (config.virtualisation.quadlet) volumes;
     in
     {
-      volumes.nodered-data.volumeConfig = {
+      volumes.node-red-data.volumeConfig = {
         type = "bind";
         device = "/opt/node-red/data";
       };
@@ -51,9 +51,9 @@ in
           gidMaps = [ "1000:0:1" ];
 
           addHosts = [
+            "git.home.lan:host-gateway"
             "papra.home.lan:host-gateway"
           ];
-
 
           environments = {
             TZ = "Europe/Berlin";
@@ -62,6 +62,8 @@ in
 
             NODE_RED_ENABLE_PROJECTS = "true";
             NODE_RED_ENABLE_SAFE_MODE = "false";
+
+            GIT_SSL_CAINFO = "/certs/home.lan.crt";
           };
 
           environmentFiles = [
@@ -75,7 +77,8 @@ in
             "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
-            "${volumes.nodered-data.ref}:/data"
+            # volumes
+            "${volumes.node-red-data.ref}:/data"
           ];
 
           publishPorts = [

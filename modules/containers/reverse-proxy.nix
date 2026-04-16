@@ -115,6 +115,11 @@ let
       port = ports.ebk;
       policy = "bypass";
     };
+
+    dav = {
+      port = ports.radicale;
+      policy = "bypass";
+    };
   };
 
   autheliaRules = [

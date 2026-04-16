@@ -21,6 +21,7 @@
     ./services/node-red.nix
     ./services/papra.nix
     ./services/qbittorrent.nix
+    ./services/radicale.nix
     ./services/transfer-sh.nix
     ./services/vnstat.nix
 
