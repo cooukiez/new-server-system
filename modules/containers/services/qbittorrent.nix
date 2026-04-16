@@ -33,6 +33,7 @@ in
         autoStart = true;
 
         unitConfig = {
+          # required for networking
           Requires = [ "gluetun.service" ];
           After = [ "gluetun.service" ];
         };
@@ -40,27 +41,34 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
         };
 
         containerConfig = {
           image = "lscr.io/linuxserver/qbittorrent:${qBittorrentVersion}";
           name = "qbittorrent";
+          user = "0:0";
 
           # networking through gluetun
           networks = [ "container:gluetun" ];
 
           environments = {
-            PUID = "10000";
-            PGID = "10000";
-
             TZ = "Europe/Berlin";
+
+            PUID = "0";
+            PGID = "0";
 
             WEBUI_PORT = "8080";
             TORRENTING_PORT = "6881";
           };
 
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # certificates
+            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
+            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+
             "${volumes.qbittorrent-config.ref}:/config"
             "${volumes.qbittorrent-download.ref}:/download"
           ];

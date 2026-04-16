@@ -65,6 +65,7 @@ in
         containerConfig = {
           image = "ghcr.io/immich-app/immich-machine-learning:${immichVersion}";
           name = "immich-ml";
+          user = "0:0";
           networks = [ "immich-net" ];
 
           volumes = [
@@ -88,6 +89,7 @@ in
         containerConfig = {
           image = "docker.io/valkey/valkey:${redisVersion}";
           name = "immich-redis";
+          user = "0:0";
           networks = [ "immich-net" ];
         };
       };
@@ -103,6 +105,7 @@ in
         containerConfig = {
           image = "ghcr.io/immich-app/postgres:${immichDbVersion}";
           name = "immich-postgres";
+          user = "0:0";
           networks = [ "immich-net" ];
 
           environments = {
@@ -131,6 +134,7 @@ in
         containerConfig = {
           image = "ghcr.io/immich-app/immich-server:${immichVersion}";
           name = "immich-server";
+          user = "0:0";
           networks = [ "immich-net" ];
 
           addHosts = [
@@ -138,6 +142,8 @@ in
           ];
 
           environments = {
+            TZ = "Europe/Berlin";
+
             DB_DATABASE_NAME = "immich";
             DB_HOSTNAME = "immich-postgres";
             DB_PORT = "5432";
@@ -152,14 +158,15 @@ in
           };
 
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
             "/etc/localtime:/etc/localtime:ro"
-
-            # secrets
-            "${config.age.secrets.immich-db-pw.path}:/run/secrets/IMMICH_DB_PW"
 
             # certificates
             "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+
+            # secrets
+            "${config.age.secrets.immich-db-pw.path}:/run/secrets/IMMICH_DB_PW"
 
             # volumes
             "${volumes.immich-media.ref}:/data"

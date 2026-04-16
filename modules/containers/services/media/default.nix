@@ -78,14 +78,16 @@ in
         containerConfig = {
           image = "docker.io/jellyfin/jellyfin:${jellyfinVersion}";
           name = "jellyfin";
+          user = "0:0";
           networks = [ "media-net" ];
-          userns = "keep-id:uid=10000,gid=10000";
 
           addHosts = [
             "ldap.home.lan:host-gateway"
           ];
 
           environments = {
+            TZ = "Europe/Berlin";
+            
             JELLYFIN_CONFIG_DIR = "/jellyfin/config";
             JELLYFIN_DATA_DIR = "/jellyfin/data";
             JELLYFIN_CACHE_DIR = "/jellyfin/cache";
@@ -93,6 +95,9 @@ in
           };
 
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
             # certificates
             "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"

@@ -14,16 +14,13 @@
   ...
 }:
 let
-  papraVersion = "latest-rootless";
+  papraVersion = "latest";
 
   papraAuthSettings = (import ../auth/oidc-client-configs.nix).papra;
-
   papraAuthJson = builtins.toJSON [ papraAuthSettings ];
 
   papraAuthUnpatchedPath = "${envSecretsSuffix}/papra/auth-client-config";
   papraAuthPatchedPath = "${envSecretsSuffix}/papra/auth-client-config-patched";
-
-  patchCommand = "${pkgs.gnused}/bin/sed -i \"s|PLACEHOLDER_CLIENT_SECRET|$(cat ${config.age.secrets.papra-client-secret.path})|g\"";
 in
 {
   home.file."${papraAuthUnpatchedPath}" = {
@@ -40,15 +37,16 @@ in
       };
     in
     {
-      papra-storage-key = mkSecret "papra/storage-key";
-      papra-auth-secret = mkSecret "papra/auth-secret";
+      papra-auth-secret = mkSecret "papra/e_auth-secret";
+      papra-storage-key = mkSecret "papra/e_storage-key";
+      papra-webhook-secret = mkSecret "papra/e_webhook-secret";
 
-      papra-client-secret.file = ../../../secrets/papra/client-secret.age;
+      papra-client-secret.file = ../../../secrets/auth/clients/s_papra.age;
     };
 
   virtualisation.quadlet =
     let
-      inherit (config.virtualisation.quadlet) volumes;
+      inherit (config.virtualisation.quadlet) volumes networks pods;
     in
     {
       volumes.data-documents.volumeConfig = {
@@ -84,7 +82,7 @@ in
         containerConfig = {
           image = "ghcr.io/papra-hq/papra:${papraVersion}";
           name = "papra";
-          user = "0:0"; # run as root
+          user = "0:0";
 
           addHosts = [
             "auth.home.lan:host-gateway"
@@ -113,13 +111,15 @@ in
           };
 
           environmentFiles = [
-            "secrets/papra/storage-key"
             "secrets/papra/auth-secret"
+            "secrets/papra/storage-key"
+            "secrets/papra/webhook-secret"
 
             "secrets/papra/auth-client-config-patched"
           ];
 
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
             "/etc/localtime:/etc/localtime:ro"
 
             # certificates

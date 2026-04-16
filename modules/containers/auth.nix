@@ -28,8 +28,6 @@ let
       level = "info";
     };
 
-    # password_reset.disable = false;
-    # password_change.disable = false;
     authentication_backend = {
       refresh_interval = "1m";
       ldap = {
@@ -87,7 +85,7 @@ let
 
     storage = {
       postgres = {
-        address = "tcp://host.containers.internal:5432";
+        address = "tcp://host.containers.internal:${ports.postgres}";
         database = "authelia";
         username = "admin";
       };
@@ -175,7 +173,7 @@ in
           Requires = [ "postgres.service" ];
           After = [ "postgres.service" ];
         };
-        
+
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
@@ -194,6 +192,7 @@ in
         containerConfig = {
           image = "docker.io/authelia/authelia:${autheliaVersion}";
           name = "authelia";
+          user = "0:0";
           networks = [ "auth-net" ];
 
           volumes =
@@ -201,6 +200,13 @@ in
               name: mount: "${config.age.secrets.${name}.path}:/run/secrets/${mount}"
             ) secretMounts)
             ++ [
+              "/etc/timezone:/etc/timezone:ro"
+              "/etc/localtime:/etc/localtime:ro"
+
+              # certificates
+              "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
+              "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+              
               "${volumes.authelia-config.ref}:/config"
             ];
 

@@ -35,12 +35,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
         };
 
         containerConfig = {
           image = "docker.gitea.com/gitea:${giteaVersion}";
           name = "gitea";
+          user = "0:0";
 
           addHosts = [
             "auth.home.lan:host-gateway"
@@ -49,11 +49,13 @@ in
           exec = "/bin/sh -c 'update-ca-certificates && /usr/bin/entrypoint /usr/bin/s6-svscan /etc/s6'";
 
           environments = {
-            USER_UID = "1000";
-            USER_GID = "1000";
+            TZ = "Europe/Berlin";
+            
+            USER_UID = "0";
+            USER_GID = "0";
 
             GITEA__database__DB_TYPE = "postgres";
-            GITEA__database__HOST = "host.containers.internal:5432";
+            GITEA__database__HOST = "host.containers.internal:${ports.postgres}";
             GITEA__database__NAME = "gitea";
             GITEA__database__USER = "gitea";
             GITEA__database__PASSWD = "gitea";

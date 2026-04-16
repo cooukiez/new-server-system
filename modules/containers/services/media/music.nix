@@ -56,7 +56,7 @@ let
     PostgresPassword = "lidarr";
 
     PostgresHost = "host.containers.internal";
-    PostgresPort = "5432";
+    PostgresPort = "${ports.postgres}";
 
     PostgresMainDb = "lidarr-main";
     PostgresLogDb = "lidarr-log";
@@ -194,6 +194,7 @@ in
         autoStart = true;
 
         unitConfig = {
+          # requires database
           Requires = [ "postgres.service" ];
           After = [ "postgres.service" ];
         };
@@ -210,16 +211,25 @@ in
         containerConfig = {
           image = "lscr.io/linuxserver/lidarr:${lidarrVersion}";
           name = "lidarr";
+          user = "0:0";
           networks = [ "media-net" ];
-          userns = "keep-id:uid=10000,gid=10000";
 
           environments = {
-            PUID = "10000";
-            PGID = "10000";
             TZ = "Europe/Berlin";
+
+            PUID = "0";
+            PGID = "0";
           };
 
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # certificates
+            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
+            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+
+            # config
             "${volumes.lidarr-data.ref}:/config"
 
             # media volumes
@@ -243,11 +253,21 @@ in
         containerConfig = {
           image = "docker.io/nginx:${lidarrListsNginxVersion}";
           name = "lidarr-lists";
+          user = "0:0";
           networks = [ "media-net" ];
 
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # certificates
+            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
+            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+
+            # config
             "${config.home.homeDirectory}/containers/lidarr/lidarr-lists.conf:/etc/nginx/conf.d/default.conf:ro"
 
+            # volumes
             "${volumes.lidarr-lists.ref}:/lists:ro"
           ];
 
@@ -268,18 +288,26 @@ in
           containerConfig = {
             image = "docker.io/nginx:${lidarrListsNginxVersion}";
             name = "cmdarr";
+            user = "0:0";
             networks = [ "media-net" ];
-            userns = "keep-id:uid=10000,gid=10000";
 
             environments = {
-              PUID = "10000";
-              PGID = "10000";
               TZ = "Europe/Berlin";
+
+              PUID = "0";
+              PGID = "0";
 
               LIDARR_URL = "http://lidarr:8686";
             };
 
             volumes = [
+              "/etc/timezone:/etc/timezone:ro"
+              "/etc/localtime:/etc/localtime:ro"
+
+              # certificates
+              "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
+              "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+
               "${volumes.cmdarr-data.ref}:/app/data:ro"
             ];
 
@@ -297,6 +325,7 @@ in
           Requires = [ "gluetun.service" ];
           After = [ "gluetun.service" ];
         };
+
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
@@ -305,12 +334,12 @@ in
         containerConfig = {
           image = "docker.io/slskd/slskd:${slskdVersion}";
           name = "slskd";
+          user = "0:0";
+
           networks = [
             "media-net"
             "vpn-service-net"
           ];
-
-          userns = "keep-id:uid=10000,gid=10000";
 
           environmentFiles = [
             "secrets/slskd/user"
@@ -319,10 +348,19 @@ in
           ];
 
           environments = {
+            TZ = "Europe/Berlin";
+
             SLSKD_REMOTE_CONFIGURATION = "false";
           };
 
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # certificates
+            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
+            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+
             # config
             "${config.home.homeDirectory}/containers/slskd/slskd.yml:/app/slskd.yml:ro"
 

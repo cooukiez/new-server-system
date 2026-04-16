@@ -66,7 +66,7 @@ let
     layout = {
       "Groups" = {
         style = "column";
-          columns = 5;
+        columns = 5;
 
         "Networking" = {
           style = "column";
@@ -356,10 +356,13 @@ let
 in
 {
   home.file = {
-    "containers/homepage/settings.yaml".source = settingsFormat.generate "settings.yaml" homepageSettings;
+    "containers/homepage/settings.yaml".source =
+      settingsFormat.generate "settings.yaml" homepageSettings;
     "containers/homepage/widgets.yaml".source = settingsFormat.generate "widgets.yaml" homepageWidgets;
-    "containers/homepage/services.yaml".source = settingsFormat.generate "services.yaml" homepageServices;
-    "containers/homepage/bookmarks.yaml".source = settingsFormat.generate "bookmarks.yaml" homepageBookmarks;
+    "containers/homepage/services.yaml".source =
+      settingsFormat.generate "services.yaml" homepageServices;
+    "containers/homepage/bookmarks.yaml".source =
+      settingsFormat.generate "bookmarks.yaml" homepageBookmarks;
   };
 
   age.secrets =

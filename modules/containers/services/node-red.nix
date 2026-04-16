@@ -21,7 +21,7 @@ in
       };
     in
     {
-      # node-red-secret = mkSecret "node-red-secret";
+
     };
 
   virtualisation.quadlet =
@@ -45,10 +45,7 @@ in
         containerConfig = {
           image = "docker.io/nodered/node-red:${nodeRedVersion}";
           name = "node-red";
-          
-          # default user 1000:1000
-          uidMaps = [ "1000:0:1" ];
-          gidMaps = [ "1000:0:1" ];
+          user = "0:0";
 
           addHosts = [
             "git.home.lan:host-gateway"
@@ -67,10 +64,11 @@ in
           };
 
           environmentFiles = [
-            # "secrets/node-red-secret"
+
           ];
 
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
             "/etc/localtime:/etc/localtime:ro"
 
             # certificates

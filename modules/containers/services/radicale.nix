@@ -13,36 +13,7 @@
 let
   settingsFormat = pkgs.formats.ini { };
 
-  radicaleVersion = "latest";
-
-  # build image
-  radicalePackageVersion = "master";
-  radicaleDependencies = "ldap";
-
-  containerFile = pkgs.writeText "Radicale.Containerfile" ''
-    FROM python:3-alpine AS builder
-
-    RUN apk add --no-cache --virtual gcc libffi-dev musl-dev \
-        && python -m venv /app/venv \
-        && /app/venv/bin/pip install --no-cache-dir "Radicale[${radicaleDependencies}] @ https://github.com/Kozea/Radicale/archive/${radicalePackageVersion}.tar.gz"
-
-    FROM python:3-alpine
-
-    WORKDIR /app
-
-    RUN addgroup -g 1000 radicale \
-        && adduser radicale --home /var/lib/radicale --system --uid 1000 --disabled-password -G radicale \
-        && apk add --no-cache ca-certificates openssl curl git
-
-    COPY --chown=radicale:radicale --from=builder /app/venv /app
-
-    VOLUME /var/lib/radicale
-
-    ENTRYPOINT [ "/app/bin/python", "/app/bin/radicale"]
-    CMD ["--hosts", "0.0.0.0:5232,[::]:5232"]
-
-    USER radicale
-  '';
+  radicaleImageVersion = "master";
 
   # radicale settings
   radicaleSettings = {
@@ -52,10 +23,10 @@ let
 
     auth = {
       type = "ldap";
-      
+
       ldap_uri = "ldap://ldap.home.lan:${toString ports.lldap}";
       ldap_base = "ou=people,dc=ldap,dc=home,dc=lan";
-      
+
       ldap_reader_dn = "uid=admin,ou=people,dc=ldap,dc=home,dc=lan";
       ldap_secret_file = "/run/secrets/LDAP_PASSWORD";
 
@@ -71,7 +42,7 @@ let
     storage = {
       filesystem_folder = "/var/lib/radicale/collections";
     };
-    
+
     logging = {
       level = "info";
     };
@@ -95,13 +66,23 @@ in
 
   virtualisation.quadlet =
     let
-      inherit (config.virtualisation.quadlet) volumes networks pods builds;
+      inherit (config.virtualisation.quadlet)
+        volumes
+        networks
+        pods
+        builds
+        ;
     in
     {
       builds.radicale-image = {
         buildConfig = {
-          file = "${containerFile}";
-          tag = "localhost/radicale-ldap:latest";
+          file = ../builds/services/radicale.Dockerfile;
+          tag = "localhost/radicale-ldap:internal";
+
+          buildArgs = {
+            VERSION = radicaleImageVersion;
+            DEPENDENCIES = "ldap";
+          };
         };
       };
 
@@ -124,7 +105,7 @@ in
         };
 
         containerConfig = {
-          image = "localhost/radicale-ldap:${radicaleVersion}";
+          image = "localhost/radicale-ldap:internal";
           name = "radicale";
           user = "0:0";
 
@@ -134,21 +115,25 @@ in
           ];
 
           environments = {
-            RADICALE_CONFIG = "/etc/radicale/config";
+            TZ = "Europe/Berlin";
 
+            RADICALE_CONFIG = "/etc/radicale/config";
             GIT_SSL_CAINFO = "/certs/home.lan.crt";
           };
 
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # certificates
+            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
+            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+
             # config
             "${config.home.homeDirectory}/containers/radicale/config:/etc/radicale/config:ro"
 
             # secrets
             "${config.age.secrets.radicale-ldap-pw.path}:/run/secrets/LDAP_PASSWORD:ro"
-
-            # certificates
-            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
-            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # volumes
             "${volumes.radicale-data.ref}:/var/lib/radicale"

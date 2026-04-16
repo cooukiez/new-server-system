@@ -69,9 +69,13 @@
 
     clientId = "papra";
     clientSecret = "PLACEHOLDER_CLIENT_SECRET";
-    
+
     type = "oidc";
     discoveryUrl = "https://auth.home.lan/.well-known/openid-configuration";
-    scopes = [ "openid" "profile" "email" ];
+    scopes = [
+      "openid"
+      "profile"
+      "email"
+    ];
   };
 }

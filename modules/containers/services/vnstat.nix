@@ -35,13 +35,23 @@ in
         containerConfig = {
           image = "docker.io/kshitizb/vnstat-dashboard:${vnstatDashboardVersion}";
           name = "vnstat-dashboard";
+          user = "0:0";
 
           environments = {
+            TZ = "Europe/Berlin";
+
             PORT = "80";
             ALLOWED_PREFIXES = "enp";
           };
 
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # certificates
+            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
+            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+
             "${volumes.vnstat-db.ref}:/var/lib/vnstat:ro"
           ];
 

@@ -47,7 +47,7 @@ let
 
     database = {
       type = "postgres";
-      host = "host.containers.internal:5432";
+      host = "host.containers.internal:${ports.postgres}";
       ssl_mode = "disable";
 
       name = "ebk";
@@ -246,14 +246,14 @@ in
         containerConfig = {
           image = "docker.io/mayswind/ezbookkeeping:${ebkVersion}";
           name = "ebk";
-          userns = "keep-id:uid=1000,gid=1000";
+          user = "0:0";
 
           addHosts = [
             "auth.home.lan:host-gateway"
           ];
 
           environments = {
-
+            TZ = "Europe/Berlin";
           };
 
           environmentFiles = [
@@ -262,14 +262,15 @@ in
           ];
 
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
             "/etc/localtime:/etc/localtime:ro"
+
+            # certificates
+            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
+            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # config
             "${config.home.homeDirectory}/containers/ebk/ezbookkeeping.ini:/ezbookkeeping/conf/ezbookkeeping.ini:ro"
-
-            # certificates
-            "/certs/home.lan.crt:/etc/ssl/certs/home.lan.crt:ro"
-            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # volumes
             "${volumes.ebk-data.ref}:/ezbookkeeping/storage"
