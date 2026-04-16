@@ -341,17 +341,17 @@ in
             "vpn-service-net"
           ];
 
-          environmentFiles = [
-            "secrets/slskd/user"
-            "secrets/slskd/password"
-            "secrets/slskd/webui-pw"
-          ];
-
           environments = {
             TZ = "Europe/Berlin";
 
             SLSKD_REMOTE_CONFIGURATION = "false";
           };
+
+          environmentFiles = [
+            "secrets/slskd/user"
+            "secrets/slskd/password"
+            "secrets/slskd/webui-pw"
+          ];
 
           volumes = [
             "/etc/timezone:/etc/timezone:ro"

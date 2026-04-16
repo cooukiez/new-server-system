@@ -102,18 +102,18 @@ let
 
   # secret mappings
   secretMap = {
-    auth-ldap-pw = "ldap/admin-pass";
+    auth-ldap-pw = "ldap/s_admin-pass";
 
-    auth-jwt = "auth/jwt-secret";
-    auth-session = "auth/session";
+    auth-jwt = "auth/s_jwt-secret";
+    auth-session = "auth/s_session";
 
-    auth-postgres-pw = "postgres-pw";
-    auth-storage-key = "auth/storage-key";
+    auth-postgres-pw = "s_postgres-pw";
+    auth-storage-key = "auth/s_storage-key";
 
-    auth-oidc-hmac = "auth/oidc-hmac";
-    auth-oidc-jwk = "auth/oidc-jwk";
+    auth-oidc-hmac = "auth/s_oidc-hmac";
+    auth-oidc-jwk = "auth/s_oidc-jwk";
 
-    auth-mail-smtp = "auth/mail-smtp";
+    auth-mail-smtp = "auth/s_mail-smtp";
   };
 
   secretMounts = {

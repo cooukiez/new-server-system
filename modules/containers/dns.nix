@@ -115,7 +115,7 @@ in
           user = "0:0";
           addCapabilities = [ "NET_BIND_SERVICE" ];
 
-          enivornments = {
+          environments = {
             TZ = "Europe/Berlin";
           };
 

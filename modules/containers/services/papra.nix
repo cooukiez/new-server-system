@@ -67,8 +67,6 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "-${pkgs.coreutils}/bin/rm -f ${papraAuthPatchedPath}"
-
             (pkgs.writeShellScript "patch-papra-auth" ''
               SECRET_VAL=$(${pkgs.coreutils}/bin/cat ${config.age.secrets.papra-client-secret.path})
 

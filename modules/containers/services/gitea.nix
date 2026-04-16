@@ -50,12 +50,12 @@ in
 
           environments = {
             TZ = "Europe/Berlin";
-            
+
             USER_UID = "0";
             USER_GID = "0";
 
             GITEA__database__DB_TYPE = "postgres";
-            GITEA__database__HOST = "host.containers.internal:${ports.postgres}";
+            GITEA__database__HOST = "host.containers.internal:${toString ports.postgres}";
             GITEA__database__NAME = "gitea";
             GITEA__database__USER = "gitea";
             GITEA__database__PASSWD = "gitea";

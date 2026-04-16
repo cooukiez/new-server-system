@@ -76,7 +76,7 @@ in
     {
       builds.radicale-image = {
         buildConfig = {
-          file = ../builds/services/radicale.Dockerfile;
+          file = "${pkgs.writeText "radicale.Dockerfile" (builtins.readFile ../builds/services/radicale.Dockerfile)}";
           tag = "localhost/radicale-ldap:internal";
 
           buildArgs = {

@@ -275,7 +275,7 @@ in
             "${config.home.homeDirectory}/containers/grafana/grafana.ini:${grafanaPaths.config}:ro"
 
             # secrets
-            "${config.age.secrets.grafana-client-key.path}:/run/secrets/AUTH_GRAFANA_OIDC:ro"
+            "${config.age.secrets.grafana-client-key.path}:/run/secrets/GRAFANA_CLIENT_KEY:ro"
           ]
           ++ (map (n: "${volumes."grafana-${n}".ref}:${grafanaPaths.${n}}") [
             "provisioning"

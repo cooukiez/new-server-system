@@ -54,12 +54,12 @@ in
   "auth/s_storage-key.age".publicKeys = allKeys;
 
   # auth clients
-  "auth/clients/e_ebk.age".publicKeys = allKeys;
+  "auth/clients/s_ebk.age".publicKeys = allKeys;
   "auth/clients/s_grafana.age".publicKeys = allKeys;
   "auth/clients/s_papra.age".publicKeys = allKeys;
 
   # ebk
-  "ebk/e_secret-key.age".publicKeys = allKeys;
+  "ebk/s_secret-key.age".publicKeys = allKeys;
 
   # homepage
 

@@ -212,12 +212,11 @@ in
     let
       mkSecret = name: {
         file = ../../../secrets/${name}.age;
-        path = "${envSecretsPrefix}/${name}";
       };
     in
     {
-      ebk-secret-key = mkSecret "ebk/secret-key";
-      ebk-client-key = mkSecret "ebk/client-key";
+      ebk-client-key = mkSecret "auth/clients/s_ebk";
+      ebk-secret-key = mkSecret "ebk/s_secret-key";
     };
 
   virtualisation.quadlet =
@@ -254,12 +253,10 @@ in
 
           environments = {
             TZ = "Europe/Berlin";
-          };
 
-          environmentFiles = [
-            "secrets/ebk/secret-key"
-            "secrets/ebk/client-key"
-          ];
+            EBKCFP_SECURITY_SECRET_KEY = "/run/secrets/EBK_SECRET_KEY";
+            EBKCFP_AUTH_OAUTH2_USER_IDENTIFIER = "/run/secrets/EBK_CLIENT_KEY";
+          };
 
           volumes = [
             "/etc/timezone:/etc/timezone:ro"
@@ -271,6 +268,10 @@ in
 
             # config
             "${config.home.homeDirectory}/containers/ebk/ezbookkeeping.ini:/ezbookkeeping/conf/ezbookkeeping.ini:ro"
+
+            # secrets
+            "${config.age.secrets.ebk-client-key.path}:/run/secrets/EBK_CLIENT_KEY"
+            "${config.age.secrets.ebk-secret-key.path}:/run/secrets/EBK_SECRET_KEY"
 
             # volumes
             "${volumes.ebk-data.ref}:/ezbookkeeping/storage"

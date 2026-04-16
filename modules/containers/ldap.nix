@@ -67,7 +67,7 @@ in
 
             LLDAP_KEY_FILE = "";
 
-            LLDAP_DATABASE_URL = "postgres://lldap:lldap@host.containers.internal:${ports.postgres}/lldap";
+            LLDAP_DATABASE_URL = "postgres://lldap:lldap@host.containers.internal:${toString ports.postgres}/lldap";
           };
 
           volumes = [

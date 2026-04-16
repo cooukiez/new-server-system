@@ -12,7 +12,7 @@
     icon = "signin";
 
     client_id = "grafana";
-    client_secret = "$__file{/run/secrets/AUTH_GRAFANA_OIDC}";
+    client_secret = "$__file{/run/secrets/GRAFANA_CLIENT_KEY}";
 
     scopes = "openid profile email groups";
     empty_scopes = false;
