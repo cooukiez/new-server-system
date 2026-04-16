@@ -61,7 +61,7 @@ in
       };
     in
     {
-      radicale-ldap-pw = mkSecret "ldap/admin-pass";
+      radicale-ldap-pw = mkSecret "ldap/s_admin-pass";
     };
 
   virtualisation.quadlet =
@@ -76,7 +76,9 @@ in
     {
       builds.radicale-image = {
         buildConfig = {
-          file = "${pkgs.writeText "radicale.Dockerfile" (builtins.readFile ../builds/services/radicale.Dockerfile)}";
+          file = "${pkgs.writeText "radicale.Dockerfile" (
+            builtins.readFile ../builds/services/radicale.Dockerfile
+          )}";
           tag = "localhost/radicale-ldap:internal";
 
           buildArgs = {

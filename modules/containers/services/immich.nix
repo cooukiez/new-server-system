@@ -23,9 +23,7 @@ let
 in
 {
   age.secrets = {
-    immich-db-pw = {
-      file = ../../../secrets/postgres-pw.age;
-    };
+    immich-db-pw.file = ../../../secrets/s_postgres-pw.age;
   };
 
   virtualisation.quadlet =

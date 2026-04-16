@@ -16,11 +16,11 @@ let
 in
 {
   age.secrets = {
-    lldap-jwt.file = ../../secrets/ldap/jwt-secret.age;
-    lldap-seed.file = ../../secrets/ldap/key-seed.age;
-    lldap-admin.file = ../../secrets/ldap/admin-pass.age;
+    lldap-jwt.file = ../../secrets/ldap/s_jwt-secret.age;
+    lldap-seed.file = ../../secrets/ldap/s_key-seed.age;
+    lldap-admin.file = ../../secrets/ldap/s_admin-pass.age;
 
-    postgres-pw.file = ../../secrets/postgres-pw.age;
+    postgres-pw.file = ../../secrets/s_postgres-pw.age;
   };
 
   virtualisation.quadlet =

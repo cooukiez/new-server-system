@@ -87,7 +87,7 @@ in
 
           environments = {
             TZ = "Europe/Berlin";
-            
+
             JELLYFIN_CONFIG_DIR = "/jellyfin/config";
             JELLYFIN_DATA_DIR = "/jellyfin/data";
             JELLYFIN_CACHE_DIR = "/jellyfin/cache";

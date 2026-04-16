@@ -19,9 +19,7 @@ let
 in
 {
   age.secrets = {
-    gluetun-key = {
-      file = ../../secrets/gluetun-key.age;
-    };
+    gluetun-key.file = ../../secrets/s_gluetun-key.age;
   };
 
   virtualisation.quadlet =

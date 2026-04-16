@@ -206,16 +206,18 @@ in
               # certificates
               "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
               "/certs/home.lan.crt:/certs/home.lan.crt:ro"
-              
+
               "${volumes.authelia-config.ref}:/config"
             ];
 
-          environments = (lib.mapAttrs' (name: envVar: {
-            name = envVar;
-            value = "/run/secrets/${secretMounts.${name}}";
-          }) envMapping) // {
-            TZ = "Europe/Berlin";
-          };
+          environments =
+            (lib.mapAttrs' (name: envVar: {
+              name = envVar;
+              value = "/run/secrets/${secretMounts.${name}}";
+            }) envMapping)
+            // {
+              TZ = "Europe/Berlin";
+            };
 
           publishPorts = [
             "${toString ports.authelia}:9091/tcp"

@@ -19,9 +19,7 @@
   ];
 
   age.secrets = {
-    tailscale-key = {
-      file = ../../../secrets/tailscale-key.age;
-    };
+    tailscale-key.file = ../../../secrets/s_tailscale-key.age;
   };
 
   services.fwupd.enable = true;

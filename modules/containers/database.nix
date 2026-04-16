@@ -14,17 +14,79 @@
 let
   postgresVersion = "alpine";
   pgadminVersion = "latest";
+
+  services = [
+    {
+      name = "authelia";
+      user = "admin";
+      dbs = [ "authelia" ];
+    }
+    {
+      name = "lldap";
+      user = "lldap";
+      dbs = [ "lldap" ];
+      pass = "lldap";
+    }
+    {
+      name = "gitea";
+      user = "gitea";
+      dbs = [ "gitea" ];
+      pass = "gitea";
+    }
+    {
+      name = "ebk";
+      user = "ebk";
+      dbs = [ "ebk" ];
+      pass = "ebk";
+    }
+    {
+      name = "lidarr";
+      user = "lidarr";
+      dbs = [
+        "lidarr-main"
+        "lidarr-log"
+      ];
+      pass = "lidarr";
+    }
+  ];
+
+  mkSql = service: ''
+    -- Configuration for ${service.name}
+    ${
+      if service ? pass then
+        ''
+          DO $$ 
+          BEGIN
+            IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = '${service.user}') THEN
+              CREATE USER ${service.user} WITH PASSWORD '${service.pass}';
+            END IF;
+          END $$;''
+      else
+        ""
+    }
+
+    ${builtins.concatStringsSep "\n" (
+      map (db: ''
+        -- Database: ${db}
+        SELECT 'CREATE DATABASE "${db}"' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${db}')\gexec
+        ALTER DATABASE "${db}" OWNER TO ${service.user};
+        GRANT ALL PRIVILEGES ON DATABASE "${db}" TO admin;
+      '') service.dbs
+    )}
+  '';
 in
 {
   age.secrets = {
-    postgres-pw = {
-      file = ../../secrets/postgres-pw.age;
-    };
-
-    pgadmin-pw = {
-      file = ../../secrets/pgadmin-pw.age;
-    };
+    postgres-pw.file = ../../secrets/s_postgres-pw.age;
+    pgadmin-pw.file = ../../secrets/s_pgadmin-pw.age;
   };
+
+  home.file."containers/postgres/init-all-db.sql".text = ''
+    -- Prevent script from crashing if a command fails
+    \set ON_ERROR_STOP off
+
+    ${builtins.concatStringsSep "\n" (map mkSql services)}
+  '';
 
   home.file."containers/postgres/authelia-init.sql" = {
     text = ''
@@ -139,7 +201,7 @@ in
             # certificates
             "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
-            
+
             # secrets
             "${config.age.secrets.postgres-pw.path}:/run/secrets/POSTGRES_PASSWORD:ro"
 
@@ -176,7 +238,7 @@ in
 
           environments = {
             TZ = "Europe/Berlin";
-            
+
             PGADMIN_DEFAULT_EMAIL = "management.homeserver@mailbox.org";
             PGADMIN_DEFAULT_PASSWORD_FILE = "/run/secrets/PGADMIN_PASSWORD";
 

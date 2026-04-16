@@ -169,7 +169,9 @@ in
     source = grafanaSettingsFormat.generate "grafana.ini" grafanaSettings;
   };
 
-  age.secrets.grafana-client-key.file = ../../secrets/grafana-client-key.age;
+  age.secrets = {
+    grafana-client-key.file = ../../secrets/auth/clients/s_grafana.age;
+  };
 
   # grafana provisioning
   home.file."containers/grafana/provisioning/datasources/datasources.yaml".text = ''
@@ -249,10 +251,10 @@ in
           addHosts = [
             "auth.home.lan:host-gateway"
           ];
-          
+
           environments = {
             TZ = "Europe/Berlin";
-            
+
             GF_PLUGINS_PREINSTALL = "grafana-clock-panel,grafana-simple-json-datasource";
 
             GF_PATHS_CONFIG = grafanaPaths.config;

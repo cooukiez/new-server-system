@@ -8,6 +8,7 @@
 {
   config,
   pkgs,
+  lib,
   staticIP,
   ports,
   ...
@@ -355,18 +356,20 @@ let
   ];
 in
 {
-  home.file = {
-    "containers/homepage/settings.yaml".source =
-      settingsFormat.generate "settings.yaml" homepageSettings;
-
-    "containers/homepage/widgets.yaml".source = settingsFormat.generate "widgets.yaml" homepageWidgets;
-
-    "containers/homepage/services.yaml".source =
-      settingsFormat.generate "services.yaml" homepageServices;
-
-    "containers/homepage/bookmarks.yaml".source =
-      settingsFormat.generate "bookmarks.yaml" homepageBookmarks;
-  };
+  home.file =
+    lib.mapAttrs'
+      (name: value: {
+        name = "containers/homepage/${name}.yaml";
+        value = {
+          source = settingsFormat.generate "${name}.yaml" value;
+        };
+      })
+      {
+        settings = homepageSettings;
+        widgets = homepageWidgets;
+        services = homepageServices;
+        bookmarks = homepageBookmarks;
+      };
 
   age.secrets =
     let
@@ -375,7 +378,7 @@ in
       };
     in
     {
-      homepage-tailscale = mkSecret "tailscale-api";
+      homepage-tailscale = mkSecret "s_tailscale-api";
     };
 
   virtualisation.quadlet =
@@ -397,7 +400,7 @@ in
 
           environments = {
             TZ = "Europe/Berlin";
-            
+
             HOMEPAGE_ALLOWED_HOSTS = "home.lan,${staticIP}";
             HOMEPAGE_FILE_TAILSCALE_KEY = "/run/secrets/HOMEPAGE_TAILSCALE_KEY";
           };

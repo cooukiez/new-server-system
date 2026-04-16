@@ -74,7 +74,7 @@ in
   "papra/e_webhook-secret.age".publicKeys = allKeys;
 
   # slskd
-  "slskd/s_password.age".publicKeys = allKeys;
+  "slskd/s_pass.age".publicKeys = allKeys;
   "slskd/s_user.age".publicKeys = allKeys;
   "slskd/s_webui-pw.age".publicKeys = allKeys;
 
