@@ -25,6 +25,7 @@
 
   # database
   postgres = 5432;
+  pgadmin = 5434;
 
   # dns
   dns = 53;

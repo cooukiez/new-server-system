@@ -86,20 +86,6 @@ in
     '';
   };
 
-  /*
-    home.file."containers/postgres/papra-init.sql" = {
-      text = ''
-        CREATE USER papra;
-        ALTER USER papra WITH PASSWORD 'papra';
-
-        CREATE DATABASE papra;
-        ALTER DATABASE papra OWNER TO papra;
-
-        GRANT ALL PRIVILEGES ON DATABASE papra TO admin;
-      '';
-    };
-  */
-
   # podman exec -it postgres psql -U admin -d app_db
 
   virtualisation.quadlet =
@@ -151,8 +137,6 @@ in
             "${config.home.homeDirectory}/containers/postgres/gitea-init.sql:/docker-entrypoint-initdb.d/gitea-init.sql:ro"
             "${config.home.homeDirectory}/containers/postgres/ebk-init.sql:/docker-entrypoint-initdb.d/ebk-init.sql:ro"
             "${config.home.homeDirectory}/containers/postgres/lidarr-init.sql:/docker-entrypoint-initdb.d/lidarr-init.sql:ro"
-
-            # "${config.home.homeDirectory}/containers/postgres/papra-init.sql:/docker-entrypoint-initdb.d/papra-init.sql:ro"
           ];
 
           publishPorts = [
@@ -161,6 +145,7 @@ in
         };
       };
 
+      # https://www.pgadmin.org/docs/pgadmin4/latest/container_deployment.html
       containers.pgadmin = {
         autoStart = true;
         serviceConfig = {
@@ -171,14 +156,19 @@ in
         containerConfig = {
           image = "docker.io/dpage/pgadmin4:${pgadminVersion}";
           name = "pgadmin";
+          user = "0:0";
+
           networks = [ "postgres-net" ];
 
           environments = {
             PGADMIN_DEFAULT_EMAIL = "management.homeserver@mailbox.org";
-            PGADMIN_PASSWORD_FILE = "/run/secrets/PGADMIN_PASSWORD";
+            PGADMIN_DEFAULT_PASSWORD_FILE = "/run/secrets/PGADMIN_PASSWORD";
 
             PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION = "True";
             PGADMIN_CONFIG_CONSOLE_LOG_LEVEL = "10";
+
+            PGADMIN_LISTEN_ADDRESS = "0.0.0.0";
+            PGADMIN_LISTEN_PORT = "80";
           };
 
           volumes = [

@@ -30,6 +30,11 @@ let
       group = "admins";
     };
 
+    db = {
+      port = ports.pgadmin;
+      policy = "bypass";
+    };
+
     glances = {
       port = ports.glances;
       policy = "one_factor";

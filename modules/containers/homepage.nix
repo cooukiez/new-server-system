@@ -30,6 +30,7 @@ let
     vnstat = "https://vnstat.home.lan";
 
     transfer-sh = "https://transfer.home.lan";
+    node-red = "https://flow.home.lan";
 
     immich = "https://immich.home.lan";
     jellyfin = "https://jellyfin.home.lan";
@@ -263,10 +264,16 @@ let
         #
         {
           "transfer.sh" = {
-            # logo not included
             icon = "https://avatars.githubusercontent.com/u/5444419?s=48&v=4";
             href = globalAddress.transfer-sh;
             description = "Convenient File Transfer";
+          };
+        }
+        {
+          "Node-RED" = {
+            icon = "https://avatars.githubusercontent.com/u/5375661?s=48&v=4";
+            href = globalAddress.node-red;
+            description = "Automation Flow System";
           };
         }
       ];
