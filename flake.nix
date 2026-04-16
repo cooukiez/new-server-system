@@ -57,10 +57,6 @@
     let
       inherit (self) outputs;
 
-      # define user configuration
-      users = import ./user-configuration.nix;
-
-      # supported systems for flake packages, shell, etc.
       hostSystem = "x86_64-linux";
       systems = [
         hostSystem
@@ -73,7 +69,11 @@
         "9.9.9.9"
       ];
 
+      users = import ./user-configuration.nix;
       ports = import ./port-configuration.nix;
+
+      squUID = 10000;
+      squGID = 10000;
 
       forAllSystems = nixpkgs.lib.genAttrs systems;
 
@@ -89,51 +89,35 @@
               staticIP
               dnsServers
               ports
+              squUID
+              squGID
               users
               ;
             nixosModules = "${self}/modules/nixos";
           };
+
           modules = [
-            # main config file
+            inputs.self.nixosModules.common
+            inputs.self.nixosModules.services
+
+            # admin configuration
+            inputs.self.homeConfigurations.admin
+
+            # container configuration
+            inputs.self.containerModules
+
             ./configuration.nix
 
+            inputs.home-manager.nixosModules.home-manager
+            inputs.quadlet-nix.nixosModules.quadlet
             inputs.agenix.nixosModules.default
-            # inputs.hardware.nixosModules.lenovo-thinkpad-x1-yoga
-          ];
-        };
-
-      mkHomeConfiguration =
-        system: username: hostname:
-        home-manager.lib.homeManagerConfiguration {
-          pkgs = import nixpkgs {
-            localSystem = {
-              inherit system;
-            };
-          };
-
-          extraSpecialArgs = {
-            inherit
-              inputs
-              outputs
-              hostSystem
-              hostname
-              staticIP
-              ;
-            userConfig = users.${username};
-            nhModules = "${self}/modules/home";
-          };
-          modules = [
-            ./home/${username}
           ];
         };
     in
     {
-      # custom packages
       packages = forAllSystems (system: import ./pkgs nixpkgs.legacyPackages.${system});
-      # formatter for your nix files
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
 
-      # custom packages and modifications, exported as overlays
       overlays = {
         inherit (import ./overlays { inherit inputs; })
           additions
@@ -144,23 +128,16 @@
         nur = inputs.nur.overlays.default;
       };
 
-      # nixos system modules
-      nixosModules = import ./modules/nixos;
+      homeConfigurations = import ./home;
 
-      # home-manager modules
+      nixosModules = import ./modules/nixos;
       homeManagerModules = import ./modules/home;
 
-      # container modules
       containerModules = import ./modules/containers;
 
       # nixos configuration entrypoint
       nixosConfigurations = {
         dhs = mkNixosConfiguration "dhs";
-      };
-
-      # standalone home-manager configuration entrypoint
-      homeConfigurations = {
-        "admin@dhs" = mkHomeConfiguration hostSystem "admin" "dhs";
       };
     };
 }

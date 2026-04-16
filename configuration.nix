@@ -16,24 +16,17 @@
   staticIP,
   dnsServers,
   ports,
+  squUID,
+  squGID,
   users,
   ...
 }:
 {
   imports = [
-    # import generated hardware configuration
     ./hardware-configuration.nix
-
-    # import other system configuration modules
-    inputs.self.nixosModules.common
-    inputs.self.nixosModules.services
-
-    inputs.home-manager.nixosModules.home-manager
-    inputs.quadlet-nix.nixosModules.quadlet
-    inputs.agenix.nixosModules.default
   ];
+
   nixpkgs = {
-    # add overlays here
     overlays = [
       inputs.self.overlays.additions
       inputs.self.overlays.modifications
@@ -41,9 +34,7 @@
       inputs.self.overlays.nur
     ];
 
-    # configure nixpkgs instance
     config = {
-      # allow unfree packages
       allowUnfree = true;
       permittedInsecurePackages = [
         "dotnet-sdk-6.0.428"
@@ -60,36 +51,39 @@
       settings = {
         # enable flakes and new nix command
         experimental-features = "nix-command flakes";
-        # opinionated: disable global registry
+        # disable global registry
         flake-registry = "";
+
         # workaround for https://github.com/NixOS/nix/issues/9574
         nix-path = myNixPath;
       };
 
-      # opinionated: disable channels
-      channel.enable = false;
-      # opinionated: make flake registry and nix path match flake inputs
+      # make flake registry and nix path match flake inputs
       registry = lib.mapAttrs (_: flake: { inherit flake; }) flakeInputs;
       nixPath = myNixPath;
 
+      channel.enable = false;
       optimise.automatic = true;
       optimise.dates = [ "03:45" ];
     };
 
-  # boot settings
   boot = {
     kernelPackages = pkgs.linuxPackages_latest;
     consoleLogLevel = 0;
+
     initrd.verbose = false;
     initrd.systemd.network.wait-online.enable = false;
+
     kernelParams = [
       "quiet"
       "rd.udev.log_level=3"
       "boot.shell_on_fail"
     ];
+
     loader.efi.canTouchEfiVariables = true;
     loader.systemd-boot.enable = true;
     loader.timeout = 0;
+
     # required for subnet routing
     kernel.sysctl = {
       "net.ipv4.ip_unprivileged_port_start" = 32;
@@ -116,7 +110,7 @@
     nameservers = dnsServers;
     interfaces.enp0s20f0u4.ipv4.addresses = [
       {
-        address = "192.168.178.3";
+        address = staticIP;
         prefixLength = 24;
       }
     ];
@@ -149,8 +143,6 @@
 
         1221 # for papra
         2283 # for immich
-        # 3000 # for adguard
-        # 8000 # for homepage
         8096 # for jellyfin
       ];
 
@@ -182,6 +174,7 @@
     LC_TELEPHONE = "en_IE.UTF-8";
     LC_TIME = "en_IE.UTF-8";
   };
+  
   console.keyMap = "us";
 
   # PATH configuration
@@ -212,77 +205,11 @@
         autoSubUidGidRange = true;
 
         group = "squ";
-        uid = 10000;
+        uid = squUID;
       };
     };
 
-  users.groups.squ.gid = 10000;
-
-  # virtualisation
-  virtualisation.quadlet.enable = true;
-  virtualisation.podman.defaultNetwork.settings.dns_enabled = true;
-
-  virtualisation.containers.storage.settings = {
-    storage = {
-      driver = "overlay";
-
-      options.overlay.mount_program = "${pkgs.fuse-overlayfs}/bin/fuse-overlayfs";
-    };
-  };
-
-  age.identityPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-  age.secrets = {
-    squ-config-key = {
-      file = ./secrets/s_global-agenix.age;
-      owner = "squ";
-      group = "squ";
-    };
-  };
-
-  home-manager = {
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    extraSpecialArgs = {
-      inherit inputs staticIP ports;
-
-      squConfigKeyPath = config.age.secrets.squ-config-key.path;
-    };
-
-    users.squ =
-      {
-        inputs,
-        config,
-        pkgs,
-        staticIP,
-        ports,
-
-        squConfigKeyPath,
-        ...
-      }:
-      {
-        imports = [
-          inputs.self.containerModules
-
-          inputs.quadlet-nix.homeManagerModules.quadlet
-          inputs.agenix.homeManagerModules.default
-          inputs.sops-nix.homeManagerModules.sops
-        ];
-
-        age.identityPaths = [ squConfigKeyPath ];
-        sops.age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
-
-        home.stateVersion = "25.11";
-      };
-  };
-
-  /*
-    security.wrappers.pasta = {
-      owner = "root";
-      group = "root";
-      capabilities = "cap_net_bind_service+ep";
-      source = "${pkgs.passt}/bin/pasta";
-    };
-  */
+  users.groups.squ.gid = squGID;
 
   # passwordless sudo
   security.sudo.wheelNeedsPassword = false;
