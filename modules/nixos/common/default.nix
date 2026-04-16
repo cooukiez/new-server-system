@@ -17,6 +17,8 @@
     ./tools.nix
   ];
 
+  age.identityPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+
   services.dbus.enable = true;
   services.fwupd.enable = true;
 

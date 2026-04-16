@@ -9,11 +9,7 @@
   inputs,
   outputs,
   config,
-  hostSystem,
-  hostname,
-  staticIP,
-  userConfig,
-  users,
+  globalConfig,
   ...
 }:
 {
@@ -26,25 +22,23 @@
       inherit
         inputs
         outputs
-        hostSystem
-        hostname
-        staticIP
+        globalConfig
         ;
 
-      userConfig = users.admin;
+      userConfig = globalConfig.users.admin;
     };
 
     users.admin =
       {
         inputs,
         config,
+        globalConfig,
         userConfig,
         ...
       }:
       {
         imports = [
           inputs.self.homeManagerModules.programs
-          inputs.nixvim.homeModules.default
         ];
 
         home = {

@@ -1,5 +1,7 @@
 {
-  staticIP,
+  config,
+  pkgs,
+  globalConfig,
   ...
 }:
 {
@@ -8,14 +10,14 @@
   };
 
   networking = {
-    hostName = hostname;
+    hostName = globalConfig.hostname;
     hostId = "deaf25e4";
     useDHCP = false;
 
-    nameservers = dnsServers;
+    nameservers = globalConfig.dnsServers;
     interfaces.enp0s20f0u4.ipv4.addresses = [
       {
-        address = staticIP;
+        address = globalConfig.staticIP;
         prefixLength = 24;
       }
     ];

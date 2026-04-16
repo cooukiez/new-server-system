@@ -14,19 +14,15 @@
   ...
 }:
 {
-  # virtualisation
   virtualisation.quadlet.enable = true;
   virtualisation.podman.defaultNetwork.settings.dns_enabled = true;
-
   virtualisation.containers.storage.settings = {
     storage = {
       driver = "overlay";
-
       options.overlay.mount_program = "${pkgs.fuse-overlayfs}/bin/fuse-overlayfs";
     };
   };
 
-  age.identityPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
   age.secrets = {
     squ-config-key = {
       file = ../../secrets/s_global-agenix.age;
@@ -39,7 +35,11 @@
     useGlobalPkgs = true;
     useUserPackages = true;
     extraSpecialArgs = {
-      inherit inputs staticIP ports;
+      inherit
+        inputs
+        outputs
+        globalConfig
+        ;
 
       squConfigKeyPath = config.age.secrets.squ-config-key.path;
     };
@@ -48,10 +48,8 @@
       {
         inputs,
         config,
-        pkgs,
-        lib,
-        staticIP,
-        ports,
+        globalConfig,
+        userConfig,
 
         squConfigKeyPath,
         ...

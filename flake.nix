@@ -94,11 +94,9 @@
 
           modules = [
             outputs.nixosModules.common
+            outputs.nixosModules.core
             outputs.nixosModules.services
-            outputs.nixosModules
             outputs.containerModules
-
-            ./configuration.nix
 
             inputs.home-manager.nixosModules.home-manager
             inputs.quadlet-nix.nixosModules.quadlet
@@ -142,6 +140,8 @@
 
                 users.users = mkUsers pkgs;
                 users.groups.squ.gid = globalConfig.squIds.gid;
+
+                system.stateVersion = "25.11";
               }
             )
           ];
