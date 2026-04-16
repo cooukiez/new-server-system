@@ -243,10 +243,9 @@ in
         containerConfig = {
           image = "docker.io/grafana/grafana-enterprise:${grafanaVersion}";
           name = "grafana";
-          user = "0:0";
           networks = [ "monitoring.network" ];
 
-          # userns = "keep-id:uid=472,gid=472";
+          userns = "keep-id:uid=472,gid=472";
 
           addHosts = [
             "auth.home.lan:host-gateway"
@@ -274,10 +273,10 @@ in
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # config
-            "${config.home.homeDirectory}/containers/grafana/grafana.ini:${grafanaPaths.config}:ro"
+            "${config.home.homeDirectory}/containers/grafana/grafana.ini:${grafanaPaths.config}:ro,U"
 
             # secrets
-            "${config.age.secrets.grafana-client-key.path}:/run/secrets/GRAFANA_CLIENT_KEY:ro"
+            "${config.age.secrets.grafana-client-key.path}:/run/secrets/GRAFANA_CLIENT_KEY:ro,U"
           ]
           ++ (map (n: "${volumes."grafana-${n}".ref}:${grafanaPaths.${n}}") [
             "provisioning"
@@ -303,10 +302,9 @@ in
         containerConfig = {
           image = "docker.io/prom/prometheus:${prometheusVersion}";
           name = "prometheus";
-          user = "0:0";
           networks = [ "monitoring.network" ];
 
-          # userns = "keep-id:uid=65534,gid=65534";
+          userns = "keep-id:uid=65534,gid=65534";
 
           environments = {
             TZ = "Europe/Berlin";
@@ -321,10 +319,10 @@ in
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # config
-            "${config.home.homeDirectory}/containers/prometheus/prometheus.yml:${prometheusPaths.config}:ro"
+            "${config.home.homeDirectory}/containers/prometheus/prometheus.yml:${prometheusPaths.config}:ro,U"
 
             # volumes
-            "${volumes.prometheus-data.ref}:${prometheusPaths.data}"
+            "${volumes.prometheus-data.ref}:${prometheusPaths.data}:U"
           ];
 
           publishPorts = [
@@ -351,10 +349,7 @@ in
         containerConfig = {
           image = "quay.io/navidys/prometheus-podman-exporter:${prometheusPodmanExporterVersion}";
           name = "podman-exporter";
-          user = "0:0";
           networks = [ "monitoring.network" ];
-
-          # userns = "keep-id:uid=10000,gid=10000";
 
           environments = {
             TZ = "Europe/Berlin";
@@ -365,7 +360,7 @@ in
             "/etc/localtime:/etc/localtime:ro"
 
             # mount squ podman socket
-            "/run/user/10000/podman/podman.sock:/run/podman/podman.sock:ro"
+            "/run/user/10000/podman/podman.sock:/run/podman/podman.sock:ro,U"
           ];
 
           environments = {
@@ -388,7 +383,6 @@ in
         containerConfig = {
           image = "docker.io/grafana/loki:${lokiVersion}";
           name = "loki";
-          user = "0:0";
           networks = [ "monitoring.network" ];
 
           environments = {
@@ -400,10 +394,10 @@ in
             "/etc/localtime:/etc/localtime:ro"
 
             # config
-            "${config.home.homeDirectory}/containers/loki/loki.yaml:${lokiPaths.config}:ro"
+            "${config.home.homeDirectory}/containers/loki/loki.yaml:${lokiPaths.config}:ro,U"
 
             # volumes
-            "${volumes.loki-data.ref}:/loki"
+            "${volumes.loki-data.ref}:/loki:U"
           ];
 
           exec = [

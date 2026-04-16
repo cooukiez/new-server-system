@@ -211,14 +211,14 @@ in
         containerConfig = {
           image = "lscr.io/linuxserver/lidarr:${lidarrVersion}";
           name = "lidarr";
-          user = "0:0";
+          userns = "keep-id:uid=10000,gid=10000";
           networks = [ "media-net" ];
 
           environments = {
             TZ = "Europe/Berlin";
 
-            PUID = "0";
-            PGID = "0";
+            PUID = "10000";
+            GUID = "10000";
           };
 
           volumes = [
@@ -230,7 +230,7 @@ in
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # config
-            "${volumes.lidarr-data.ref}:/config"
+            "${volumes.lidarr-data.ref}:/config:ro,U"
 
             # media volumes
             "${volumes.media-download.ref}:/download"
@@ -253,7 +253,6 @@ in
         containerConfig = {
           image = "docker.io/nginx:${lidarrListsNginxVersion}";
           name = "lidarr-lists";
-          user = "0:0";
           networks = [ "media-net" ];
 
           volumes = [
@@ -265,10 +264,10 @@ in
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # config
-            "${config.home.homeDirectory}/containers/lidarr/lidarr-lists.conf:/etc/nginx/conf.d/default.conf:ro"
+            "${config.home.homeDirectory}/containers/lidarr/lidarr-lists.conf:/etc/nginx/conf.d/default.conf:ro,U"
 
             # volumes
-            "${volumes.lidarr-lists.ref}:/lists:ro"
+            "${volumes.lidarr-lists.ref}:/lists:ro,U"
           ];
 
           publishPorts = [
@@ -334,7 +333,8 @@ in
         containerConfig = {
           image = "docker.io/slskd/slskd:${slskdVersion}";
           name = "slskd";
-          user = "0:0";
+          userns = "keep-id:uid=10000,gid=10000";
+          user = "10000:10000";
 
           networks = [
             "media-net"

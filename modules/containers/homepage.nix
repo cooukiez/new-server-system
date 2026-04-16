@@ -396,7 +396,6 @@ in
         containerConfig = {
           image = "ghcr.io/gethomepage/homepage:${homepageVersion}";
           name = "homepage";
-          user = "0:0";
 
           environments = {
             TZ = "Europe/Berlin";
@@ -414,19 +413,19 @@ in
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # podman socket (not used currently)
-            "/run/user/10000/podman/podman.sock:/run/podman/podman.sock:ro"
+            "/run/user/10000/podman/podman.sock:/run/podman/podman.sock:ro,U"
 
             # config
-            "${config.home.homeDirectory}/containers/homepage/settings.yaml:/app/config/settings.yaml:ro"
-            "${config.home.homeDirectory}/containers/homepage/widgets.yaml:/app/config/widgets.yaml:ro"
-            "${config.home.homeDirectory}/containers/homepage/services.yaml:/app/config/services.yaml:ro"
-            "${config.home.homeDirectory}/containers/homepage/bookmarks.yaml:/app/config/bookmarks.yaml:ro"
+            "${config.home.homeDirectory}/containers/homepage/settings.yaml:/app/config/settings.yaml:ro,U"
+            "${config.home.homeDirectory}/containers/homepage/widgets.yaml:/app/config/widgets.yaml:ro,U"
+            "${config.home.homeDirectory}/containers/homepage/services.yaml:/app/config/services.yaml:ro,U"
+            "${config.home.homeDirectory}/containers/homepage/bookmarks.yaml:/app/config/bookmarks.yaml:ro,U"
 
             # background
-            "${./assets/background-fullres.png}:/app/public/images/background.png:ro"
+            "${./assets/background-fullres.png}:/app/public/images/background.png:ro,U"
 
             # secrets
-            "${config.age.secrets.homepage-tailscale.path}:/run/secrets/HOMEPAGE_TAILSCALE_KEY:ro"
+            "${config.age.secrets.homepage-tailscale.path}:/run/secrets/HOMEPAGE_TAILSCALE_KEY:ro,U"
           ];
 
           publishPorts = [

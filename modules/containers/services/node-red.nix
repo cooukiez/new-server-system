@@ -45,7 +45,6 @@ in
         containerConfig = {
           image = "docker.io/nodered/node-red:${nodeRedVersion}";
           name = "node-red";
-          user = "0:0";
 
           addHosts = [
             "git.home.lan:host-gateway"
@@ -76,7 +75,7 @@ in
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # volumes
-            "${volumes.node-red-data.ref}:/data"
+            "${volumes.node-red-data.ref}:/data:U"
           ];
 
           publishPorts = [

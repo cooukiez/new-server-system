@@ -97,7 +97,7 @@
             outputs.nixosModules.common
             outputs.nixosModules.core
             outputs.nixosModules.services
-            outputs.containerModules
+            # outputs.containerModules
 
             inputs.home-manager.nixosModules.home-manager
             inputs.quadlet-nix.nixosModules.quadlet

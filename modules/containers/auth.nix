@@ -192,12 +192,11 @@ in
         containerConfig = {
           image = "docker.io/authelia/authelia:${autheliaVersion}";
           name = "authelia";
-          user = "0:0";
           networks = [ "auth-net" ];
 
           volumes =
             (lib.mapAttrsToList (
-              name: mount: "${config.age.secrets.${name}.path}:/run/secrets/${mount}"
+              name: mount: "${config.age.secrets.${name}.path}:/run/secrets/${mount}:ro,U"
             ) secretMounts)
             ++ [
               "/etc/timezone:/etc/timezone:ro"
@@ -207,7 +206,7 @@ in
               "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
               "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
-              "${volumes.authelia-config.ref}:/config"
+              "${volumes.authelia-config.ref}:/config:U"
             ];
 
           environments =

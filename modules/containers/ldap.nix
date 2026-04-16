@@ -49,7 +49,6 @@ in
         containerConfig = {
           image = "docker.io/lldap/lldap:${lldapVersion}";
           name = "lldap";
-          user = "0:0";
           networks = [ "auth-net" ];
 
           environments = {
@@ -79,9 +78,9 @@ in
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # secrets
-            "${config.age.secrets.lldap-jwt.path}:/run/secrets/LLDAP_JWT_SECRET:ro"
-            "${config.age.secrets.lldap-seed.path}:/run/secrets/LLDAP_KEY_SEED:ro"
-            "${config.age.secrets.lldap-admin.path}:/run/secrets/LLDAP_ADMIN_PASS:ro"
+            "${config.age.secrets.lldap-jwt.path}:/run/secrets/LLDAP_JWT_SECRET:ro,U"
+            "${config.age.secrets.lldap-seed.path}:/run/secrets/LLDAP_KEY_SEED:ro,U"
+            "${config.age.secrets.lldap-admin.path}:/run/secrets/LLDAP_ADMIN_PASS:ro,U"
 
             # volumes
             "${volumes.lldap-data.ref}:/data"

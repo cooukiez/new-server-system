@@ -25,8 +25,8 @@
       us = "sudo nixos-rebuild switch --upgrade-all --impure";
       sw-nix = "sudo nixos-rebuild switch --impure";
 
-      nus = "sync-flake && nh os switch /etc/nixos";
-      nuus = "sync-flake && nh os switch /etc/nixos --update";
+      nus = "nh os switch /etc/nixos";
+      nuus = "nh os switch /etc/nixos --update";
 
       cns = "sudo sh -c 'nix-env -p /nix/var/nix/profiles/system --delete-generations old && nix-collect-garbage -d && nix-store --optimise && nix-store --verify'";
 

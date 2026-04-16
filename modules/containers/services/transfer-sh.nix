@@ -35,7 +35,6 @@ in
         containerConfig = {
           image = "docker.io/dutchcoders/transfer.sh:${transferSHVersion}";
           name = "transfer-sh";
-          user = "0:0";
 
           exec = [
             "--provider"
@@ -56,7 +55,7 @@ in
             "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
-            "${volumes.transfer-sh-data.ref}:/data"
+            "${volumes.transfer-sh-data.ref}:/data:U"
           ];
 
           publishPorts = [

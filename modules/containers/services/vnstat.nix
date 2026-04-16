@@ -35,7 +35,6 @@ in
         containerConfig = {
           image = "docker.io/kshitizb/vnstat-dashboard:${vnstatDashboardVersion}";
           name = "vnstat-dashboard";
-          user = "0:0";
 
           environments = {
             TZ = "Europe/Berlin";

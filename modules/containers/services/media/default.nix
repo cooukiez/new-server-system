@@ -78,7 +78,6 @@ in
         containerConfig = {
           image = "docker.io/jellyfin/jellyfin:${jellyfinVersion}";
           name = "jellyfin";
-          user = "0:0";
           networks = [ "media-net" ];
 
           addHosts = [
@@ -103,10 +102,10 @@ in
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # volumes
-            "${volumes.jellyfin-config.ref}:/jellyfin/config"
-            "${volumes.jellyfin-data.ref}:/jellyfin/data"
-            "${volumes.jellyfin-cache.ref}:/jellyfin/cache"
-            "${volumes.jellyfin-log.ref}:/jellyfin/log"
+            "${volumes.jellyfin-config.ref}:/jellyfin/config:U"
+            "${volumes.jellyfin-data.ref}:/jellyfin/data:U"
+            "${volumes.jellyfin-cache.ref}:/jellyfin/cache:U"
+            "${volumes.jellyfin-log.ref}:/jellyfin/log:U"
 
             "${volumes.media-music.ref}:/media/music:ro"
           ];

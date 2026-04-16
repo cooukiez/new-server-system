@@ -245,7 +245,6 @@ in
         containerConfig = {
           image = "docker.io/mayswind/ezbookkeeping:${ebkVersion}";
           name = "ebk";
-          user = "0:0";
 
           addHosts = [
             "auth.home.lan:host-gateway"
@@ -267,15 +266,15 @@ in
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # config
-            "${config.home.homeDirectory}/containers/ebk/ezbookkeeping.ini:/ezbookkeeping/conf/ezbookkeeping.ini:ro"
+            "${config.home.homeDirectory}/containers/ebk/ezbookkeeping.ini:/ezbookkeeping/conf/ezbookkeeping.ini:ro,U"
 
             # secrets
-            "${config.age.secrets.ebk-client-key.path}:/run/secrets/EBK_CLIENT_KEY"
-            "${config.age.secrets.ebk-secret-key.path}:/run/secrets/EBK_SECRET_KEY"
+            "${config.age.secrets.ebk-client-key.path}:/run/secrets/EBK_CLIENT_KEY:ro,U"
+            "${config.age.secrets.ebk-secret-key.path}:/run/secrets/EBK_SECRET_KEY:ro,U"
 
             # volumes
-            "${volumes.ebk-data.ref}:/ezbookkeeping/storage"
-            "${volumes.ebk-log.ref}:/ezbookkeeping/log"
+            "${volumes.ebk-data.ref}:/ezbookkeeping/storage:U"
+            "${volumes.ebk-log.ref}:/ezbookkeeping/log:U"
           ];
 
           publishPorts = [

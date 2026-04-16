@@ -40,7 +40,6 @@ in
         containerConfig = {
           image = "docker.gitea.com/gitea:${giteaVersion}";
           name = "gitea";
-          user = "0:0";
 
           addHosts = [
             "auth.home.lan:host-gateway"
@@ -50,9 +49,6 @@ in
 
           environments = {
             TZ = "Europe/Berlin";
-
-            USER_UID = "0";
-            USER_GID = "0";
 
             GITEA__database__DB_TYPE = "postgres";
             GITEA__database__HOST = "host.containers.internal:${toString ports.postgres}";
@@ -70,7 +66,7 @@ in
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # volumes
-            "${volumes.gitea-data.ref}:/data"
+            "${volumes.gitea-data.ref}:/data:U"
           ];
 
           publishPorts = [

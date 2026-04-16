@@ -109,7 +109,6 @@ in
         containerConfig = {
           image = "localhost/radicale-ldap:internal";
           name = "radicale";
-          user = "0:0";
 
           addHosts = [
             "ldap.home.lan:host-gateway"
@@ -132,13 +131,13 @@ in
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # config
-            "${config.home.homeDirectory}/containers/radicale/config:/etc/radicale/config:ro"
+            "${config.home.homeDirectory}/containers/radicale/config:/etc/radicale/config:ro,U"
 
             # secrets
-            "${config.age.secrets.radicale-ldap-pw.path}:/run/secrets/LDAP_PASSWORD:ro"
+            "${config.age.secrets.radicale-ldap-pw.path}:/run/secrets/LDAP_PASSWORD:ro,U"
 
             # volumes
-            "${volumes.radicale-data.ref}:/var/lib/radicale"
+            "${volumes.radicale-data.ref}:/var/lib/radicale:U"
           ];
 
           publishPorts = [

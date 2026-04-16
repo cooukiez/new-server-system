@@ -244,13 +244,13 @@ in
             "/etc/localtime:/etc/localtime:ro"
 
             # config files
-            "${config.home.homeDirectory}/containers/caddy/Caddyfile:/etc/caddy/Caddyfile:ro"
+            "${config.home.homeDirectory}/containers/caddy/Caddyfile:/etc/caddy/Caddyfile:ro,U"
 
             # volumes
             "${volumes.caddy-certs.ref}:/certs:ro"
 
-            "${volumes.caddy-config.ref}:/config"
-            "${volumes.caddy-data.ref}:/data"
+            "${volumes.caddy-config.ref}:/config:U"
+            "${volumes.caddy-data.ref}:/data:U"
           ];
 
           publishPorts = [

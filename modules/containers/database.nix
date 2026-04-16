@@ -182,7 +182,6 @@ in
         containerConfig = {
           image = "docker.io/library/postgres:${postgresVersion}";
           name = "postgres";
-          user = "0:0";
           networks = [ "postgres-net" ];
 
           environments = {
@@ -203,17 +202,17 @@ in
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # secrets
-            "${config.age.secrets.postgres-pw.path}:/run/secrets/POSTGRES_PASSWORD:ro"
+            "${config.age.secrets.postgres-pw.path}:/run/secrets/POSTGRES_PASSWORD:ro,U"
 
             # volumes
-            "${volumes.postgres-data.ref}:/var/lib/postgresql"
+            "${volumes.postgres-data.ref}:/var/lib/postgresql:U"
 
             # startup scripts
-            "${config.home.homeDirectory}/containers/postgres/authelia-init.sql:/docker-entrypoint-initdb.d/authelia-init.sql:ro"
-            "${config.home.homeDirectory}/containers/postgres/lldap-init.sql:/docker-entrypoint-initdb.d/lldap-init.sql:ro"
-            "${config.home.homeDirectory}/containers/postgres/gitea-init.sql:/docker-entrypoint-initdb.d/gitea-init.sql:ro"
-            "${config.home.homeDirectory}/containers/postgres/ebk-init.sql:/docker-entrypoint-initdb.d/ebk-init.sql:ro"
-            "${config.home.homeDirectory}/containers/postgres/lidarr-init.sql:/docker-entrypoint-initdb.d/lidarr-init.sql:ro"
+            "${config.home.homeDirectory}/containers/postgres/authelia-init.sql:/docker-entrypoint-initdb.d/authelia-init.sql:ro,U"
+            "${config.home.homeDirectory}/containers/postgres/lldap-init.sql:/docker-entrypoint-initdb.d/lldap-init.sql:ro,U"
+            "${config.home.homeDirectory}/containers/postgres/gitea-init.sql:/docker-entrypoint-initdb.d/gitea-init.sql:ro,U"
+            "${config.home.homeDirectory}/containers/postgres/ebk-init.sql:/docker-entrypoint-initdb.d/ebk-init.sql:ro,U"
+            "${config.home.homeDirectory}/containers/postgres/lidarr-init.sql:/docker-entrypoint-initdb.d/lidarr-init.sql:ro,U"
           ];
 
           publishPorts = [

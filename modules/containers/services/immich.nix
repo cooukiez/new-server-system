@@ -62,14 +62,13 @@ in
         containerConfig = {
           image = "ghcr.io/immich-app/immich-machine-learning:${immichVersion}";
           name = "immich-ml";
-          user = "0:0";
           networks = [ "immich-net" ];
 
           volumes = [
             "/etc/timezone:/etc/timezone:ro"
             "/etc/localtime:/etc/localtime:ro"
 
-            "${volumes.immich-ml-cache.ref}:/cache"
+            "${volumes.immich-ml-cache.ref}:/cache:U"
           ];
 
           devices = [
@@ -89,7 +88,6 @@ in
         containerConfig = {
           image = "docker.io/valkey/valkey:${redisVersion}";
           name = "immich-redis";
-          user = "0:0";
           networks = [ "immich-net" ];
 
           volumes = [
@@ -110,7 +108,6 @@ in
         containerConfig = {
           image = "ghcr.io/immich-app/postgres:${immichDbVersion}";
           name = "immich-postgres";
-          user = "0:0";
           networks = [ "immich-net" ];
 
           environments = {
@@ -125,8 +122,8 @@ in
             "/etc/timezone:/etc/timezone:ro"
             "/etc/localtime:/etc/localtime:ro"
 
-            "${volumes.immich-db.ref}:/var/lib/postgresql/data"
-            "${config.age.secrets.immich-db-pw.path}:/run/secrets/IMMICH_DB_PW"
+            "${volumes.immich-db.ref}:/var/lib/postgresql/data:U"
+            "${config.age.secrets.immich-db-pw.path}:/run/secrets/IMMICH_DB_PW:U"
           ];
         };
       };
@@ -142,7 +139,6 @@ in
         containerConfig = {
           image = "ghcr.io/immich-app/immich-server:${immichVersion}";
           name = "immich-server";
-          user = "0:0";
           networks = [ "immich-net" ];
 
           addHosts = [
@@ -174,10 +170,10 @@ in
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # secrets
-            "${config.age.secrets.immich-db-pw.path}:/run/secrets/IMMICH_DB_PW"
+            "${config.age.secrets.immich-db-pw.path}:/run/secrets/IMMICH_DB_PW:ro,U"
 
             # volumes
-            "${volumes.immich-media.ref}:/data"
+            "${volumes.immich-media.ref}:/data:U"
           ];
 
           devices = [

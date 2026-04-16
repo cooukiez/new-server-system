@@ -113,8 +113,9 @@ in
         containerConfig = {
           image = "docker.io/scuzza/gluetun-webui:${gluetunWebUIVersion}";
           name = "gluetun-webui";
-          user = "0:0";
           networks = [ "vpn-service-net" ];
+
+          addCapabilities = [ "NET_RAW" ];
 
           environments = {
             TZ = "Europe/Berlin";

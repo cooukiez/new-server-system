@@ -80,7 +80,6 @@ in
         containerConfig = {
           image = "ghcr.io/papra-hq/papra:${papraVersion}";
           name = "papra";
-          user = "0:0";
 
           addHosts = [
             "auth.home.lan:host-gateway"
@@ -125,8 +124,8 @@ in
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # volumes
-            "${volumes.data-documents.ref}:/data"
-            "${volumes.papra-data.ref}:/app/app-data"
+            "${volumes.data-documents.ref}:/data:U"
+            "${volumes.papra-data.ref}:/app/app-data:U"
           ];
 
           publishPorts = [
