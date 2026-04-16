@@ -23,7 +23,6 @@
       gs = "git status";
 
       us = "sudo nixos-rebuild switch --upgrade-all --impure";
-
       sw-nix = "sudo nixos-rebuild switch --impure";
 
       nus = "sync-flake && nh os switch /etc/nixos";
@@ -36,7 +35,6 @@
       gtop = "sudo intel_gpu_top";
 
       help = "bash -c 'help'";
-
       c = "clear";
     };
 

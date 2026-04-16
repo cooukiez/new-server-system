@@ -19,12 +19,7 @@
     useUserPackages = true;
 
     extraSpecialArgs = {
-      inherit
-        inputs
-        outputs
-        globalConfig
-        ;
-
+      inherit inputs outputs globalConfig;
       userConfig = globalConfig.users.admin;
     };
 
@@ -52,7 +47,6 @@
         programs.home-manager.enable = true;
         systemd.user.startServices = "sd-switch";
 
-        # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
         home.stateVersion = "25.11";
       };
   };

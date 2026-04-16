@@ -74,7 +74,7 @@
         // {
           squ = {
             description = "quadlet-user";
-            uid = globalConfig.squIds.uid;
+            uid = globalConfig.squ.uid;
             group = "squ";
 
             isNormalUser = true;
@@ -140,7 +140,7 @@
                   };
 
                 users.users = mkUsers pkgs;
-                users.groups.squ.gid = globalConfig.squIds.gid;
+                users.groups.squ.gid = globalConfig.squ.gid;
 
                 system.stateVersion = "25.11";
               }

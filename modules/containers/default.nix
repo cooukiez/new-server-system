@@ -10,14 +10,25 @@
   outputs,
   config,
   pkgs,
+  lib,
   globalConfig,
   ...
 }:
+let
+  getNixFiles =
+    dir:
+    let
+      contents = builtins.readDir dir;
+    in
+    map (name: dir + "/${name}") (
+      builtins.filter (name: lib.hasSuffix ".nix" name) (builtins.attrNames contents)
+    );
+in
 {
-  virtualisation.quadlet.enable = true;
-  virtualisation.podman.defaultNetwork.settings.dns_enabled = true;
-  virtualisation.containers.storage.settings = {
-    storage = {
+  virtualisation = {
+    quadlet.enable = true;
+    podman.defaultNetwork.settings.dns_enabled = true;
+    containers.storage.settings.storage = {
       driver = "overlay";
       options.overlay.mount_program = "${pkgs.fuse-overlayfs}/bin/fuse-overlayfs";
     };
@@ -35,12 +46,7 @@
     useGlobalPkgs = true;
     useUserPackages = true;
     extraSpecialArgs = {
-      inherit
-        inputs
-        outputs
-        globalConfig
-        ;
-
+      inherit inputs outputs globalConfig;
       squConfigKeyPath = config.age.secrets.squ-config-key.path;
     };
 
@@ -56,11 +62,8 @@
         ...
       }:
       let
-        envSuffix = ".config/containers/systemd/env";
-        envSecretsSuffix = ".config/containers/systemd/secrets";
-
-        envPrefix = "${config.home.homeDirectory}/${envSuffix}";
-        envSecretsPrefix = "${config.home.homeDirectory}/${envSecretsSuffix}";
+        baseDir = ".config/containers/systemd";
+        mkPath = sub: "${config.home.homeDirectory}/${baseDir}/${sub}";
       in
       {
         imports = [
@@ -68,17 +71,9 @@
           inputs.agenix.homeManagerModules.default
 
           ./services/media
-
-          ./services/ebk.nix
-          ./services/gitea.nix
-          ./services/immich.nix
-          ./services/node-red.nix
-          ./services/papra.nix
-          ./services/qbittorrent.nix
-          ./services/radicale.nix
-          ./services/transfer-sh.nix
-          ./services/vnstat.nix
-
+        ]
+        ++ (getNixFiles ./services)
+        ++ [
           ./auth.nix
           ./database.nix
           ./dns.nix
@@ -93,12 +88,12 @@
 
         _module.args = {
           ports = globalConfig.ports;
-          
-          envSuffix = envSuffix;
-          envSecretsSuffix = envSecretsSuffix;
 
-          envPrefix = envPrefix;
-          envSecretsPrefix = envSecretsPrefix;
+          envSuffix = "${baseDir}/env";
+          envSecretsSuffix = "${baseDir}/secrets";
+
+          envPrefix = mkPath "env";
+          envSecretsPrefix = mkPath "secrets";
         };
 
         virtualisation.quadlet =
