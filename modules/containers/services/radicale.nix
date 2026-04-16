@@ -11,9 +11,38 @@
   ...
 }:
 let
-  settingsFormat = pkgs.formats.yaml { };
+  settingsFormat = pkgs.formats.ini { };
 
-  radicaleVersion = "3.5.4";
+  radicaleVersion = "latest";
+
+  # build image
+  radicalePackageVersion = "master";
+  radicaleDependencies = "ldap";
+
+  containerFile = pkgs.writeText "Radicale.Containerfile" ''
+    FROM python:3-alpine AS builder
+
+    RUN apk add --no-cache --virtual gcc libffi-dev musl-dev \
+        && python -m venv /app/venv \
+        && /app/venv/bin/pip install --no-cache-dir "Radicale[${radicaleDependencies}] @ https://github.com/Kozea/Radicale/archive/${radicalePackageVersion}.tar.gz"
+
+    FROM python:3-alpine
+
+    WORKDIR /app
+
+    RUN addgroup -g 1000 radicale \
+        && adduser radicale --home /var/lib/radicale --system --uid 1000 --disabled-password -G radicale \
+        && apk add --no-cache ca-certificates openssl curl git
+
+    COPY --chown=radicale:radicale --from=builder /app/venv /app
+
+    VOLUME /var/lib/radicale
+
+    ENTRYPOINT [ "/app/bin/python", "/app/bin/radicale"]
+    CMD ["--hosts", "0.0.0.0:5232,[::]:5232"]
+
+    USER radicale
+  '';
 
   # radicale settings
   radicaleSettings = {
@@ -40,7 +69,6 @@ let
     };
 
     storage = {
-      type = "filesystem";
       filesystem_folder = "/var/lib/radicale/collections";
     };
     
@@ -67,12 +95,14 @@ in
 
   virtualisation.quadlet =
     let
-      inherit (config.virtualisation.quadlet) volumes;
+      inherit (config.virtualisation.quadlet) volumes networks pods builds;
     in
     {
-      volumes.radicale-config.volumeConfig = {
-        type = "bind";
-        device = "/opt/radicale/config";
+      builds.radicale-image = {
+        buildConfig = {
+          file = "${containerFile}";
+          tag = "localhost/radicale-ldap:latest";
+        };
       };
 
       volumes.radicale-data.volumeConfig = {
@@ -83,13 +113,18 @@ in
       containers.radicale = {
         autoStart = true;
 
+        unitConfig = {
+          Requires = [ "radicale-image-build.service" ];
+          After = [ "radicale-image-build.service" ];
+        };
+
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
         };
 
         containerConfig = {
-          image = "ghcr.io/kozea/radicale:${radicaleVersion}";
+          image = "localhost/radicale-ldap:${radicaleVersion}";
           name = "radicale";
           user = "0:0";
 
@@ -100,7 +135,7 @@ in
 
           environments = {
             RADICALE_CONFIG = "/etc/radicale/config";
-            
+
             GIT_SSL_CAINFO = "/certs/home.lan.crt";
           };
 
@@ -116,7 +151,6 @@ in
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # volumes
-            "${volumes.radicale-config.ref}:/etc/radicale:ro"
             "${volumes.radicale-data.ref}:/var/lib/radicale"
           ];
 

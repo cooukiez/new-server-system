@@ -11,6 +11,13 @@
   lib,
   ...
 }:
+let
+  envSuffix = "containers/systemd/env";
+  envSecretsSuffix = "containers/systemd/secrets";
+
+  envPrefix = "${config.xdg.configHome}/${envSuffix}";
+  envSecretsPrefix = "${config.xdg.configHome}/${envSecretsSuffix}";
+in
 {
   imports = [
     ./services/media
@@ -36,8 +43,11 @@
   ];
 
   _module.args = {
-    envPrefix = "${config.xdg.configHome}/containers/systemd/env";
-    envSecretsPrefix = "${config.xdg.configHome}/containers/systemd/secrets";
+    envSuffix = envSuffix;
+    envSecretsSuffix = envSecretsSuffix;
+
+    envPrefix = envPrefix;
+    envSecretsPrefix = envSecretsPrefix;
   };
 
   virtualisation.quadlet =

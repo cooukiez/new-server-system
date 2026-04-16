@@ -90,6 +90,10 @@
     "d /opt/papra 0755 10000 10000 -"
     "d /opt/papra/data 0755 10000 10000 -"
 
+    "d /opt/radicale 0755 10000 10000 -"
+    "d /opt/radicale/config 0755 10000 10000 -"
+    "d /opt/radicale/data 0755 10000 10000 -"
+
     "d /opt/ebk 0755 10000 10000 -"
     "d /opt/ebk/data 0755 10000 10000 -"
     "d /opt/ebk/log 0755 10000 10000 -"

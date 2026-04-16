@@ -70,7 +70,7 @@ in
   # papra
   "papra/storage-key.age".publicKeys = allKeys;
   "papra/auth-secret.age".publicKeys = allKeys;
-  "papra/auth-client.age".publicKeys = allKeys;
+  "papra/client-secret.age".publicKeys = allKeys;
 
   # ebk
   "ebk/secret-key.age".publicKeys = allKeys;

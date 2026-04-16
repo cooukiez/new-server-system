@@ -7,14 +7,35 @@
 
 {
   config,
+  pkgs,
   ports,
+  envSecretsSuffix,
   envSecretsPrefix,
   ...
 }:
 let
   papraVersion = "latest-rootless";
+
+  papraAuthSettings = {
+    providerId = "authelia";
+    providerName = "Authelia";
+    providerIconUrl = "https://www.authelia.com/images/branding/logo-cropped.png";
+    clientId = "papra";
+    clientSecret = "PLACEHOLDER_AUTH_CLIENT_SECRET";
+    type = "oidc";
+    discoveryUrl = "https://auth.home.lan/.well-known/openid-configuration";
+    scopes = [ "openid" "profile" "email" ];
+  };
+
+  papraAuthJson = builtins.toJSON [ papraAuthSettings ];
 in
 {
+  home.file."${envSecretsSuffix}/papra/auth-client-config" = {
+    text = ''
+      AUTH_PROVIDERS_CUSTOMS=${papraAuthJson}
+    '';
+  };
+
   age.secrets =
     let
       mkSecret = name: {
@@ -26,8 +47,7 @@ in
       papra-storage-key = mkSecret "papra/storage-key";
       papra-auth-secret = mkSecret "papra/auth-secret";
 
-      # see config at bottom
-      papra-auth-client = mkSecret "papra/auth-client";
+      papra-client-secret.file = "../../../secrets/papra/client-secret";
     };
 
   virtualisation.quadlet =
@@ -51,6 +71,17 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "${pkgs.coreutils}/bin/cp ${envSecretsPrefix}/papra/auth-client-config ${envSecretsPrefix}/papra/auth-client-config-patched"
+            
+            ''
+            ${pkgs.gnused}/bin/sed -i -e "/PLACEHOLDER_AUTH_CLIENT_SECRET/ {
+              r ${config.age.secrets.papra-client-secret.path}
+              d
+            }" ${envSecretsPrefix}/papra/auth-client-config-patched
+            ''
+          ];
         };
 
         containerConfig = {
@@ -92,7 +123,7 @@ in
             "secrets/papra/storage-key"
             "secrets/papra/auth-secret"
 
-            "secrets/papra/auth-client"
+            "secrets/papra/auth-client-config-patched"
           ];
 
           volumes = [
@@ -114,5 +145,3 @@ in
       };
     };
 }
-
-# echo -n 'AUTH_PROVIDERS_CUSTOMS=[{"providerId":"authelia","providerName":"Authelia","providerIconUrl":"https://www.authelia.com/images/branding/logo-cropped.png","clientId":"papra","clientSecret":"","type":"oidc","discoveryUrl":"https://auth.home.lan/.well-known/openid-configuration","scopes":["openid","profile","email"]}]' | agenix -e papra/auth-client.age
