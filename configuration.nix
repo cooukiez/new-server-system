@@ -233,7 +233,7 @@
   age.identityPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
   age.secrets = {
     squ-config-key = {
-      file = ./secrets/global-agenix.age;
+      file = ./secrets/s_global-agenix.age;
       owner = "squ";
       group = "squ";
     };

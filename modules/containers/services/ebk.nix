@@ -47,7 +47,7 @@ let
 
     database = {
       type = "postgres";
-      host = "host.containers.internal:${ports.postgres}";
+      host = "host.containers.internal:${toString ports.postgres}";
       ssl_mode = "disable";
 
       name = "ebk";

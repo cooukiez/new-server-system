@@ -56,7 +56,7 @@ let
     PostgresPassword = "lidarr";
 
     PostgresHost = "host.containers.internal";
-    PostgresPort = "${ports.postgres}";
+    PostgresPort = "${toString ports.postgres}";
 
     PostgresMainDb = "lidarr-main";
     PostgresLogDb = "lidarr-log";

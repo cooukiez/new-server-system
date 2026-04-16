@@ -85,7 +85,7 @@ let
 
     storage = {
       postgres = {
-        address = "tcp://host.containers.internal:${ports.postgres}";
+        address = "tcp://host.containers.internal:${toString ports.postgres}";
         database = "authelia";
         username = "admin";
       };
