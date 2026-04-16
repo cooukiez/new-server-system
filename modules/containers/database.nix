@@ -180,7 +180,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/library/postgres:${postgresVersion}";
+          image = "quay.io/postgres:${postgresVersion}";
           name = "postgres";
           networks = [ "postgres-net" ];
 
@@ -230,9 +230,8 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/dpage/pgadmin4:${pgadminVersion}";
+          image = "quay.io/pgadmin4:${pgadminVersion}";
           name = "pgadmin";
-          user = "0:0";
           networks = [ "postgres-net" ];
 
           environments = {
@@ -257,10 +256,10 @@ in
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # secrets
-            "${config.age.secrets.pgadmin-pw.path}:/run/secrets/PGADMIN_PASSWORD:ro"
+            "${config.age.secrets.pgadmin-pw.path}:/run/secrets/PGADMIN_PASSWORD:ro,U"
 
             # volumes
-            "${volumes.pgadmin-data.ref}:/var/lib/pgadmin"
+            "${volumes.pgadmin-data.ref}:/var/lib/pgadmin:U"
           ];
 
           publishPorts = [

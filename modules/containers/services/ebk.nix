@@ -243,7 +243,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/mayswind/ezbookkeeping:${ebkVersion}";
+          image = "quay.io/ezbookkeeping:${ebkVersion}";
           name = "ebk";
 
           addHosts = [

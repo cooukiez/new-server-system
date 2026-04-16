@@ -47,7 +47,6 @@ in
         containerConfig = {
           image = "ghcr.io/qdm12/gluetun:${gluetunVersion}";
           name = "gluetun";
-          user = "0:0";
           networks = [ "vpn-service-net" ];
 
           addCapabilities = [
@@ -83,10 +82,10 @@ in
             "/etc/localtime:/etc/localtime:ro"
 
             # secrets
-            "${config.age.secrets.gluetun-key.path}:/run/secrets/WIREGUARD_KEY"
+            "${config.age.secrets.gluetun-key.path}:/run/secrets/WIREGUARD_KEY:ro,U"
 
             # volumes
-            "${volumes.gluetun-data.ref}:/gluetun"
+            "${volumes.gluetun-data.ref}:/gluetun:U"
           ];
 
           devices = [
@@ -111,7 +110,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/scuzza/gluetun-webui:${gluetunWebUIVersion}";
+          image = "quay.io/gluetun-webui:${gluetunWebUIVersion}";
           name = "gluetun-webui";
           networks = [ "vpn-service-net" ];
 

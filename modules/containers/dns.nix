@@ -110,7 +110,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/adguard/adguardhome:latest";
+          image = "quay.io/adguardhome:latest";
           name = "adguardhome";
           addCapabilities = [ "NET_BIND_SERVICE" ];
 

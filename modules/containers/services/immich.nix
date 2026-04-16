@@ -86,7 +86,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/valkey/valkey:${redisVersion}";
+          image = "quay.io/valkey:${redisVersion}";
           name = "immich-redis";
           networks = [ "immich-net" ];
 

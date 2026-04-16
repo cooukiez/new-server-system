@@ -47,7 +47,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/lldap/lldap:${lldapVersion}";
+          image = "quay.io/lldap:${lldapVersion}";
           name = "lldap";
           networks = [ "auth-net" ];
 

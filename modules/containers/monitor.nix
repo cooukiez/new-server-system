@@ -300,7 +300,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/prom/prometheus:${prometheusVersion}";
+          image = "quay.io/prometheus:${prometheusVersion}";
           name = "prometheus";
           networks = [ "monitoring.network" ];
 

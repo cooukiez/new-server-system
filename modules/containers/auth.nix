@@ -190,7 +190,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/authelia/authelia:${autheliaVersion}";
+          image = "quay.io/authelia:${autheliaVersion}";
           name = "authelia";
           networks = [ "auth-net" ];
 

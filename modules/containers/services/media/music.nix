@@ -251,7 +251,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/nginx:${lidarrListsNginxVersion}";
+          image = "quay.io/nginx:${lidarrListsNginxVersion}";
           name = "lidarr-lists";
           networks = [ "media-net" ];
 
@@ -287,14 +287,10 @@ in
           containerConfig = {
             image = "docker.io/nginx:${lidarrListsNginxVersion}";
             name = "cmdarr";
-            user = "0:0";
             networks = [ "media-net" ];
 
             environments = {
               TZ = "Europe/Berlin";
-
-              PUID = "0";
-              PGID = "0";
 
               LIDARR_URL = "http://lidarr:8686";
             };
