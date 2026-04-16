@@ -69,8 +69,9 @@ in
   "ldap/s_key-seed.age".publicKeys = allKeys;
 
   # papra
-  "papra/e_storage-key.age".publicKeys = allKeys;
   "papra/e_auth-secret.age".publicKeys = allKeys;
+  "papra/e_storage-key.age".publicKeys = allKeys;
+  "papra/e_webhook-secret.age".publicKeys = allKeys;
 
   # slskd
   "slskd/s_password.age".publicKeys = allKeys;
@@ -90,6 +91,6 @@ in
   "s_postgres-pw.age".publicKeys = allKeys;
 
   # tailscale
-  "s_tailscale-key.age".publicKeys = allKeys;
   "s_tailscale-api.age".publicKeys = allKeys;
+  "s_tailscale-key.age".publicKeys = allKeys;
 }
