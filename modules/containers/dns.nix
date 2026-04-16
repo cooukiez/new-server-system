@@ -8,7 +8,7 @@
 {
   config,
   pkgs,
-  staticIP,
+  globalConfig,
   ports,
   ...
 }:
@@ -58,17 +58,17 @@ let
         {
           enabled = true;
           domain = "home.lan";
-          answer = "${staticIP}";
+          answer = "${globalConfig.staticIP}";
         }
         {
           enabled = true;
           domain = "*.home.lan";
-          answer = "${staticIP}";
+          answer = "${globalConfig.staticIP}";
         }
         {
           enabled = true;
           domain = "*.home.lan.fritz.box";
-          answer = "${staticIP}";
+          answer = "${globalConfig.staticIP}";
         }
       ];
     };

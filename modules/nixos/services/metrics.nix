@@ -6,7 +6,7 @@
 */
 
 {
-  ports,
+  globalConfig,
   ...
 }:
 {
@@ -18,7 +18,7 @@
     extraArgs = [
       "-w"
       "-p"
-      "${toString ports.glances}"
+      "${toString globalConfig.ports.glances}"
       "-B"
       "0.0.0.0"
     ];
@@ -31,19 +31,19 @@
       "processes"
       "hwmon"
     ];
-    port = ports.nodeExporter;
+    port = globalConfig.ports.nodeExporter;
   };
 
   services.promtail = {
     enable = true;
     configuration = {
       server = {
-        http_listen_port = ports.promtailExporter;
+        http_listen_port = globalConfig.ports.promtailExporter;
         grpc_listen_port = 0;
       };
 
       positions.filename = "/tmp/positions.yaml";
-      clients = [ { url = "http://127.0.0.1:${toString ports.loki}/loki/api/v1/push"; } ];
+      clients = [ { url = "http://127.0.0.1:${toString globalConfig.ports.loki}/loki/api/v1/push"; } ];
       scrape_configs = [
         {
           job_name = "journal";

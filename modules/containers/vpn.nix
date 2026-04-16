@@ -7,7 +7,6 @@
 
 {
   config,
-  staticIP,
   ports,
   ...
 }:

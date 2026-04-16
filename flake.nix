@@ -40,6 +40,7 @@
           "9.9.9.9"
         ];
 
+        hostname = "dhs";
         hostSystem = "x86_64-linux";
         staticIP = "192.168.178.3";
 

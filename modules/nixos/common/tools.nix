@@ -37,7 +37,6 @@ in
     # my scripts
     clear-logs
     fix-perms
-    sync-flake
 
     # tools
     intel-gpu-tools

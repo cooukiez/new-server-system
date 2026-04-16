@@ -7,10 +7,10 @@
 
 {
   inputs,
+  outputs,
   config,
   pkgs,
-  staticIP,
-  ports,
+  globalConfig,
   ...
 }:
 {
@@ -48,6 +48,7 @@
       {
         inputs,
         config,
+        lib,
         globalConfig,
         userConfig,
 
@@ -65,7 +66,6 @@
         imports = [
           inputs.quadlet-nix.homeManagerModules.quadlet
           inputs.agenix.homeManagerModules.default
-          inputs.sops-nix.homeManagerModules.sops
 
           ./services/media
 
@@ -90,9 +90,10 @@
         ];
 
         age.identityPaths = [ squConfigKeyPath ];
-        sops.age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
 
         _module.args = {
+          ports = globalConfig.ports;
+          
           envSuffix = envSuffix;
           envSecretsSuffix = envSecretsSuffix;
 

@@ -9,7 +9,7 @@
   config,
   pkgs,
   lib,
-  staticIP,
+  globalConfig,
   ports,
   ...
 }:
@@ -401,7 +401,7 @@ in
           environments = {
             TZ = "Europe/Berlin";
 
-            HOMEPAGE_ALLOWED_HOSTS = "home.lan,${staticIP}";
+            HOMEPAGE_ALLOWED_HOSTS = "home.lan,${globalConfig.staticIP}";
             HOMEPAGE_FILE_TAILSCALE_KEY = "/run/secrets/HOMEPAGE_TAILSCALE_KEY";
           };
 
