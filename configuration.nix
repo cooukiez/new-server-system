@@ -22,76 +22,6 @@
   ...
 }:
 {
-  imports = [
-    ./hardware-configuration.nix
-  ];
-
-  nixpkgs = {
-    overlays = [
-      inputs.self.overlays.additions
-      inputs.self.overlays.modifications
-      inputs.self.overlays.unstable-packages
-      inputs.self.overlays.nur
-    ];
-
-    config = {
-      allowUnfree = true;
-      permittedInsecurePackages = [
-        "dotnet-sdk-6.0.428"
-        "dotnet-runtime-6.0.36"
-      ];
-    };
-  };
-  nix =
-    let
-      flakeInputs = lib.filterAttrs (_: lib.isType "flake") inputs;
-      myNixPath = lib.mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
-    in
-    {
-      settings = {
-        # enable flakes and new nix command
-        experimental-features = "nix-command flakes";
-        # disable global registry
-        flake-registry = "";
-
-        # workaround for https://github.com/NixOS/nix/issues/9574
-        nix-path = myNixPath;
-      };
-
-      # make flake registry and nix path match flake inputs
-      registry = lib.mapAttrs (_: flake: { inherit flake; }) flakeInputs;
-      nixPath = myNixPath;
-
-      channel.enable = false;
-      optimise.automatic = true;
-      optimise.dates = [ "03:45" ];
-    };
-
-  boot = {
-    kernelPackages = pkgs.linuxPackages_latest;
-    consoleLogLevel = 0;
-
-    initrd.verbose = false;
-    initrd.systemd.network.wait-online.enable = false;
-
-    kernelParams = [
-      "quiet"
-      "rd.udev.log_level=3"
-      "boot.shell_on_fail"
-    ];
-
-    loader.efi.canTouchEfiVariables = true;
-    loader.systemd-boot.enable = true;
-    loader.timeout = 0;
-
-    # required for subnet routing
-    kernel.sysctl = {
-      "net.ipv4.ip_unprivileged_port_start" = 32;
-
-      "net.ipv4.ip_forward" = 1;
-      "net.ipv6.conf.all.forwarding" = 1;
-    };
-  };
 
   # disable systemd services that are affecting the boot time
   systemd.services = {
@@ -174,42 +104,11 @@
     LC_TELEPHONE = "en_IE.UTF-8";
     LC_TIME = "en_IE.UTF-8";
   };
-  
+
   console.keyMap = "us";
 
   # PATH configuration
   environment.localBinInPath = true;
-
-  # user configuration
-  users.users =
-    (lib.mapAttrs (_: user: {
-      description = user.fullName;
-      isNormalUser = true;
-      createHome = true;
-      linger = true;
-      extraGroups = [
-        "wheel"
-        "networkmanager"
-      ];
-      password = "CHANGE-ME";
-      shell = pkgs.zsh;
-    }) users)
-    // {
-      squ = {
-        description = "quadlet-user";
-
-        isNormalUser = true;
-        createHome = true;
-
-        linger = true;
-        autoSubUidGidRange = true;
-
-        group = "squ";
-        uid = squUID;
-      };
-    };
-
-  users.groups.squ.gid = squGID;
 
   # passwordless sudo
   security.sudo.wheelNeedsPassword = false;
@@ -219,7 +118,4 @@
   zramSwap.enable = true;
   zramSwap.memoryPercent = 50;
   zramSwap.algorithm = "lz4";
-
-  # see https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
-  system.stateVersion = "25.11";
 }

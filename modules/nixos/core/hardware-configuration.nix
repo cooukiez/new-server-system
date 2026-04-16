@@ -26,6 +26,7 @@
     "usb_storage"
     "sd_mod"
   ];
+  
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
