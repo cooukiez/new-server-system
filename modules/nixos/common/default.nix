@@ -9,7 +9,7 @@
   inputs,
   pkgs,
   lib,
-  hostSystem,
+  globalConfig,
   ...
 }:
 {
@@ -20,7 +20,6 @@
   age.identityPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
 
   services.dbus.enable = true;
-  services.fwupd.enable = true;
 
   environment.sessionVariables = {
     LIBVA_DRIVER_NAME = "iHD";
@@ -81,7 +80,7 @@
     zip
 
     # encryption
-    inputs.agenix.packages.${hostSystem}.default
+    inputs.agenix.packages.${globalConfig.hostSystem}.default
 
     # nixos related
     home-manager

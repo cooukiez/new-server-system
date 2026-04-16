@@ -34,6 +34,9 @@
     };
   };
 
+  # firmware update
+  services.fwupd.enable = true;
+
   # disable systemd services that are affecting the boot time
   systemd.services = {
     NetworkManager-wait-online.enable = false;
@@ -66,7 +69,7 @@
 
   # passwordless sudo
   security.sudo.wheelNeedsPassword = false;
-  security.pki.certificateFiles = [ ./home.lan.crt ];
+  security.pki.certificateFiles = [ ../../../home.lan.crt ];
 
   # zram configuration
   zramSwap.enable = true;

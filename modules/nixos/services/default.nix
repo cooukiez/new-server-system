@@ -8,6 +8,7 @@
 {
   config,
   pkgs,
+  globalConfig,
   ...
 }:
 {
@@ -16,6 +17,20 @@
     ./metrics.nix
     ./structure.nix
   ];
+
+  services.vnstat.enable = true;
+
+  services.glances = {
+    enable = true;
+
+    extraArgs = [
+      "-w"
+      "-p"
+      "${toString globalConfig.ports.glances}"
+      "-B"
+      "0.0.0.0"
+    ];
+  };
 
   services.samba = {
     enable = true;

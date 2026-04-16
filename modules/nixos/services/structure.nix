@@ -7,8 +7,14 @@
 
 {
   pkgs,
+  globalConfig,
   ...
 }:
+let
+  mkOpt = path: "d /opt/${path} 0755 ${globalConfig.squUID} 10000 -";
+  mkMedia = path: "d /media/${path} 0755 10000 10000 -";
+  mkData = path: "d /data/${path} 0755 10000 10000 -";
+in
 {
   systemd.tmpfiles.rules = [
     "Z /etc/certs 0400 10000 10000 -"

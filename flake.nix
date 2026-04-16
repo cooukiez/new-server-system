@@ -44,7 +44,7 @@
         hostSystem = "x86_64-linux";
         staticIP = "192.168.178.3";
 
-        squIds = {
+        squ = {
           uid = 10000;
           gid = 10000;
         };

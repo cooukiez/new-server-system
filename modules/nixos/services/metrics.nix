@@ -10,20 +10,6 @@
   ...
 }:
 {
-  services.vnstat.enable = true;
-
-  services.glances = {
-    enable = true;
-
-    extraArgs = [
-      "-w"
-      "-p"
-      "${toString globalConfig.ports.glances}"
-      "-B"
-      "0.0.0.0"
-    ];
-  };
-
   services.prometheus.exporters.node = {
     enable = true;
     enabledCollectors = [

@@ -27,8 +27,6 @@
 
     firewall = {
       enable = true;
-
-      # for vpn connections
       checkReversePath = "loose";
 
       trustedInterfaces = [
