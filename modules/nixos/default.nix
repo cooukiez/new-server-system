@@ -6,7 +6,7 @@
 */
 
 {
-  # list module files here
   common = import ./common;
+  core = import ./core;
   services = import ./services;
 }

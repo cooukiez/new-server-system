@@ -12,7 +12,6 @@
 let
   clear-logs = pkgs.writeShellScriptBin "clear-logs" (builtins.readFile ./scripts/clear-logs.sh);
   fix-perms = pkgs.writeShellScriptBin "fix-perms" (builtins.readFile ./scripts/fix-perms.sh);
-  sync-flake = pkgs.writeShellScriptBin "sync-flake" (builtins.readFile ./scripts/sync-flake.sh);
 in
 {
   # nvim base editor
@@ -30,7 +29,6 @@ in
     gping
     htop
     httpie
-    # ngrok
     nssTools
     powertop
     procs

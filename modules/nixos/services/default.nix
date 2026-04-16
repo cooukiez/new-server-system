@@ -18,25 +18,6 @@
     ./structure.nix
   ];
 
-  age.secrets = {
-    tailscale-key.file = ../../../secrets/s_tailscale-key.age;
-  };
-
-  services.fwupd.enable = true;
-  services.vnstat.enable = true;
-
-  services.openssh = {
-    enable = true;
-    ports = [ 22 ];
-    settings = {
-      UseDns = true;
-      X11Forwarding = false;
-
-      PermitRootLogin = "yes";
-      PasswordAuthentication = true;
-    };
-  };
-
   services.samba = {
     enable = true;
     openFirewall = true;
@@ -59,29 +40,6 @@
         "valid users" = "admin";
         "force user" = "root";
       };
-    };
-  };
-
-  services.tailscale = {
-    enable = true;
-    useRoutingFeatures = "both";
-    disableUpstreamLogging = true;
-
-    authKeyFile = config.age.secrets.tailscale-key.path;
-
-    extraUpFlags = [
-      "--advertise-exit-node"
-      "--advertise-routes=192.168.178.0/24"
-    ];
-  };
-
-  services.networkd-dispatcher = {
-    enable = true;
-    rules."50-tailscale-optimizations" = {
-      onState = [ "routable" ];
-      script = ''
-        ${pkgs.ethtool}/bin/ethtool -K eth0 rx-udp-gro-forwarding on rx-gro-list off
-      '';
     };
   };
 }

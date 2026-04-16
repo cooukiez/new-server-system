@@ -18,13 +18,14 @@
   ];
 
   services.dbus.enable = true;
+  services.fwupd.enable = true;
 
   environment.sessionVariables = {
     LIBVA_DRIVER_NAME = "iHD";
     GIT_SSH_COMMAND = "ssh -i /home/admin/.ssh/id_ed25519";
   };
 
-  # enable all terminfo
+  environment.localBinInPath = true;
   environment.enableAllTerminfo = true;
 
   programs.nix-ld.enable = true;
@@ -33,10 +34,9 @@
     enable = true;
     clean.enable = true;
     clean.extraArgs = "--keep-since 4d --keep 3";
-    flake = "/etc/nixos"; # sets NH_OS_FLAKE variable for you
+    flake = "/etc/nixos";
   };
 
-  # zsh shell
   programs.zsh.enable = true;
 
   # system packages

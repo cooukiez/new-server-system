@@ -5,9 +5,6 @@
   created 2026-04-02
 */
 
-# generated config by nixos
-# do not modify this file
-
 {
   config,
   lib,
@@ -26,7 +23,7 @@
     "usb_storage"
     "sd_mod"
   ];
-  
+
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];

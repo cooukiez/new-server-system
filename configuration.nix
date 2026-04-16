@@ -23,14 +23,6 @@
 }:
 {
 
-  # disable systemd services that are affecting the boot time
-  systemd.services = {
-    NetworkManager-wait-online.enable = false;
-    plymouth-quit-wait.enable = false;
-  };
-
-  systemd.targets.network-online.wantedBy = [ "multi-user.target" ];
-
   # hostname
   networking = {
     hostName = hostname;

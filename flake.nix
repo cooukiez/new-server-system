@@ -23,7 +23,7 @@
     quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
   };
 
-  utputs =
+  outputs =
     {
       self,
       nixpkgs,
@@ -95,6 +95,7 @@
           modules = [
             outputs.nixosModules.common
             outputs.nixosModules.services
+            outputs.nixosModules
             outputs.containerModules
 
             ./configuration.nix
@@ -113,7 +114,6 @@
                     inputs.self.overlays.additions
                     inputs.self.overlays.modifications
                     inputs.self.overlays.unstable-packages
-                    inputs.self.overlays.nur
                   ];
 
                   config.allowUnfree = true;
@@ -149,6 +149,14 @@
     in
     {
       packages = forAllSystems (system: import ./pkgs nixpkgs.legacyPackages.${system});
+      overlays = {
+        inherit (import ./overlays { inherit inputs; })
+          additions
+          modifications
+          unstable-packages
+          ;
+      };
+
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
 
       nixosModules = import ./modules/nixos;
