@@ -134,7 +134,7 @@ in
             "${config.home.homeDirectory}/containers/radicale/config:/etc/radicale/config:ro,U"
 
             # secrets
-            "${config.age.secrets.radicale-ldap-pw.path}:/run/secrets/LDAP_PASSWORD:ro,U"
+            "${config.age.secrets.radicale-ldap-pw.path}:/run/secrets/LDAP_PASSWORD:ro"
 
             # volumes
             "${volumes.radicale-data.ref}:/var/lib/radicale:U"

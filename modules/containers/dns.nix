@@ -15,6 +15,8 @@
 let
   settingsFormat = pkgs.formats.yaml { };
 
+  adguardVersion = "latest";
+
   adguardSettings = {
     http = {
       address = "0.0.0.0:3000";
@@ -110,7 +112,7 @@ in
         };
 
         containerConfig = {
-          image = "quay.io/adguardhome:latest";
+          image = "adguard/adguardhome:${adguardVersion}";
           name = "adguardhome";
           addCapabilities = [ "NET_BIND_SERVICE" ];
 

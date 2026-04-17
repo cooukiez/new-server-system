@@ -33,7 +33,7 @@ in
         };
 
         containerConfig = {
-          image = "quay.io/transfer.sh:${transferSHVersion}";
+          image = "docker.io/dutchcoders/transfer.sh:${transferSHVersion}";
           name = "transfer-sh";
 
           exec = [

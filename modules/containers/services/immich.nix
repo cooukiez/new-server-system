@@ -86,7 +86,7 @@ in
         };
 
         containerConfig = {
-          image = "quay.io/valkey:${redisVersion}";
+          image = "docker.io/valkey/valkey:${redisVersion}";
           name = "immich-redis";
           networks = [ "immich-net" ];
 
@@ -123,7 +123,7 @@ in
             "/etc/localtime:/etc/localtime:ro"
 
             "${volumes.immich-db.ref}:/var/lib/postgresql/data:U"
-            "${config.age.secrets.immich-db-pw.path}:/run/secrets/IMMICH_DB_PW:U"
+            "${config.age.secrets.immich-db-pw.path}:/run/secrets/IMMICH_DB_PW:ro"
           ];
         };
       };
@@ -170,7 +170,7 @@ in
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # secrets
-            "${config.age.secrets.immich-db-pw.path}:/run/secrets/IMMICH_DB_PW:ro,U"
+            "${config.age.secrets.immich-db-pw.path}:/run/secrets/IMMICH_DB_PW:ro"
 
             # volumes
             "${volumes.immich-media.ref}:/data:U"

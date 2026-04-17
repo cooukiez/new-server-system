@@ -276,7 +276,7 @@ in
             "${config.home.homeDirectory}/containers/grafana/grafana.ini:${grafanaPaths.config}:ro,U"
 
             # secrets
-            "${config.age.secrets.grafana-client-key.path}:/run/secrets/GRAFANA_CLIENT_KEY:ro,U"
+            "${config.age.secrets.grafana-client-key.path}:/run/secrets/GRAFANA_CLIENT_KEY:ro"
           ]
           ++ (map (n: "${volumes."grafana-${n}".ref}:${grafanaPaths.${n}}") [
             "provisioning"
@@ -300,7 +300,7 @@ in
         };
 
         containerConfig = {
-          image = "quay.io/prometheus:${prometheusVersion}";
+          image = "docker.io/prom/prometheus:${prometheusVersion}";
           name = "prometheus";
           networks = [ "monitoring.network" ];
 

@@ -180,7 +180,7 @@ in
         };
 
         containerConfig = {
-          image = "quay.io/postgres:${postgresVersion}";
+          image = "docker.io/library/postgres:${postgresVersion}";
           name = "postgres";
           networks = [ "postgres-net" ];
 
@@ -202,7 +202,7 @@ in
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # secrets
-            "${config.age.secrets.postgres-pw.path}:/run/secrets/POSTGRES_PASSWORD:ro,U"
+            "${config.age.secrets.postgres-pw.path}:/run/secrets/POSTGRES_PASSWORD:ro"
 
             # volumes
             "${volumes.postgres-data.ref}:/var/lib/postgresql:U"
@@ -230,7 +230,7 @@ in
         };
 
         containerConfig = {
-          image = "quay.io/pgadmin4:${pgadminVersion}";
+          image = "docker.io/dpage/pgadmin4:${pgadminVersion}";
           name = "pgadmin";
           networks = [ "postgres-net" ];
 
@@ -256,7 +256,7 @@ in
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # secrets
-            "${config.age.secrets.pgadmin-pw.path}:/run/secrets/PGADMIN_PASSWORD:ro,U"
+            "${config.age.secrets.pgadmin-pw.path}:/run/secrets/PGADMIN_PASSWORD:ro"
 
             # volumes
             "${volumes.pgadmin-data.ref}:/var/lib/pgadmin:U"

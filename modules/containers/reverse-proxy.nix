@@ -231,7 +231,7 @@ in
         };
 
         containerConfig = {
-          image = "quay.io/caddy:${caddyVersion}";
+          image = "docker.io/library/caddy:${caddyVersion}";
           name = "caddy";
           addCapabilities = [ "NET_BIND_SERVICE" ];
 

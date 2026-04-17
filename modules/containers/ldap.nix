@@ -47,7 +47,7 @@ in
         };
 
         containerConfig = {
-          image = "quay.io/lldap:${lldapVersion}";
+          image = "ghcr.io/lldap/lldap:${lldapVersion}";
           name = "lldap";
           networks = [ "auth-net" ];
 
@@ -78,9 +78,9 @@ in
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # secrets
-            "${config.age.secrets.lldap-jwt.path}:/run/secrets/LLDAP_JWT_SECRET:ro,U"
-            "${config.age.secrets.lldap-seed.path}:/run/secrets/LLDAP_KEY_SEED:ro,U"
-            "${config.age.secrets.lldap-admin.path}:/run/secrets/LLDAP_ADMIN_PASS:ro,U"
+            "${config.age.secrets.lldap-jwt.path}:/run/secrets/LLDAP_JWT_SECRET:ro"
+            "${config.age.secrets.lldap-seed.path}:/run/secrets/LLDAP_KEY_SEED:ro"
+            "${config.age.secrets.lldap-admin.path}:/run/secrets/LLDAP_ADMIN_PASS:ro"
 
             # volumes
             "${volumes.lldap-data.ref}:/data"

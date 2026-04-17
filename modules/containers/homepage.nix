@@ -400,6 +400,9 @@ in
           environments = {
             TZ = "Europe/Berlin";
 
+            HOMEPAGE_VAR_CONFIG_CHOWN = "false";
+            HOMEPAGE_VAR_PUBLIC_CHOWN = "false";
+
             HOMEPAGE_ALLOWED_HOSTS = "home.lan,${globalConfig.staticIP}";
             HOMEPAGE_FILE_TAILSCALE_KEY = "/run/secrets/HOMEPAGE_TAILSCALE_KEY";
           };
@@ -422,10 +425,10 @@ in
             "${config.home.homeDirectory}/containers/homepage/bookmarks.yaml:/app/config/bookmarks.yaml:ro,U"
 
             # background
-            "${./assets/background-fullres.png}:/app/public/images/background.png:ro,U"
+            "${./assets/background-fullres.png}:/app/public/images/background.png:ro"
 
             # secrets
-            "${config.age.secrets.homepage-tailscale.path}:/run/secrets/HOMEPAGE_TAILSCALE_KEY:ro,U"
+            "${config.age.secrets.homepage-tailscale.path}:/run/secrets/HOMEPAGE_TAILSCALE_KEY:ro"
           ];
 
           publishPorts = [

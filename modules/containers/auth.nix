@@ -190,13 +190,13 @@ in
         };
 
         containerConfig = {
-          image = "quay.io/authelia:${autheliaVersion}";
+          image = "ghcr.io/authelia/authelia:${autheliaVersion}";
           name = "authelia";
           networks = [ "auth-net" ];
 
           volumes =
             (lib.mapAttrsToList (
-              name: mount: "${config.age.secrets.${name}.path}:/run/secrets/${mount}:ro,U"
+              name: mount: "${config.age.secrets.${name}.path}:/run/secrets/${mount}:ro"
             ) secretMounts)
             ++ [
               "/etc/timezone:/etc/timezone:ro"

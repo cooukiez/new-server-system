@@ -16,6 +16,8 @@ let
   settingsFormat = pkgs.formats.ini { };
 
   ebkVersion = "latest";
+  ebkUID = "297607";
+
 
   # ezbookkeeping settings
   ebkSettings = {
@@ -243,7 +245,7 @@ in
         };
 
         containerConfig = {
-          image = "quay.io/ezbookkeeping:${ebkVersion}";
+          image = "docker.io/mayswind/ezbookkeeping:${ebkVersion}";
           name = "ebk";
 
           addHosts = [
@@ -254,7 +256,7 @@ in
             TZ = "Europe/Berlin";
 
             EBKCFP_SECURITY_SECRET_KEY = "/run/secrets/EBK_SECRET_KEY";
-            EBKCFP_AUTH_OAUTH2_USER_IDENTIFIER = "/run/secrets/EBK_CLIENT_KEY";
+            EBKCFP_AUTH_OAUTH2_CLIENT_SECRET = "/run/secrets/EBK_CLIENT_KEY";
           };
 
           volumes = [
@@ -269,8 +271,8 @@ in
             "${config.home.homeDirectory}/containers/ebk/ezbookkeeping.ini:/ezbookkeeping/conf/ezbookkeeping.ini:ro,U"
 
             # secrets
-            "${config.age.secrets.ebk-client-key.path}:/run/secrets/EBK_CLIENT_KEY:ro,U"
-            "${config.age.secrets.ebk-secret-key.path}:/run/secrets/EBK_SECRET_KEY:ro,U"
+            "${config.age.secrets.ebk-client-key.path}:/run/secrets/EBK_CLIENT_KEY:ro"
+            "${config.age.secrets.ebk-secret-key.path}:/run/secrets/EBK_SECRET_KEY:ro"
 
             # volumes
             "${volumes.ebk-data.ref}:/ezbookkeeping/storage:U"

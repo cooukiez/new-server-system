@@ -82,7 +82,7 @@ in
             "/etc/localtime:/etc/localtime:ro"
 
             # secrets
-            "${config.age.secrets.gluetun-key.path}:/run/secrets/WIREGUARD_KEY:ro,U"
+            "${config.age.secrets.gluetun-key.path}:/run/secrets/WIREGUARD_KEY:ro"
 
             # volumes
             "${volumes.gluetun-data.ref}:/gluetun:U"
@@ -110,7 +110,7 @@ in
         };
 
         containerConfig = {
-          image = "quay.io/gluetun-webui:${gluetunWebUIVersion}";
+          image = "docker.io/scuzza/gluetun-webui:${gluetunWebUIVersion}";
           name = "gluetun-webui";
           networks = [ "vpn-service-net" ];
 

@@ -33,7 +33,7 @@ in
         };
 
         containerConfig = {
-          image = "quay.io/vnstat-dashboard:${vnstatDashboardVersion}";
+          image = "docker.io/kshitizb/vnstat-dashboard:${vnstatDashboardVersion}";
           name = "vnstat-dashboard";
 
           environments = {

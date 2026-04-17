@@ -230,7 +230,7 @@ in
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # config
-            "${volumes.lidarr-data.ref}:/config:ro,U"
+            "${volumes.lidarr-data.ref}:/config:U"
 
             # media volumes
             "${volumes.media-download.ref}:/download"
@@ -243,6 +243,7 @@ in
         };
       };
 
+      /*
       containers.lidarr-lists = {
         autoStart = true;
         serviceConfig = {
@@ -251,7 +252,7 @@ in
         };
 
         containerConfig = {
-          image = "quay.io/nginx:${lidarrListsNginxVersion}";
+          image = "docker.io/nginx:${lidarrListsNginxVersion}";
           name = "lidarr-lists";
           networks = [ "media-net" ];
 
@@ -275,6 +276,7 @@ in
           ];
         };
       };
+      */
 
       /*
         containers.cmdarr = {
@@ -344,9 +346,9 @@ in
           };
 
           environmentFiles = [
-            "secrets/slskd/user"
-            "secrets/slskd/password"
-            "secrets/slskd/webui-pw"
+            "secrets/slskd/e_user"
+            "secrets/slskd/e_pass"
+            "secrets/slskd/e_webui-pw"
           ];
 
           volumes = [
