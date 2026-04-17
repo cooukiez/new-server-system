@@ -29,7 +29,7 @@
     use_pkce = true;
     auth_style = "InHeader";
 
-    tls_client_ca = "/certs/home.lan.crt";
+    tls_client_ca = "/certs/ca.crt";
 
     role_attribute_path = "contains(groups, 'admins') && 'Admin' || contains(groups, 'editors') && 'Editor' || 'Viewer'";
   };

@@ -97,7 +97,7 @@ in
             DOCUMENTS_CONTENT_EXTRACTION_ENABLED = "true";
             DOCUMENTS_OCR_LANGUAGES = "deu,eng";
 
-            NODE_EXTRA_CA_CERTS = "/certs/home.lan.crt";
+            NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
 
             AUTH_FIRST_USER_AS_ADMIN = "true";
             AUTH_PROVIDERS_EMAIL_IS_ENABLED = "false";
@@ -120,8 +120,8 @@ in
             "/etc/localtime:/etc/localtime:ro"
 
             # certificates
-            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
-            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+            "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
+            "/certs/ca.crt:/certs/ca.crt:ro"
 
             # volumes
             "${volumes.data-documents.ref}:/data:U"

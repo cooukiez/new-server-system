@@ -54,12 +54,12 @@ in
           environments = {
             TZ = "Europe/Berlin";
 
-            NODE_EXTRA_CA_CERTS = "/certs/home.lan.crt";
+            NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
 
             NODE_RED_ENABLE_PROJECTS = "true";
             NODE_RED_ENABLE_SAFE_MODE = "false";
 
-            GIT_SSL_CAINFO = "/certs/home.lan.crt";
+            GIT_SSL_CAINFO = "/certs/ca.crt";
           };
 
           environmentFiles = [
@@ -71,8 +71,8 @@ in
             "/etc/localtime:/etc/localtime:ro"
 
             # certificates
-            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
-            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+            "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
+            "/certs/ca.crt:/certs/ca.crt:ro"
 
             # volumes
             "${volumes.node-red-data.ref}:/data:U"

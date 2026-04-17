@@ -69,7 +69,7 @@
 
   # passwordless sudo
   security.sudo.wheelNeedsPassword = false;
-  security.pki.certificateFiles = [ ../../../home.lan.crt ];
+  security.pki.certificateFiles = [ ../../../ca.crt ];
 
   # zram configuration
   zramSwap.enable = true;

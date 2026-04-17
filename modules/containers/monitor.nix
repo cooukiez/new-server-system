@@ -30,7 +30,7 @@ let
 
     config = "${root}/grafana.ini";
     provisioning = "${root}/provisioning";
-    cert = "/certs/home.lan.crt";
+    cert = "/certs/ca.crt";
 
     data = "${root}/data";
     plugins = "${root}/plugins";
@@ -269,8 +269,8 @@ in
             "/etc/localtime:/etc/localtime:ro"
 
             # certificates
-            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
-            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+            "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
+            "/certs/ca.crt:/certs/ca.crt:ro"
 
             # config
             "${config.home.homeDirectory}/containers/grafana/grafana.ini:${grafanaPaths.config}:ro,U"
@@ -315,8 +315,8 @@ in
             "/etc/localtime:/etc/localtime:ro"
 
             # certificates
-            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
-            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+            "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
+            "/certs/ca.crt:/certs/ca.crt:ro"
 
             # config
             "${config.home.homeDirectory}/containers/prometheus/prometheus.yml:${prometheusPaths.config}:ro,U"

@@ -36,7 +36,7 @@ let
       ldap_groups_attribute = "memberOf";
 
       ldap_security = "tls";
-      ldap_ssl_ca_file = "/certs/home.lan.crt";
+      ldap_ssl_ca_file = "/certs/ca.crt";
     };
 
     storage = {
@@ -120,7 +120,7 @@ in
             TZ = "Europe/Berlin";
 
             RADICALE_CONFIG = "/etc/radicale/config";
-            GIT_SSL_CAINFO = "/certs/home.lan.crt";
+            GIT_SSL_CAINFO = "/certs/ca.crt";
           };
 
           volumes = [
@@ -128,8 +128,8 @@ in
             "/etc/localtime:/etc/localtime:ro"
 
             # certificates
-            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
-            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+            "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
+            "/certs/ca.crt:/certs/ca.crt:ro"
 
             # config
             "${config.home.homeDirectory}/containers/radicale/config:/etc/radicale/config:ro,U"

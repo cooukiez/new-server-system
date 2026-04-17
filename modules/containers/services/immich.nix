@@ -158,7 +158,7 @@ in
             IMMICH_MACHINE_LEARNING_URL = "http://immich-ml:3003";
             REDIS_HOSTNAME = "immich-redis";
 
-            NODE_EXTRA_CA_CERTS = "/certs/home.lan.crt";
+            NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
           };
 
           volumes = [
@@ -166,8 +166,8 @@ in
             "/etc/localtime:/etc/localtime:ro"
 
             # certificates
-            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
-            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+            "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
+            "/certs/ca.crt:/certs/ca.crt:ro"
 
             # secrets
             "${config.age.secrets.immich-db-pw.path}:/run/secrets/IMMICH_DB_PW:ro"
