@@ -58,6 +58,7 @@ in
       mkSecret = name: {
         file = ../../../secrets/${name}.age;
         path = "${envSecretsPrefix}/${name}";
+        mode = "444";
       };
     in
     {

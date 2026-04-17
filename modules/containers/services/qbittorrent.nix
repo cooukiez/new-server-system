@@ -46,7 +46,7 @@ in
         containerConfig = {
           image = "lscr.io/linuxserver/qbittorrent:${qBittorrentVersion}";
           name = "qbittorrent";
-          
+
           # networking through gluetun
           networks = [ "container:gluetun" ];
 

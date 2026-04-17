@@ -22,19 +22,29 @@ let
       address = "0.0.0.0:3000";
     };
 
-    dns = {
-      bind_hosts = [ "0.0.0.0" ];
-      port = 53;
+    dns =
+      let
+        ips = [
+          "9.9.9.10"
+          "149.112.112.10"
+        ] ++ globalConfig.dnsServers;
+      in
+      {
+        bind_hosts = [ "0.0.0.0" ];
+        port = 53;
 
-      upstream_mode = "fastest_addr";
-      upstream_timeout = "2s";
-      upstream_dns = [ "https://dns10.quad9.net/dns-query" ];
+        upstream_mode = "fastest_addr";
+        upstream_timeout = "2s";
+        upstream_dns = [
+          "https://cloudflare-dns.com/dns-query"
+          "https://mozilla.cloudflare-dns.com/dns-query"
+          "https://dns.google/dns-query"
+          "https://dns.quad9.net/dns-query"
+          "https://unfiltered.joindns4.eu/dns-query"
+        ];
 
-      bootstrap_dns = [
-        "9.9.9.10"
-        "149.112.112.10"
-      ];
-    };
+        bootstrap_dns = ips;
+      };
 
     dhcp = {
       enabled = false;

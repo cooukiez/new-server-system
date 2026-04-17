@@ -113,6 +113,9 @@ in
           publishPorts = [
             "${toString ports.jellyfin}:8096/tcp"
           ];
+
+          healthStartPeriod = "60s";
+          healthInterval = "30s";
         };
       };
     };

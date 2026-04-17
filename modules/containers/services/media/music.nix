@@ -244,38 +244,38 @@ in
       };
 
       /*
-      containers.lidarr-lists = {
-        autoStart = true;
-        serviceConfig = {
-          Restart = "always";
-          RestartSec = "10";
+        containers.lidarr-lists = {
+          autoStart = true;
+          serviceConfig = {
+            Restart = "always";
+            RestartSec = "10";
+          };
+
+          containerConfig = {
+            image = "docker.io/nginx:${lidarrListsNginxVersion}";
+            name = "lidarr-lists";
+            networks = [ "media-net" ];
+
+            volumes = [
+              "/etc/timezone:/etc/timezone:ro"
+              "/etc/localtime:/etc/localtime:ro"
+
+              # certificates
+              "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
+              "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+
+              # config
+              "${config.home.homeDirectory}/containers/lidarr/lidarr-lists.conf:/etc/nginx/conf.d/default.conf:ro,U"
+
+              # volumes
+              "${volumes.lidarr-lists.ref}:/lists:ro,U"
+            ];
+
+            publishPorts = [
+              "${toString ports.lidarrLists}:80/tcp"
+            ];
+          };
         };
-
-        containerConfig = {
-          image = "docker.io/nginx:${lidarrListsNginxVersion}";
-          name = "lidarr-lists";
-          networks = [ "media-net" ];
-
-          volumes = [
-            "/etc/timezone:/etc/timezone:ro"
-            "/etc/localtime:/etc/localtime:ro"
-
-            # certificates
-            "/certs/home.lan.crt:/usr/local/share/ca-certificates/home.lan.crt:ro"
-            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
-
-            # config
-            "${config.home.homeDirectory}/containers/lidarr/lidarr-lists.conf:/etc/nginx/conf.d/default.conf:ro,U"
-
-            # volumes
-            "${volumes.lidarr-lists.ref}:/lists:ro,U"
-          ];
-
-          publishPorts = [
-            "${toString ports.lidarrLists}:80/tcp"
-          ];
-        };
-      };
       */
 
       /*

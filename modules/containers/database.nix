@@ -76,10 +76,17 @@ let
   '';
 in
 {
-  age.secrets = {
-    postgres-pw.file = ../../secrets/s_postgres-pw.age;
-    pgadmin-pw.file = ../../secrets/s_pgadmin-pw.age;
-  };
+  age.secrets =
+    let
+      mkSecret = name: {
+        file = ../../secrets/${name}.age;
+        mode = "444";
+      };
+    in
+    {
+      postgres-pw = mkSecret "s_postgres-pw";
+      pgadmin-pw = mkSecret "s_pgadmin-pw";
+    };
 
   home.file."containers/postgres/init-all-db.sql".text = ''
     -- Prevent script from crashing if a command fails
@@ -88,68 +95,11 @@ in
     ${builtins.concatStringsSep "\n" (map mkSql services)}
   '';
 
-  home.file."containers/postgres/authelia-init.sql" = {
-    text = ''
-      CREATE DATABASE authelia;
-      ALTER DATABASE authelia OWNER TO admin;
-      GRANT ALL PRIVILEGES ON DATABASE authelia TO admin;
-    '';
-  };
-
-  home.file."containers/postgres/lldap-init.sql" = {
-    text = ''
-      CREATE USER lldap;
-      ALTER USER lldap WITH PASSWORD 'lldap';
-
-      CREATE DATABASE lldap;
-      ALTER DATABASE lldap OWNER TO lldap;
-
-      GRANT ALL PRIVILEGES ON DATABASE lldap TO admin;
-    '';
-  };
-
-  home.file."containers/postgres/gitea-init.sql" = {
-    text = ''
-      CREATE USER gitea;
-      ALTER USER gitea WITH PASSWORD 'gitea';
-
-      CREATE DATABASE gitea;
-      ALTER DATABASE gitea OWNER TO gitea;
-
-      GRANT ALL PRIVILEGES ON DATABASE gitea TO admin;
-    '';
-  };
-
-  home.file."containers/postgres/ebk-init.sql" = {
-    text = ''
-      CREATE USER ebk;
-      ALTER USER ebk WITH PASSWORD 'ebk';
-
-      CREATE DATABASE ebk;
-      ALTER DATABASE ebk OWNER TO ebk;
-
-      GRANT ALL PRIVILEGES ON DATABASE ebk TO admin;
-    '';
-  };
-
-  home.file."containers/postgres/lidarr-init.sql" = {
-    text = ''
-      CREATE USER lidarr;
-      ALTER USER lidarr WITH PASSWORD 'lidarr';
-
-      CREATE DATABASE "lidarr-main";
-      ALTER DATABASE "lidarr-main" OWNER TO lidarr;
-
-      CREATE DATABASE "lidarr-log";
-      ALTER DATABASE "lidarr-log" OWNER TO lidarr;
-
-      GRANT ALL PRIVILEGES ON DATABASE "lidarr-main" TO admin;
-      GRANT ALL PRIVILEGES ON DATABASE "lidarr-log" TO admin;
-    '';
-  };
-
-  # access postgres database
+  # [access postgres database]
   # podman exec -it postgres psql -U admin -d app_db
+
+  # [run init script]
+  # cat ~/containers/postgres/init-all-db.sql | podman exec -i postgres psql -U admin -d postgres
 
   virtualisation.quadlet =
     let
@@ -208,11 +158,7 @@ in
             "${volumes.postgres-data.ref}:/var/lib/postgresql:U"
 
             # startup scripts
-            "${config.home.homeDirectory}/containers/postgres/authelia-init.sql:/docker-entrypoint-initdb.d/authelia-init.sql:ro,U"
-            "${config.home.homeDirectory}/containers/postgres/lldap-init.sql:/docker-entrypoint-initdb.d/lldap-init.sql:ro,U"
-            "${config.home.homeDirectory}/containers/postgres/gitea-init.sql:/docker-entrypoint-initdb.d/gitea-init.sql:ro,U"
-            "${config.home.homeDirectory}/containers/postgres/ebk-init.sql:/docker-entrypoint-initdb.d/ebk-init.sql:ro,U"
-            "${config.home.homeDirectory}/containers/postgres/lidarr-init.sql:/docker-entrypoint-initdb.d/lidarr-init.sql:ro,U"
+            "${config.home.homeDirectory}/containers/postgres/init-all-db.sql:/docker-entrypoint-initdb.d/init-all-db.sql:ro,U"
           ];
 
           publishPorts = [
