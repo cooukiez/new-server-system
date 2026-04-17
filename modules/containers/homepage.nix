@@ -18,12 +18,31 @@ let
 
   homepageVersion = "latest";
 
+  hostInt = "http://host.containers.internal";
+
+  mkSvc = name: icon: href: desc: {
+    "${name}" = {
+      inherit icon href;
+      description = desc;
+    };
+  };
+
+  mkGlance = name: metric: chart: {
+    "${name}".widget = {
+      inherit metric chart;
+      type = "glances";
+      url = "${hostInt}:${toString ports.glances}";
+      version = 4;
+    };
+  };
+
   globalAddress = {
     fritzbox = "http://192.168.178.1";
 
     homepage = "https://home.lan";
 
     adguard = "https://dns.home.lan";
+    tailscale = "https://login.tailscale.com/admin/machines";
     gluetun = "https://vpn.home.lan";
 
     grafana = "https://monitor.home.lan";
@@ -45,13 +64,37 @@ let
     ebk = "https://finance.home.lan";
   };
 
+  icons = {
+    caddy = "caddy";
+    adguard = "adguard-home";
+    tailscale = "tailscale";
+    gluetun = "gluetun";
+
+    grafana = "grafana";
+    glances = "glances";
+    vnstat = "mdi-chart-timeline-variant";
+
+    immich = "immich";
+    jellyfin = "jellyfin";
+    lidarr = "lidarr";
+    slskd = "slskd";
+    qbittorrent = "qbittorrent";
+
+    papra = "papra";
+    gitea = "gitea";
+    ebk = "ezbookkeeping";
+
+    transfer-sh = "https://avatars.githubusercontent.com/u/5444419?s=48&v=4";
+    node-red = "https://avatars.githubusercontent.com/u/5375661?s=48&v=4";
+  };
+
   # homepage settings
   homepageSettings = {
     title = "homeserver";
     headerStyle = "clean";
 
     background = {
-      image = "/images/background.png";
+      image = "/images/background.jpg";
       saturate = 75;
       brightness = 70;
       opacity = 100;
@@ -67,7 +110,7 @@ let
     layout = {
       "Groups" = {
         style = "column";
-        columns = 5;
+        columns = 4;
 
         "Networking" = {
           style = "column";
@@ -77,12 +120,16 @@ let
         };
         "Services" = {
           style = "column";
-          columns = 2;
         };
 
         "System Monitor" = {
           style = "column";
         };
+      };
+
+      "Apps" = {
+        style = "row";
+        columns = 5;
       };
     };
   };
@@ -95,28 +142,40 @@ let
       };
     }
     {
-      datetime = {
-        format = {
-          date = "long";
-          time = "short";
-          hour12 = false;
-        };
-      };
-    }
-    {
-      openmeteo = {
-        label = "Weather";
-        latitude = "52.52";
-        longitude = "13.40";
-        units = "metric";
-        cache = 5;
-      };
-    }
-    {
       resources = {
         disk = "/";
       };
     }
+    {
+      search = {
+        provider = "duckduckgo";
+        focus = true;
+        target = "_blank";
+        showSearchSuggestions = true;
+      };
+    }
+    /*
+      {
+        datetime = {
+          format = {
+            date = "long";
+            time = "short";
+            hour12 = false;
+          };
+        };
+      }
+    */
+    /*
+      {
+        openmeteo = {
+          label = "Weather";
+          latitude = "52.52";
+          longitude = "13.40";
+          units = "metric";
+          cache = 5;
+        };
+      }
+    */
   ];
 
   homepageServices = [
@@ -124,30 +183,30 @@ let
       "Networking" = [
         {
           "Caddy" = {
-            icon = "caddy";
+            icon = icons.caddy;
             href = globalAddress.homepage;
             description = "Server Reverse Proxy";
             widget = {
               type = "caddy";
-              url = "http://host.containers.internal:${toString ports.caddyAdmin}";
+              url = "${hostInt}:${toString ports.caddyAdmin}";
             };
           };
         }
         {
           "AdGuard Home" = {
-            icon = "adguard-home";
+            icon = icons.adguard;
             href = globalAddress.adguard;
             description = "Private DNS Server";
             widget = {
               type = "adguard";
-              url = "http://host.containers.internal:${toString ports.adguard}";
+              url = "${hostInt}:${toString ports.adguard}";
             };
           };
         }
         {
           "Tailscale" = {
-            icon = "tailscale";
-            href = "https://login.tailscale.com/admin/machines";
+            icon = icons.tailscale;
+            href = globalAddress.tailscale;
             description = "Bridge Internal Network";
             widget = {
               type = "tailscale";
@@ -158,12 +217,12 @@ let
         }
         {
           "Gluetun / VPN" = {
-            icon = "gluetun";
+            icon = icons.gluetun;
             href = globalAddress.gluetun;
             description = "Server VPN Provider";
             widget = {
               type = "gluetun";
-              url = "http://host.containers.internal:${toString ports.gluetun}";
+              url = "${hostInt}:${toString ports.gluetun}";
               version = 2;
               key = "169qzBxFa0ET26rkTWa3akmVopysVilS";
             };
@@ -173,168 +232,41 @@ let
     }
     {
       "Monitoring" = [
-        {
-          "Grafana" = {
-            icon = "grafana";
-            href = globalAddress.grafana;
-            description = "Container / Monitoring Dashboard";
-          };
-        }
-        {
-          "Glances" = {
-            icon = "glances";
-            href = globalAddress.glances;
-            description = "Server Usage Statistics";
-          };
-        }
-        {
-          "VNStat" = {
-            icon = "mdi-chart-timeline-variant";
-            href = globalAddress.vnstat;
-            description = "VNStat Dashboard";
-          };
-        }
+        (mkSvc "Grafana" icons.grafana globalAddress.grafana "Container / Monitoring Dashboard")
+        (mkSvc "Glances" icons.glances globalAddress.glances "Server Usage Statistics")
+        (mkSvc "VNStat" icons.vnstat globalAddress.vnstat "VNStat Dashboard")
       ];
     }
     {
       "Services" = [
-        #
-        # media
-        #
-        {
-          "Immich" = {
-            icon = "immich";
-            href = globalAddress.immich;
-            description = "Photo Management System";
-          };
-        }
-        {
-          "Jellyfin" = {
-            icon = "jellyfin";
-            href = globalAddress.jellyfin;
-            description = "Universal Media Server";
-          };
-        }
-        {
-          "Lidarr" = {
-            icon = "lidarr";
-            href = globalAddress.lidarr;
-            description = "Music Tracker / Downloader";
-          };
-        }
-        {
-          "Slskd" = {
-            icon = "slskd";
-            href = globalAddress.slskd;
-            description = "Soulseek Network Integration";
-          };
-        }
-        {
-          "qBittorrent" = {
-            icon = "qbittorrent";
-            href = globalAddress.qbittorrent;
-            description = "Torrent / Magnet Downloader";
-          };
-        }
-        #
-        # organisation
-        #
-        {
-          "Papra" = {
-            icon = "papra";
-            href = globalAddress.papra;
-            description = "Document Management System";
-          };
-        }
-        {
-          "Gitea" = {
-            icon = "gitea";
-            href = globalAddress.gitea;
-            description = "Selfhosted DevOps Platform";
-          };
-        }
-        {
-          "ezBookkeeping" = {
-            icon = "ezbookkeeping";
-            href = globalAddress.ebk;
-            description = "Personal Finance Management";
-          };
-        }
-        #
-        # other
-        #
-        {
-          "transfer.sh" = {
-            icon = "https://avatars.githubusercontent.com/u/5444419?s=48&v=4";
-            href = globalAddress.transfer-sh;
-            description = "Convenient File Transfer";
-          };
-        }
-        {
-          "Node-RED" = {
-            icon = "https://avatars.githubusercontent.com/u/5375661?s=48&v=4";
-            href = globalAddress.node-red;
-            description = "Automation Flow System";
-          };
-        }
+        (mkSvc "Node-RED" icons.node-red globalAddress.node-red "Automation Flow System")
+        (mkSvc "transfer.sh" icons.transfer-sh globalAddress.transfer-sh "Convenient File Transfer")
       ];
     }
     {
       "System Monitor" = [
-        {
-          "Info" = {
-            widget = {
-              type = "glances";
-              url = "http://host.containers.internal:${toString ports.glances}";
-              version = 4;
-              metric = "info";
-            };
-          };
-        }
-        {
-          "CPU Usage" = {
-            widget = {
-              type = "glances";
-              url = "http://host.containers.internal:${toString ports.glances}";
-              version = 4;
-              metric = "cpu";
-              chart = false;
-            };
-          };
-        }
-        {
-          "Memory Usage" = {
-            widget = {
-              type = "glances";
-              url = "http://host.containers.internal:${toString ports.glances}";
-              version = 4;
-              metric = "memory";
-              chart = false;
-            };
-          };
-        }
-        {
-          "Network Usage" = {
-            widget = {
-              type = "glances";
-              url = "http://host.containers.internal:${toString ports.glances}";
-              version = 4;
-              metric = "network:enp0s20f0u4";
-              chart = false;
-            };
-          };
-        }
-        {
-          "Disk SSD" = {
-            widget = {
-              type = "glances";
-              url = "http://host.containers.internal:${toString ports.glances}";
-              version = 4;
-              metric = "disk:nvme0n1";
-              chart = false;
-            };
-          };
-        }
+        (mkGlance "Info" "info" null)
+        (mkGlance "CPU Usage" "cpu" false)
+        (mkGlance "Memory Usage" "memory" false)
+        (mkGlance "Network" "network:enp0s20f0u4" false)
+        (mkGlance "Disk SSD" "disk:nvme0n1" false)
+      ];
+    }
+    {
+      "Apps" = [
+        # media
+        (mkSvc "Immich" icons.immich globalAddress.immich "Photo Management System")
+        (mkSvc "Jellyfin" icons.jellyfin globalAddress.jellyfin "Universal Media Server")
+        (mkSvc "Lidarr" icons.lidarr globalAddress.lidarr "Music Tracker / Downloader")
+
+        # media download
+        (mkSvc "Slskd" icons.slskd globalAddress.slskd "Soulseek Network Integration")
+        (mkSvc "qBittorrent" icons.qbittorrent globalAddress.qbittorrent "Torrent / Magnet Management")
+
+        # general
+        (mkSvc "Papra" icons.papra globalAddress.papra "Document Management System")
+        (mkSvc "Gitea" icons.gitea globalAddress.gitea "Selfhosted DevOps Platform")
+        (mkSvc "ezBookkeeping" icons.ebk globalAddress.ebk "Personal Finance Management")
       ];
     }
   ];
@@ -425,7 +357,7 @@ in
             "${config.home.homeDirectory}/containers/homepage/bookmarks.yaml:/app/config/bookmarks.yaml:ro,U"
 
             # background
-            "${./assets/background-fullres.png}:/app/public/images/background.png:ro"
+            "${./assets/background-fullres-compressed.jpg}:/app/public/images/background.jpg:ro"
 
             # secrets
             "${config.age.secrets.homepage-tailscale.path}:/run/secrets/HOMEPAGE_TAILSCALE_KEY:ro"

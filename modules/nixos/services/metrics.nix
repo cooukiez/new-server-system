@@ -17,6 +17,7 @@
       "processes"
       "hwmon"
     ];
+
     port = globalConfig.ports.nodeExporter;
   };
 
@@ -29,7 +30,12 @@
       };
 
       positions.filename = "/tmp/positions.yaml";
-      clients = [ { url = "http://127.0.0.1:${toString globalConfig.ports.loki}/loki/api/v1/push"; } ];
+      clients = [
+        {
+          url = "http://127.0.0.1:${toString globalConfig.ports.loki}/loki/api/v1/push";
+        }
+      ];
+
       scrape_configs = [
         {
           job_name = "journal";
@@ -43,11 +49,15 @@
 
           relabel_configs = [
             {
-              source_labels = [ "__journal__systemd_unit" ];
+              source_labels = [
+                "__journal__systemd_unit"
+              ];
               target_label = "unit";
             }
             {
-              source_labels = [ "__journal_syslog_identifier" ];
+              source_labels = [
+                "__journal_syslog_identifier"
+              ];
               target_label = "syslog_identifier";
             }
           ];
