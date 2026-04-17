@@ -4,18 +4,21 @@
 }:
 let
   del-baks = pkgs.writeShellScriptBin "del-baks" (builtins.readFile ./scripts/del-baks.sh);
+
+  restricted = "0750 0 0";
+  unrestricted = "0755 0 0";
 in
 {
   systemd.tmpfiles.rules = [
-    "d /bak 0755 0 0 -"
-    "d /bak/borg 0755 0 0 -"
+    "d /bak ${unrestricted} -"
+    "d /bak/borg ${unrestricted} -"
 
-    "d /bak/borg/config 0750 0 0 -"
+    "d /bak/borg/config ${restricted} -"
 
-    "d /bak/borg/data 0755 0 0 -"
-    "d /bak/borg/cache 0755 0 0 -"
+    "d /bak/borg/data ${unrestricted} -"
+    "d /bak/borg/cache ${unrestricted} -"
 
-    "d /bak/opt 0750 0 0 -"
+    "d /bak/opt ${restricted} -"
   ];
 
   environment.systemPackages = with pkgs; [
@@ -37,8 +40,15 @@ in
       BORG_CACHE_DIR = "/bak/borg/cache";
     };
 
+    failOnWarnings = false;
+
     preHook = ''
       umask 0022
+    '';
+
+    postHook = ''
+      echo "Setting permissions on data and cache."
+      chmod -R 755 /bak/borg/data /bak/borg/cache
     '';
 
     readWritePaths = [
@@ -47,6 +57,7 @@ in
     ];
 
     exclude = [
+      "/opt/postgres/data"
       "/opt/lidarr/data/MediaCover"
     ];
 
