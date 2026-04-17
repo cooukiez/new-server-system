@@ -16,22 +16,6 @@ let
 
   mkRules = prefix: dirs: map (d: "d /${prefix}/${d} 0755 ${uid} ${gid} -") dirs;
 
-  mediaDirs = [
-    "music"
-    "photos"
-
-    "download/slskd/finished"
-    "download/slskd/incomplete"
-
-    "download/deezer"
-
-    "download/qbittorrent"
-  ];
-
-  dataDirs = [
-    "documents"
-  ];
-
   optDirs = [
     # auth
     "authelia/config"
@@ -40,13 +24,10 @@ let
     # infra
     "adguardhome/conf"
     "adguardhome/work"
-
     "caddy/config"
     "caddy/data"
-
     "postgres/data"
     "postgres/pgadmin"
-
     "gluetun/data"
 
     # monitoring
@@ -54,45 +35,65 @@ let
     "grafana/data"
     "grafana/plugins"
     "grafana/log"
-
     "prometheus/data"
     "loki/data"
 
+    #
     # services
+    #
+
+    # media
     "immich/db"
     "immich/ml-cache"
-
-    "node-red/data"
-
-    "lidarr/data"
-    "lidarr/lists"
-
-    "cmdarr/data"
-
-    "slskd/data"
 
     "jellyfin/config"
     "jellyfin/data"
     "jellyfin/cache"
     "jellyfin/log"
 
+    "lidarr/data"
+    "cmdarr/data"
+
+    # downloaders
+    "slskd/data"
     "qbittorrent/data"
 
+    # genral
+    "node-red/data"
     "transfer-sh/data"
 
-    "gitea/data"
-    "papra/data"
-
-    "radicale/config"
-    "radicale/data"
-
+    # services
     "ebk/data"
     "ebk/log"
+    "gitea/data"
+    "papra/data"
+    "radicale/config"
+    "radicale/data"
+  ];
+
+  mediaDirs = [
+    "music"
+    "photos"
+
+    # media download paths
+    "download/deezer"
+
+    "download/slskd/finished"
+    "download/slskd/incomplete"
+
+    "download/qbittorrent"
+  ];
+
+  dataDirs = [
+    "documents"
   ];
 in
 {
   systemd.tmpfiles.rules = [
     "Z /etc/certs 0400 ${uid} ${gid} -"
+
+    "d /certs 0755 ${uid} ${gid} -"
+    "Z /certs 0755 ${uid} ${gid} -"
 
     "d /opt 0755 ${uid} ${gid} -"
     "d /media 0755 ${uid} ${gid} -"

@@ -7,6 +7,7 @@
 
 {
   config,
+  globalConfig,
   ports,
   ...
 }:
@@ -168,6 +169,26 @@ in
 
     (my_tls) {
       tls /certs/home.lan.crt /certs/home.lan.key
+    }
+
+    https://${globalConfig.staticIP} {
+      import my_tls
+      redir http://{host}{uri}
+    }
+
+    http://${globalConfig.staticIP} {
+      handle /cert {
+        header Content-Disposition "attachment; filename=root-ca.crt"
+        header Content-Type "application/x-x509-ca-cert"
+        
+        root * /certs
+        rewrite * /ca.crt
+        file_server
+      }
+
+      handle {
+        redir https://home.lan
+      }
     }
 
     (auth_verify) {
