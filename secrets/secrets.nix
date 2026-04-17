@@ -55,11 +55,13 @@ in
 
   # auth clients
   "auth/clients/s_ebk.age".publicKeys = allKeys;
+  "auth/clients/e_ebk.age".publicKeys = allKeys;
   "auth/clients/s_grafana.age".publicKeys = allKeys;
   "auth/clients/s_papra.age".publicKeys = allKeys;
 
   # ebk
   "ebk/s_secret-key.age".publicKeys = allKeys;
+  "ebk/e_secret-key.age".publicKeys = allKeys;
 
   # homepage
 
