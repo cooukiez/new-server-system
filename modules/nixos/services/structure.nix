@@ -18,26 +18,36 @@ let
 
   optDirs = [
     # auth
+    "authelia"
     "authelia/config"
+    "lldap"
     "lldap/data"
 
     # infra
+    "adguardhome"
     "adguardhome/conf"
     "adguardhome/work"
+    "caddy"
     "caddy/config"
     "caddy/data"
+    "postgres"
     "postgres/data"
     "postgres/pgadmin"
+    "gluetun"
     "gluetun/data"
+    "borg"
     "borg/data"
     "borg/cache"
 
     # monitoring
+    "grafana"
     "grafana/provisioning"
     "grafana/data"
     "grafana/plugins"
     "grafana/log"
+    "prometheus"
     "prometheus/data"
+    "loki"
     "loki/data"
 
     #
@@ -45,36 +55,51 @@ let
     #
 
     # media
+    "immich"
     "immich/db"
     "immich/ml-cache"
 
+    "jellyfin"
     "jellyfin/config"
     "jellyfin/data"
     "jellyfin/cache"
     "jellyfin/log"
 
+    "lidarr"
     "lidarr/data"
+    "cmdarr"
     "cmdarr/data"
 
     # downloaders
+    "slskd"
     "slskd/data"
+    "qbittorrent"
     "qbittorrent/data"
 
     # genral
+    "node-red"
     "node-red/data"
+    "transfer-sh"
     "transfer-sh/data"
 
     # services
+    "ebk"
     "ebk/data"
     "ebk/log"
+    "gitea"
     "gitea/data"
+    "papra"
     "papra/data"
+    "radicale"
     "radicale/config"
     "radicale/data"
+    "stirling"
     "stirling/config"
     "stirling/tessdata"
     "stirling/pipeline"
     "stirling/log"
+    "open-archiver"
+    "open-archiver/data"
   ];
 
   mediaDirs = [
@@ -82,11 +107,10 @@ let
     "photos"
 
     # media download paths
+    "download"
     "download/deezer"
-
     "download/slskd/finished"
     "download/slskd/incomplete"
-
     "download/qbittorrent"
   ];
 

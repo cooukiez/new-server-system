@@ -92,4 +92,7 @@
 
   # borg
   borg = 8081;
+
+  stirling = 9010;
+  open-arciver = 3010;
 }

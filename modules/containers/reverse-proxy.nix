@@ -132,6 +132,10 @@ let
       group = "users";
     };
 
+    archiver = {
+      port = ports.open-archiver;
+      policy = "bypass";
+    };
   };
 
   autheliaRules = [
