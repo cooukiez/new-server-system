@@ -26,20 +26,25 @@ in
         };
       };
 
-      # borg volumes
       volumes.opt-data.volumeConfig = {
         type = "bind";
         device = "/opt";
       };
 
+      volumes.external-data.volumeConfig = {
+        type = "bind";
+        device = "/bak/opt";
+      };
+
+      # borg volumes
       volumes.borg-data.volumeConfig = {
         type = "bind";
-        device = "/bak/borg/data";
+        device = "/opt/borg/data";
       };
 
       volumes.borg-cache.volumeConfig = {
         type = "bind";
-        device = "/bak/borg/cache";
+        device = "/opt/borg/cache";
       };
 
       # borg-ui redis
@@ -78,6 +83,9 @@ in
           environments = {
             TZ = "Europe/Berlin";
 
+            PUID = "0";
+            PGID = "0";
+
             REDIS_HOST = "borg-redis";
             REDIS_PORT = "6379";
           };
@@ -91,8 +99,10 @@ in
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             "${volumes.opt-data.ref}:/local:ro"
-            "${volumes.borg-data.ref}:/data:ro"
-            "${volumes.borg-cache.ref}:/home/borg/.cache/borg:ro"
+            "${volumes.external-data.ref}:/external:U"
+
+            "${volumes.borg-data.ref}:/data:U"
+            "${volumes.borg-cache.ref}:/home/borg/.cache/borg:U"
           ];
 
           publishPorts = [

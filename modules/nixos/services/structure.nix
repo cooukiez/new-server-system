@@ -29,6 +29,8 @@ let
     "postgres/data"
     "postgres/pgadmin"
     "gluetun/data"
+    "borg/data"
+    "borg/cache"
 
     # monitoring
     "grafana/provisioning"
@@ -98,6 +100,9 @@ in
     "d /opt 0755 ${uid} ${gid} -"
     "d /media 0755 ${uid} ${gid} -"
     "d /data 0755 ${uid} ${gid} -"
+
+    "d /bak 0755 ${uid} ${gid} -"
+    "d /bak/opt 0755 ${uid} ${gid} -"
   ]
   ++ (mkRules "opt" optDirs)
   ++ (mkRules "media" mediaDirs)
