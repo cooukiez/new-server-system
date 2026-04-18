@@ -125,6 +125,13 @@ let
       port = ports.radicale;
       policy = "bypass";
     };
+
+    pdf = {
+      port = ports.stirling;
+      policy = "one_factor";
+      group = "users";
+    };
+
   };
 
   autheliaRules = [

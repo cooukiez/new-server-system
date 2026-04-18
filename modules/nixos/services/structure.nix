@@ -71,6 +71,10 @@ let
     "papra/data"
     "radicale/config"
     "radicale/data"
+    "stirling/config"
+    "stirling/tessdata"
+    "stirling/pipeline"
+    "stirling/log"
   ];
 
   mediaDirs = [
