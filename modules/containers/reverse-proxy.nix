@@ -60,8 +60,7 @@ let
 
     bak = {
       port = ports.borg;
-      policy = "one_factor";
-      group = "admins";
+      policy = "bypass";
     };
 
     #

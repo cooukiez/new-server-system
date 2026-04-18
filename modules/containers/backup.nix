@@ -67,7 +67,7 @@ in
         };
       };
 
-      # borg
+      # borg server
       containers.borg = {
         autoStart = true;
         serviceConfig = {
@@ -76,7 +76,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/ainullcode/borg:${borgUIVersion}";
+          image = "docker.io/ainullcode/borg-ui:${borgUIVersion}";
           name = "borg";
           networks = [ "borg-net" ];
 
@@ -88,6 +88,10 @@ in
 
             REDIS_HOST = "borg-redis";
             REDIS_PORT = "6379";
+
+            # configure for authelia
+            # DISABLE_AUTHENTICATION = "true";
+            # PROXY_AUTH_HEADER = "X-Remote-User";
           };
 
           volumes = [
