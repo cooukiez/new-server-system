@@ -19,18 +19,16 @@
     ./structure.nix
   ];
 
-  services.vnstat.enable = true;
-
-  services.glances = {
+  services.openssh = {
     enable = true;
+    ports = [ 22 ];
+    settings = {
+      UseDns = true;
+      X11Forwarding = false;
 
-    extraArgs = [
-      "-w"
-      "-p"
-      "${toString globalConfig.ports.glances}"
-      "-B"
-      "0.0.0.0"
-    ];
+      PermitRootLogin = "yes";
+      PasswordAuthentication = true;
+    };
   };
 
   services.samba = {
@@ -56,5 +54,17 @@
         "force user" = "root";
       };
     };
+  };
+
+  services.glances = {
+    enable = true;
+
+    extraArgs = [
+      "-w"
+      "-p"
+      "${toString globalConfig.ports.glances}"
+      "-B"
+      "0.0.0.0"
+    ];
   };
 }

@@ -9,6 +9,9 @@
     tailscale-key.file = ../../../secrets/s_tailscale-key.age;
   };
 
+  # enable network statistics
+  services.vnstat.enable = true;
+
   networking = {
     hostName = globalConfig.hostname;
     hostId = "deaf25e4";

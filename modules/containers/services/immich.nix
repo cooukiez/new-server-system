@@ -16,9 +16,9 @@ let
   dbPath = "/opt/immich/db";
   mlCachePath = "/opt/immich/ml-cache";
 
-  immichVersion = "release";
-  immichDbVersion = "14-vectorchord0.5.3";
   redisVersion = "alpine";
+  immichDbVersion = "14-vectorchord0.5.3";
+  immichVersion = "release";
 in
 {
   age.secrets = {

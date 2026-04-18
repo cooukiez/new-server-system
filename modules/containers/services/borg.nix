@@ -1,3 +1,104 @@
-{
+/*
+  modules/containers/services/vnstat.nix
 
+  part of der-home-server
+  created 2026-04-12
+*/
+
+{
+  config,
+  ports,
+  ...
+}:
+let
+  borgUIVersion = "latest";
+  redisVersion = "alpine";
+in
+{
+  virtualisation.quadlet =
+    let
+      inherit (config.virtualisation.quadlet) volumes networks pods;
+    in
+    {
+      networks.borg-net = {
+        networkConfig = {
+          internal = false;
+        };
+      };
+
+      # borg volumes
+      volumes.opt-data.volumeConfig = {
+        type = "bind";
+        device = "/opt";
+      };
+
+      volumes.borg-data.volumeConfig = {
+        type = "bind";
+        device = "/bak/borg/data";
+      };
+
+      volumes.borg-cache.volumeConfig = {
+        type = "bind";
+        device = "/bak/borg/cache";
+      };
+
+      # borg-ui redis
+      containers.borg-redis = {
+        autoStart = true;
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
+        };
+
+        containerConfig = {
+          image = "docker.io/library/redis:${redisVersion}";
+          name = "borg-redis";
+          networks = [ "borg-net" ];
+
+          volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+          ];
+        };
+      };
+
+      # borg-ui
+      containers.borg-ui = {
+        autoStart = true;
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
+        };
+
+        containerConfig = {
+          image = "docker.io/ainullcode/borg-ui:${borgUIVersion}";
+          name = "borg-ui";
+          networks = [ "borg-net" ];
+
+          environments = {
+            TZ = "Europe/Berlin";
+
+            REDIS_HOST = "borg-redis";
+            REDIS_PORT = "6379";
+          };
+
+          volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # certificates
+            "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
+            "/certs/ca.crt:/certs/ca.crt:ro"
+
+            "${volumes.opt-data.ref}:/local:ro"
+            "${volumes.borg-data.ref}:/data:ro"
+            "${volumes.borg-cache.ref}:/home/borg/.cache/borg:ro"
+          ];
+
+          publishPorts = [
+            "${toString ports.borg-ui}:8081/tcp"
+          ];
+        };
+      };
+    };
 }

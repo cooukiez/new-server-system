@@ -89,4 +89,7 @@
 
   # transfer-sh
   transferSH = 8010;
+
+  # borg
+  borg-ui = 8081;
 }

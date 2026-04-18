@@ -75,16 +75,4 @@
   zramSwap.enable = true;
   zramSwap.memoryPercent = 50;
   zramSwap.algorithm = "lz4";
-
-  services.openssh = {
-    enable = true;
-    ports = [ 22 ];
-    settings = {
-      UseDns = true;
-      X11Forwarding = false;
-
-      PermitRootLogin = "yes";
-      PasswordAuthentication = true;
-    };
-  };
 }

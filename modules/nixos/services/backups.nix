@@ -29,6 +29,7 @@ in
     paths = [ "/opt" ];
     repo = "/bak/opt";
     doInit = true;
+    failOnWarnings = false;
     encryption.mode = "none";
 
     user = "root";
@@ -39,12 +40,6 @@ in
       BORG_DATA_DIR = "/bak/borg/data";
       BORG_CACHE_DIR = "/bak/borg/cache";
     };
-
-    failOnWarnings = false;
-
-    preHook = ''
-      umask 0022
-    '';
 
     postHook = ''
       echo "Setting permissions on data and cache."
