@@ -47,7 +47,7 @@ in
         device = "/opt/borg/cache";
       };
 
-      # borg-ui redis
+      # borg redis
       containers.borg-redis = {
         autoStart = true;
         serviceConfig = {
@@ -67,8 +67,8 @@ in
         };
       };
 
-      # borg-ui
-      containers.borg-ui = {
+      # borg
+      containers.borg = {
         autoStart = true;
         serviceConfig = {
           Restart = "always";
@@ -76,8 +76,8 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/ainullcode/borg-ui:${borgUIVersion}";
-          name = "borg-ui";
+          image = "docker.io/ainullcode/borg:${borgUIVersion}";
+          name = "borg";
           networks = [ "borg-net" ];
 
           environments = {
@@ -106,7 +106,7 @@ in
           ];
 
           publishPorts = [
-            "${toString ports.borg-ui}:8081/tcp"
+            "${toString ports.borg}:8081/tcp"
           ];
         };
       };

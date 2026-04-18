@@ -58,8 +58,8 @@ let
       group = "admins";
     };
 
-    borg = {
-      port = ports.borg-ui;
+    bak = {
+      port = ports.borg;
       policy = "one_factor";
       group = "admins";
     };

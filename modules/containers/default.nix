@@ -75,6 +75,7 @@ in
         ++ (getNixFiles ./services)
         ++ [
           ./auth.nix
+          ./backup.nix
           ./database.nix
           ./dns.nix
           ./homepage.nix

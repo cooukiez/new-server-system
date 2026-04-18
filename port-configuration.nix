@@ -91,5 +91,5 @@
   transferSH = 8010;
 
   # borg
-  borg-ui = 8081;
+  borg = 8081;
 }
