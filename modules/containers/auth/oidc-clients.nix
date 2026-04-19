@@ -163,7 +163,7 @@
     pkce_challenge_method = "";
 
     redirect_uris = [
-      "https://link.home.lan/api/v1/auth/callback/authelia"
+      "https://links.home.lan/api/v1/auth/callback/authelia"
     ];
 
     scopes = [

@@ -100,6 +100,10 @@ in
           name = "linkwarden";
           networks = [ "linkwarden-net" ];
 
+          addHosts = [
+            "auth.home.lan:host-gateway"
+          ];
+
           environments = {
             DATABASE_URL = "postgresql://linkwarden:linkwarden@host.containers.internal:${toString ports.postgres}/linkwarden";
             
@@ -108,6 +112,12 @@ in
             NEXT_PUBLIC_AUTHELIA_ENABLED = "true";
             AUTHELIA_WELLKNOWN_URL = "https://auth.home.lan/.well-known/openid-configuration";
             AUTHELIA_CLIENT_ID = "linkwarden";
+
+            NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
+
+            NEXTAUTH_URL = "https://links.home.lan/api/v1/auth";
+            NEXT_PUBLIC_CREDENTIALS_ENABLED = "false";
+            NEXT_PUBLIC_DISABLE_REGISTRATION = "true";
           };
 
           environmentFiles = [
@@ -117,6 +127,13 @@ in
           ];
 
           volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # certificates
+            "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
+            "/certs/ca.crt:/certs/ca.crt:ro"
+
             "${volumes.linkwarden-data.ref}:/data/data"
           ];
 

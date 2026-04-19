@@ -138,7 +138,7 @@ let
       group = "users";
     };
 
-    link = {
+    links = {
       port = ports.linkwarden;
       policy = "bypass";
     };
