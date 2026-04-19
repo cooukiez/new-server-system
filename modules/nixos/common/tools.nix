@@ -41,6 +41,8 @@ in
     # tools
     intel-gpu-tools
     nvtopPackages.intel
+    sqlcipher
+    sqld
     sqlite
   ];
 }
