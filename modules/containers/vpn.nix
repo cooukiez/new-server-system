@@ -2,7 +2,7 @@
   modules/containers/vpn.nix
 
   part of der-home-server
-  created 2026-04-12
+  created 2026-04-19
 */
 
 {
@@ -17,7 +17,7 @@ let
   gluetunWebUIVersion = "latest";
 in
 {
-  myServices = {
+  myServices.gluetun = {
     serviceConfig = {
       description = "Server VPN Provider";
       serviceType = "Networking";
@@ -26,12 +26,12 @@ in
       port = ports.gluetun-webui;
 
       policy = "one_factor";
-      policy = "admins";
+      group = "admins";
 
       icon = "gluetun";
     };
 
-    gluetun = {
+    containerConfig = {
       volumes = {
         gluetun-data = "/opt/gluetun/data";
       };

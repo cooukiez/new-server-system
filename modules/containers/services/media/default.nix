@@ -2,7 +2,7 @@
   modules/containers/services/media/default.nix
 
   part of der-home-server
-  created 2026-04-12
+  created 2026-04-16
 */
 
 {

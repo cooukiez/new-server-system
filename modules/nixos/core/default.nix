@@ -1,3 +1,10 @@
+/*
+  modules/nixos/core/default.nix
+
+  part of der-home-server
+  created 2026-04-16
+*/
+
 {
   pkgs,
   ...

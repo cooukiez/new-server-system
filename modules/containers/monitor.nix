@@ -2,7 +2,7 @@
   modules/containers/monitor.nix
 
   part of der-home-server
-  created 2026-04-12
+  created 2026-04-19
 */
 
 {
@@ -57,8 +57,8 @@ let
     server = {
       protocol = "http";
       http_port = 3000;
-      domain = "monitor.home.lan";
-      root_url = "https://monitor.home.lan/";
+      domain = config.myServices.grafana.serviceConfig.domain;
+      root_url = config.myServices.grafana.serviceConfig.href;
     };
 
     security = {
@@ -372,7 +372,7 @@ in
 
             # config
             "${
-              config.myServices.prometheus.containerConfig."prometheus.yml".fullPath
+              config.myServices.prometheus.containerConfig.files."prometheus.yml".fullPath
             }:${prometheusPaths.config}:ro,U"
 
             # volumes

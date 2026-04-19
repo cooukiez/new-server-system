@@ -2,7 +2,7 @@
   modules/containers/default.nix
 
   part of der-home-server
-  created 2026-04-08
+  created 2026-04-19
 */
 
 {
@@ -86,10 +86,9 @@ in
           ./ldap.nix
           ./monitor.nix
           ./reverse-proxy.nix
+          ./service-config.nix
           ./vpn.nix
         ];
-
-        options.myServices = import ./service-config.nix { inherit config lib; };
 
         config = {
           age.identityPaths = [ squConfigKeyPath ];
@@ -144,16 +143,17 @@ in
             };
 
           # files in home directory
-          home.file = lib.concatMapAttrs (
-            serviceName: serviceCfg:
-            lib.mapAttrs' (
-              fileName: fileCfg:
-              lib.nameValuePair (fileCfg.path) {
-                source = fileCfg.source;
-              }
-
-            ) serviceCfg.containerConfig.files
-          ) config.myServices;
+          home.file = lib.mkMerge (
+            lib.mapAttrsToList (
+              serviceName: serviceCfg:
+              lib.mapAttrs' (
+                fileName: fileCfg:
+                lib.nameValuePair (fileCfg.path) {
+                  source = fileCfg.source;
+                }
+              ) serviceCfg.containerConfig.files
+            ) config.myServices
+          );
 
           systemd.user.services."podman-user-wait-network-online" = lib.mkForce {
             Unit.Description = "Replacement podman-user-wait-network-online to prevent quadlet hang";

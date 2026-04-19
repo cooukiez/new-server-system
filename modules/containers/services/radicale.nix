@@ -1,6 +1,8 @@
 /*
-  modules/containers/services/node-red.nix
-  Created: 2026-04-15
+  modules/containers/services/radicale.nix
+
+  part of der-home-server
+  created 2026-04-16
 */
 
 {

@@ -2,7 +2,7 @@
   modules/containers/grafana/default.nix
 
   part of der-home-server
-  created 2026-04-12
+  created 2026-04-19
 */
 
 {
@@ -261,7 +261,7 @@ in
 {
   home.file = dashboardFiles;
 
-  config.myServices.grafana.containerConfig.files."provisioning/dashboards/dashboards.yaml" = {
+  myServices.grafana.containerConfig.files."provisioning/dashboards/dashboards.yaml" = {
     source = (pkgs.formats.ini { }).generate "dashboards.yaml" dashboardFiles;
   };
 }

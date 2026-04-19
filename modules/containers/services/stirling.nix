@@ -1,6 +1,8 @@
 /*
-  modules/containers/services/stirling-pdf.nix
-  Stirling-PDF - Local hosted web based PDF editor
+  modules/containers/services/stirling.nix
+
+  part of der-home-server
+  created 2026-04-19
 */
 
 {

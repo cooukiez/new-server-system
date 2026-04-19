@@ -2,7 +2,7 @@
   modules/nixos/services/structure.nix
 
   part of der-home-server
-  created 2026-04-10
+  created 2026-04-19
 */
 
 {

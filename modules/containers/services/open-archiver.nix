@@ -1,3 +1,10 @@
+/*
+  modules/containers/services/open-archiver.nix
+
+  part of der-home-server
+  created 2026-04-19
+*/
+
 {
   config,
   ports,

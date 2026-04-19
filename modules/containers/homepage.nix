@@ -1,8 +1,8 @@
 /*
-  modules/containers/services/papra.nix
+  modules/containers/homepage.nix
 
   part of der-home-server
-  created 2026-04-14
+  created 2026-04-19
 */
 
 {
@@ -18,14 +18,14 @@ let
 
   hostInt = "http://host.containers.internal";
 
-  publicServices = filterAttrs (n: s: s.serviceConfig != null) config.myServices;
-  groupedData = groupBy (s: s.serviceConfig.serviceType) (attrValues activeServices);
+  publicServices = lib.filterAttrs (n: s: s.serviceConfig != null) config.myServices;
+  groupedData = lib.groupBy (s: s.serviceConfig.serviceType) (lib.attrValues publicServices);
 
-  autoGroups = mapAttrsToList (name: services: {
+  autoGroups = lib.mapAttrsToList (name: services: {
     "${name}" = map (
       s: mkSvc s.name s.serviceConfig.icon s.serviceConfig.href s.serviceConfig.description
     ) services;
-  }) (removeAttrs groupedData [ "Networking" ]);
+  }) (lib.removeAttrs groupedData [ "Networking" ]);
 
   mkSvc = name: icon: href: desc: {
     "${name}" = {
