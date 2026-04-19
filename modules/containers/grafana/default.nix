@@ -240,20 +240,28 @@ let
       };
     }) dashboards
   );
+
+  grafanaDashboardSettings = {
+    apiVersion = 1;
+    providers = [
+      {
+        name = "Default";
+        orgId = 1;
+        folder = "";
+        type = "file";
+
+        disableDeletion = false;
+        editable = true;
+
+        options.path = "${grafanaPaths.provisioning}/dashboards";
+      }
+    ];
+  };
 in
 {
-  home.file = dashboardFiles // {
-    "containers/grafana/provisioning/dashboards/dashboards.yaml".text = ''
-      apiVersion: 1
-      providers:
-        - name: 'Default'
-          orgId: 1
-          folder: ""
-          type: file
-          disableDeletion: false
-          editable: true
-          options:
-            path: ${grafanaPaths.provisioning}/dashboards
-    '';
+  home.file = dashboardFiles;
+
+  config.myServices.grafana.containerConfig.files."provisioning/dashboards/dashboards.yaml" = {
+    source = (pkgs.formats.ini { }).generate "dashboards.yaml" dashboardFiles;
   };
 }

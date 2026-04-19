@@ -10,13 +10,18 @@
   pkgs,
   lib,
   ports,
-  autheliaRules,
   ...
 }:
 let
   settingsFormat = pkgs.formats.yaml { };
 
   autheliaVersion = "latest";
+
+  publicServices = lib.filterAttrs (_: svc: svc.serviceConfig != { }) config.myServices;
+  sortedServiceList = lib.sort (a: b: a.serviceConfig.subdomain < b.serviceConfig.subdomain) (
+    lib.attrValues publicServices
+  );
+
   autheliaSettings = {
     theme = "dark";
 
@@ -40,7 +45,33 @@ let
 
     access_control = {
       default_policy = "deny";
-      rules = autheliaRules;
+      rules = [
+        {
+          domain = "auth.home.lan";
+          policy = "bypass";
+        }
+        {
+          domain = "ldap.home.lan";
+          policy = "bypass";
+        }
+        {
+          domain = "home.lan";
+          policy = "bypass";
+        }
+      ]
+      ++ (lib.mapAttrsToList (
+        svc:
+        let
+          cfg = svc.serviceConfig;
+        in
+        {
+          domain = "${cfg.subdomain}.home.lan";
+          policy = cfg.policy;
+        }
+        // (lib.optionalAttrs (cfg.group != null) {
+          subject = [ "group:${cfg.group}" ];
+        })
+      ) sortedServiceList);
     };
 
     session = {

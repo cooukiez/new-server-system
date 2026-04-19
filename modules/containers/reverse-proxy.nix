@@ -14,238 +14,99 @@
 let
   caddyVersion = "latest";
 
-  services = {
-    #
-    # administration
-    #
-    dns = {
-      port = ports.adguard;
-      policy = "one_factor";
-      group = "admins";
-    };
+  publicServices = lib.filterAttrs (_: svc: svc.serviceConfig != { }) config.myServices;
+  sortedServiceList = lib.sort (a: b: a.serviceConfig.subdomain < b.serviceConfig.subdomain) (
+    lib.attrValues publicServices
+  );
 
-    vpn = {
-      port = ports.gluetunWebUI;
-      policy = "one_factor";
-      group = "admins";
-    };
-
-    db = {
-      port = ports.pgadmin;
-      policy = "bypass";
-    };
-
-    glances = {
-      port = ports.glances;
-      policy = "one_factor";
-      group = "admins";
-    };
-
-    monitor = {
-      port = ports.grafana;
-      policy = "bypass";
-    };
-
-    prometheus = {
-      port = ports.prometheus;
-      policy = "one_factor";
-      group = "admins";
-    };
-
-    vnstat = {
-      port = ports.vnstat;
-      policy = "one_factor";
-      group = "admins";
-    };
-
-    bak = {
-      port = ports.borg;
-      policy = "bypass";
-    };
-
-    #
-    # services
-    #
-    immich = {
-      port = ports.immich;
-      policy = "bypass";
-    };
-
-    jellyfin = {
-      port = ports.jellyfin;
-      policy = "bypass";
-    };
-
-    flow = {
-      port = ports.node-red;
-      policy = "one_factor";
-      group = "admins";
-    };
-
-    lidarr = {
-      port = ports.lidarr;
-      policy = "bypass";
-    };
-
-    ll = {
-      port = ports.lidarrLists;
-      policy = "bypass";
-    };
-
-    slskd = {
-      port = ports.slskdHttp;
-      policy = "bypass";
-    };
-
-    torrent = {
-      port = ports.qBittorrent;
-      policy = "bypass";
-    };
-
-    transfer = {
-      port = ports.transferSH;
-      policy = "bypass";
-    };
-
-    git = {
-      port = ports.giteaHttp;
-      policy = "bypass";
-    };
-
-    papra = {
-      port = ports.papra;
-      policy = "bypass";
-    };
-
-    finance = {
-      port = ports.ebk;
-      policy = "bypass";
-    };
-
-    dav = {
-      port = ports.radicale;
-      policy = "bypass";
-    };
-
-    pdf = {
-      port = ports.stirling;
-      policy = "one_factor";
-      group = "users";
-    };
-
-    archiver = {
-      port = ports.open-archiver;
-      policy = "one_factor";
-      group = "users";
-    };
-
-    links = {
-      port = ports.linkwarden;
-      policy = "bypass";
-    };
-  };
-
-  autheliaRules = [
-    {
-      domain = "auth.home.lan";
-      policy = "bypass";
-    }
-    {
-      domain = "ldap.home.lan";
-      policy = "bypass";
-    }
-    {
-      domain = "home.lan";
-      policy = "bypass";
-    }
-  ]
-  ++ (map (
-    name:
-    let
-      svc = services.${name};
-    in
-    {
-      domain = "${name}.home.lan";
-      policy = svc.policy;
-    }
-    // (if svc ? group then { subject = [ "group:${svc.group}" ]; } else { })
-  ) (builtins.attrNames services));
-
-  serviceHandlers = builtins.concatStringsSep "\n" (
-    map (name: ''
-      @${name} host ${name}.home.lan
-      handle @${name} {
-        import auth_verify
-        reverse_proxy host.containers.internal:${toString services.${name}.port}
-      }
-    '') (builtins.attrNames services)
+  serviceHandlers = lib.concatStringsSep "\n" (
+    map (
+      svc:
+      let
+        cfg = svc.serviceConfig;
+      in
+      ''
+        @${cfg.name} host ${cfg.subdomain}.home.lan
+        handle @${cfg.name} {
+          import auth_verify
+          reverse_proxy host.containers.internal:${toString cfg.port}
+        }
+      ''
+    ) sortedServiceList
   );
 in
 {
-  _module.args.autheliaRules = autheliaRules;
+  myServices.caddy = {
+    containerConfig = {
+      volumes.caddy-config = "/opt/caddy/config";
+      volumes.caddy-data = "/opt/caddy/data";
 
-  home.file."containers/caddy/Caddyfile".text = ''
-    {
-      # enable admin API
-      admin 0.0.0.0:2019
-    }
+      files."Caddyfile" = {
+        source = pkgs.writeText "Caddyfile" ''
+          {
+            # enable admin API
+            admin 0.0.0.0:2019
+          }
 
-    (my_tls) {
-      tls /certs/home.lan.crt /certs/home.lan.key
-    }
+          (my_tls) {
+            tls /certs/home.lan.crt /certs/home.lan.key
+          }
 
-    https://${globalConfig.staticIP} {
-      import my_tls
-      redir http://{host}{uri}
-    }
+          https://${globalConfig.staticIP} {
+            import my_tls
+            redir http://{host}{uri}
+          }
 
-    http://${globalConfig.staticIP} {
-      handle /cert {
-        header Content-Disposition "attachment; filename=root-ca.crt"
-        header Content-Type "application/x-x509-ca-cert"
-        
-        root * /certs
-        rewrite * /ca.crt
-        file_server
-      }
+          http://${globalConfig.staticIP} {
+            handle /cert {
+              header Content-Disposition "attachment; filename=root-ca.crt"
+              header Content-Type "application/x-x509-ca-cert"
+              
+              root * /certs
+              rewrite * /ca.crt
+              file_server
+            }
 
-      handle {
-        redir https://home.lan
-      }
-    }
+            handle {
+              redir https://home.lan
+            }
+          }
 
-    (auth_verify) {
-      forward_auth host.containers.internal:${toString ports.authelia} {
-        uri /api/verify?rd=https://auth.home.lan/
-        copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
-      }
-    }
+          (auth_verify) {
+            forward_auth host.containers.internal:${toString ports.authelia} {
+              uri /api/verify?rd=https://auth.home.lan/
+              copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+            }
+          }
 
-    home.lan {
-      import my_tls
-      reverse_proxy host.containers.internal:${toString ports.homepage}
-    }
+          home.lan {
+            import my_tls
+            reverse_proxy host.containers.internal:${toString ports.homepage}
+          }
 
-    *.home.lan {
-      import my_tls
+          *.home.lan {
+            import my_tls
 
-      @auth host auth.home.lan
-      handle @auth {
-        reverse_proxy host.containers.internal:${toString ports.authelia}
-      }
+            @auth host auth.home.lan
+            handle @auth {
+              reverse_proxy host.containers.internal:${toString ports.authelia}
+            }
 
-      @ldap host ldap.home.lan
-      handle @ldap {
-        reverse_proxy host.containers.internal:${toString ports.lldapWeb}
-      }
+            @ldap host ldap.home.lan
+            handle @ldap {
+              reverse_proxy host.containers.internal:${toString ports.lldapWeb}
+            }
 
-      ${serviceHandlers}
-      
-      handle {
-        abort
-      }
-    }
-  '';
+            ${serviceHandlers}
+            
+            handle {
+              abort
+            }
+          }
+        '';
+      };
+    };
+  };
 
   virtualisation.quadlet =
     let
@@ -259,12 +120,12 @@ in
 
       volumes.caddy-config.volumeConfig = {
         type = "bind";
-        device = "/opt/caddy/config";
+        device = config.myServices.caddy.containerConfig.volumes.caddy-config;
       };
 
       volumes.caddy-data.volumeConfig = {
         type = "bind";
-        device = "/opt/caddy/data";
+        device = config.myServices.caddy.containerConfig.volumes.caddy-data;
       };
 
       containers.caddy = {
@@ -288,7 +149,7 @@ in
             "/etc/localtime:/etc/localtime:ro"
 
             # config files
-            "${config.home.homeDirectory}/containers/caddy/Caddyfile:/etc/caddy/Caddyfile:ro,U"
+            "${config.myServices.caddy.containerConfig.files."Caddyfile".fullPath}:/etc/caddy/Caddyfile:ro,U"
 
             # volumes
             "${volumes.caddy-certs.ref}:/certs:ro"

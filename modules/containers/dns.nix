@@ -89,16 +89,18 @@ let
 in
 {
   myServices.adguard = {
-    description = "Private DNS Server";
-    serviceType = "Networking";
+    serviceConfig = {
+      description = "Private DNS Server";
+      serviceType = "Networking";
 
-    subdomain = "dns";
-    port = ports.adguard;
+      subdomain = "dns";
+      port = ports.adguard;
 
-    policy = "one_factor";
-    group = "admins";
+      policy = "one_factor";
+      group = "admins";
 
-    icon = "adguard-home";
+      icon = "adguard-home";
+    };
 
     containerConfig = {
       files."AdGuardHome.yaml" = {
@@ -109,8 +111,6 @@ in
       volumes = {
         adguard-conf = "/opt/adguardhome/conf";
         adguard-work = "/opt/adguardhome/work";
-        test = "/opt/adguardhome/test";
-        test2 = "/opt/test/test";
       };
     };
   };

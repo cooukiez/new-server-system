@@ -17,6 +17,29 @@ let
   gluetunWebUIVersion = "latest";
 in
 {
+  myServices = {
+    gluetun = {
+      volumes = {
+        gluetun-data = "/opt/gluetun/data";
+      };
+    };
+
+    gluetun-webui = {
+      serviceConfig = {
+        description = "Server VPN Provider";
+        serviceType = "Networking";
+
+        subdomain = "vpn";
+        port = ports.gluetun-webui;
+
+        policy = "one_factor";
+        policy = "admins";
+
+        icon = "gluetun";
+      };
+    };
+  };
+
   age.secrets = {
     gluetun-key.file = ../../secrets/s_gluetun-key.age;
   };
@@ -34,7 +57,7 @@ in
 
       volumes.gluetun-data.volumeConfig = {
         type = "bind";
-        device = "/opt/gluetun/data";
+        device = config.myServices.gluetun.containerConfig.volumes.gluetun-data;
       };
 
       containers.gluetun = {

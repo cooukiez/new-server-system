@@ -12,10 +12,6 @@
   ...
 }:
 let
-  grafanaSettingsFormat = pkgs.formats.ini { };
-  prometheusSettingsFormat = pkgs.formats.yaml { };
-  lokiSettingsFormat = pkgs.formats.yaml { };
-
   grafanaVersion = "latest";
   prometheusVersion = "latest";
   prometheusPodmanExporterVersion = "latest";
@@ -24,7 +20,9 @@ let
   prometheusDatasource = "PBFA97CFB590B2093";
   lokiDatasource = "P8E80F9AEF21F6940";
 
-  # grafana paths inside container
+  #
+  # paths inside container
+  #
   grafanaPaths = rec {
     root = "/grafana";
 
@@ -37,7 +35,6 @@ let
     log = "${root}/log";
   };
 
-  # prometheus paths inside container
   prometheusPaths = rec {
     root = "/prometheus";
 
@@ -45,7 +42,6 @@ let
     data = "${root}/data";
   };
 
-  # loki paths inside container
   lokiPaths = rec {
     root = "/loki";
 
@@ -91,6 +87,26 @@ let
     };
 
     "auth.generic_oauth" = (import ./auth/oidc-client-configs.nix).grafana;
+  };
+
+  grafanaDatasourceSettings = {
+    apiVersion = 1;
+    datasources = [
+      {
+        name = "Prometheus";
+        type = "prometheus";
+        uid = prometheusDatasource;
+        access = "proxy";
+        url = "http://prometheus:${toString ports.prometheus}";
+        isDefault = true;
+      }
+      {
+        name = "Loki";
+        type = "loki";
+        uid = lokiDatasource;
+        url = "http://loki:${toString ports.loki}";
+      }
+    ];
   };
 
   #
@@ -164,39 +180,74 @@ in
     grafanaPaths = grafanaPaths;
   };
 
-  # grafana
-  home.file."containers/grafana/grafana.ini" = {
-    source = grafanaSettingsFormat.generate "grafana.ini" grafanaSettings;
+  myServices = {
+    grafana = {
+      serviceConfig = {
+        description = "Container / Monitoring Dashboard";
+        serviceType = "Monitoring";
+
+        subdomain = "monitor";
+        port = ports.grafana;
+
+        policy = "bypass";
+
+        icon = "grafana";
+      };
+
+      containerConfig = {
+        files."grafana.ini" = {
+          source = (pkgs.formats.ini { }).generate "grafana.ini" grafanaSettings;
+        };
+
+        files."provisioning/datasources/datasources.yaml" = {
+          source = (pkgs.formats.yaml { }).generate "datasources.yaml" grafanaDatasourceSettings;
+        };
+
+        volumes = {
+          grafana-provisioning = "/opt/grafana/provisiong";
+          grafana-data = "/opt/grafana/data";
+          grafana-plugins = "/opt/grafana/plugins";
+          grafana-log = "/opt/grafana/log";
+        };
+      };
+    };
+
+    prometheus = {
+      serviceConfig = {
+        description = "System Statistics Datasource";
+        serviceType = "Monitoring";
+
+        subdomain = "prometheus";
+        port = ports.prometheus;
+
+        policy = "one_factor";
+        group = "admins";
+
+        icon = "prometheus";
+      };
+
+      containerConfig = {
+        files."prometheus.yml" = {
+          source = (pkgs.formats.yaml { }).generate "prometheus.yml" prometheusSettings;
+        };
+
+        volumes.prometheus-data = "/opt/prometheus/data";
+      };
+    };
+
+    loki = {
+      containerConfig = {
+        files."loki.yaml" = {
+          source = (pkgs.formats.yaml { }).generate "loki.yaml" lokiSettings;
+        };
+
+        volumes.loki-data = "/opt/loki/data";
+      };
+    };
   };
 
   age.secrets = {
     grafana-client-key.file = ../../secrets/auth/clients/s_grafana.age;
-  };
-
-  # grafana provisioning
-  home.file."containers/grafana/provisioning/datasources/datasources.yaml".text = ''
-    apiVersion: 1
-    datasources:
-      - name: Prometheus
-        type: prometheus
-        uid: ${prometheusDatasource}
-        access: proxy
-        url: http://prometheus:${toString ports.prometheus}
-        isDefault: true
-      - name: Loki
-        type: loki
-        uid: ${lokiDatasource}
-        url: http://loki:${toString ports.loki}
-  '';
-
-  # prometheus
-  home.file."containers/prometheus/prometheus.yml" = {
-    source = prometheusSettingsFormat.generate "prometheus.yml" prometheusSettings;
-  };
-
-  # loki
-  home.file."containers/loki/loki.yaml" = {
-    source = lokiSettingsFormat.generate "loki.yaml" lokiSettings;
   };
 
   virtualisation.quadlet =
@@ -219,13 +270,13 @@ in
             };
           })
           {
-            grafana-provisioning = "/opt/grafana/provisioning";
-            grafana-data = "/opt/grafana/data";
-            grafana-plugins = "/opt/grafana/plugins";
-            grafana-log = "/opt/grafana/log";
+            grafana-provisioning = config.myServices.grafana.containerConfig.volumes.grafana-provisioning;
+            grafana-data = config.myServices.grafana.containerConfig.volumes.grafana-data;
+            grafana-plugins = config.myServices.grafana.containerConfig.volumes.grafana-plugins;
+            grafana-log = config.myServices.grafana.containerConfig.volumes.grafana-log;
 
-            prometheus-data = "/opt/prometheus/data";
-            loki-data = "/opt/loki/data";
+            prometheus-data = config.myServices.prometheus.containerConfig.volumes.prometheus-data;
+            loki-data = config.myServices.prometheus.containerConfig.volumes.loki-data;
           };
 
       containers.grafana = {
@@ -235,7 +286,6 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            # copy contents of provisioning
             "${pkgs.coreutils}/bin/cp -rfL ${config.home.homeDirectory}/containers/grafana/provisioning/. /opt/grafana/provisioning/"
           ];
         };
@@ -273,7 +323,9 @@ in
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # config
-            "${config.home.homeDirectory}/containers/grafana/grafana.ini:${grafanaPaths.config}:ro,U"
+            "${
+              config.myServices.grafana.containerConfig.files."grafana.ini".fullPath
+            }:${grafanaPaths.config}:ro,U"
 
             # secrets
             "${config.age.secrets.grafana-client-key.path}:/run/secrets/GRAFANA_CLIENT_KEY:ro"
@@ -319,7 +371,9 @@ in
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # config
-            "${config.home.homeDirectory}/containers/prometheus/prometheus.yml:${prometheusPaths.config}:ro,U"
+            "${
+              config.myServices.prometheus.containerConfig."prometheus.yml".fullPath
+            }:${prometheusPaths.config}:ro,U"
 
             # volumes
             "${volumes.prometheus-data.ref}:${prometheusPaths.data}:U"
@@ -394,7 +448,7 @@ in
             "/etc/localtime:/etc/localtime:ro"
 
             # config
-            "${config.home.homeDirectory}/containers/loki/loki.yaml:${lokiPaths.config}:ro,U"
+            "${config.myServices.loki.containerConfig.files."loki.yaml".fullPath}:${lokiPaths.config}:ro,U"
 
             # volumes
             "${volumes.loki-data.ref}:/loki:U"

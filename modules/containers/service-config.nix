@@ -15,52 +15,63 @@ lib.mkOption {
       in
       {
         options = {
-          name = lib.mkOption {
-            type = lib.types.str;
-            default = name;
+          serviceConfig = lib.mkOption {
+            description = "Public service configuration";
+            default = { };
+            type = lib.types.submodule (
+              { config, ... }:
+              {
+                options = {
+                  name = lib.mkOption {
+                    type = lib.types.str;
+                    default = serviceName;
+                  };
+
+                  description = lib.mkOption { type = lib.types.str; };
+
+                  serviceType = lib.mkOption {
+                    type = lib.types.enum [
+                      "Apps"
+                      "Restricted"
+                      "Networking"
+                      "Monitoring"
+                      "Services"
+                    ];
+                    default = "Apps";
+                    description = "The category this service belongs to on the homepage";
+                  };
+
+                  subdomain = lib.mkOption { type = lib.types.str; };
+                  port = lib.mkOption { type = lib.types.int; };
+
+                  href = lib.mkOption {
+                    type = lib.types.str;
+                    readOnly = true;
+                    default = "https://${config.subdomain}.home.lan";
+                    description = "The external URL for the service (read-only)";
+                  };
+
+                  policy = lib.mkOption {
+                    type = lib.types.enum [
+                      "bypass"
+                      "one_factor"
+                      "two_factor"
+                    ];
+                    default = "one_factor";
+                    description = "Auth policy for the reverse proxy";
+                  };
+
+                  group = lib.mkOption {
+                    type = lib.types.nullOr lib.types.str;
+                    default = null;
+                    description = "LDAP group allowed to access this service";
+                  };
+
+                  icon = lib.mkOption { type = lib.types.str; };
+                };
+              }
+            );
           };
-
-          description = lib.mkOption { type = lib.types.str; };
-
-          serviceType = lib.mkOption {
-            type = lib.types.enum [
-              "Apps"
-              "Restricted"
-              "Networking"
-              "Monitoring"
-              "Services"
-            ];
-            default = "Apps";
-            description = "The category this service belongs to on the homepage";
-          };
-
-          subdomain = lib.mkOption { type = lib.types.str; };
-          port = lib.mkOption { type = lib.types.int; };
-
-          href = lib.mkOption {
-            type = lib.types.str;
-            readOnly = true;
-            default = "https://${config.subdomain}.home.lan";
-            description = "The external URL for the service (read-only)";
-          };
-
-          policy = lib.mkOption {
-            type = lib.types.enum [
-              "bypass"
-              "one_factor"
-              "two_factor"
-            ];
-            default = "one_factor";
-            description = "Auth policy for the reverse proxy";
-          };
-
-          group = lib.mkOption {
-            type = lib.types.nullOr lib.types.str;
-            default = null;
-            description = "LDAP group allowed to access this service";
-          };
-
-          icon = lib.mkOption { type = lib.types.str; };
 
           containerConfig = {
             files = lib.mkOption {
@@ -127,6 +138,7 @@ lib.mkOption {
               type = lib.types.attrsOf lib.types.str;
               default = { };
               description = "Mapping of volume names to host paths";
+
               example = {
                 volume-data = "/opt/service/volume";
               };
@@ -136,6 +148,6 @@ lib.mkOption {
       }
     )
   );
-  
+
   default = { };
 }
