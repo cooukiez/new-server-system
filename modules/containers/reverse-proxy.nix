@@ -78,7 +78,8 @@ let
 
     flow = {
       port = ports.node-red;
-      policy = "bypass";
+      policy = "one_factor";
+      group = "admins";
     };
 
     lidarr = {

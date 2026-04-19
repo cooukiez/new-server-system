@@ -13,8 +13,6 @@
   ...
 }:
 let
-  settingsFormat = pkgs.formats.yaml { };
-
   adguardVersion = "latest";
 
   adguardSettings = {
@@ -90,8 +88,31 @@ let
   };
 in
 {
-  home.file."containers/adguardhome/AdGuardHome.yaml" = {
-    source = settingsFormat.generate "AdGuardHome.yaml" adguardSettings;
+  myServices.adguard = {
+    description = "Private DNS Server";
+    serviceType = "Networking";
+
+    subdomain = "dns";
+    port = ports.adguard;
+
+    policy = "one_factor";
+    group = "admins";
+
+    icon = "adguard-home";
+
+    containerConfig = {
+      files."AdGuardHome.yaml" = {
+        source = (pkgs.formats.yaml { }).generate "AdGuardHome.yaml" adguardSettings;
+        copyToVolume = [ { volume = config.myServices.adguard.containerConfig.volumes.adguard-conf; } ];
+      };
+
+      volumes = {
+        adguard-conf = "/opt/adguardhome/conf";
+        adguard-work = "/opt/adguardhome/work";
+        test = "/opt/adguardhome/test";
+        test2 = "/opt/test/test";
+      };
+    };
   };
 
   virtualisation.quadlet =
@@ -101,12 +122,12 @@ in
     {
       volumes.adguard-conf.volumeConfig = {
         type = "bind";
-        device = "/opt/adguardhome/conf";
+        device = config.myServices.adguard.containerConfig.volumes.adguard-conf;
       };
 
       volumes.adguard-work.volumeConfig = {
         type = "bind";
-        device = "/opt/adguardhome/work";
+        device = config.myServices.adguard.containerConfig.volumes.adguard-work;
       };
 
       containers.adguardhome = {
@@ -114,12 +135,6 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
-          ExecStartPre = [
-            # adguardhome requires read and write
-            "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/adguardhome/AdGuardHome.yaml /opt/adguardhome/conf/AdGuardHome.yaml"
-            "${pkgs.coreutils}/bin/chmod 644 /opt/adguardhome/conf/AdGuardHome.yaml"
-          ];
         };
 
         containerConfig = {

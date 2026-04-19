@@ -86,8 +86,14 @@ in
         autoStart = true;
 
         unitConfig = {
-          Requires = [ "postgres.service" "linkwarden-meili.service" ];
-          After = [ "postgres.service" "linkwarden-meili.service" ];
+          Requires = [
+            "postgres.service"
+            "linkwarden-meili.service"
+          ];
+          After = [
+            "postgres.service"
+            "linkwarden-meili.service"
+          ];
         };
 
         serviceConfig = {
@@ -106,7 +112,7 @@ in
 
           environments = {
             DATABASE_URL = "postgresql://linkwarden:linkwarden@host.containers.internal:${toString ports.postgres}/linkwarden";
-            
+
             MEILISEARCH_ENDPOINT = "http://linkwarden-meili:7700";
 
             NEXT_PUBLIC_AUTHELIA_ENABLED = "true";

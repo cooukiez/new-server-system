@@ -110,8 +110,16 @@ in
         autoStart = true;
 
         unitConfig = {
-          Requires = [ "postgres.service" "open-archiver-meili.service" "open-archiver-redis.service" ];
-          After = [ "postgres.service" "open-archiver-meili.service" "open-archiver-redis.service" ];
+          Requires = [
+            "postgres.service"
+            "open-archiver-meili.service"
+            "open-archiver-redis.service"
+          ];
+          After = [
+            "postgres.service"
+            "open-archiver-meili.service"
+            "open-archiver-redis.service"
+          ];
         };
 
         serviceConfig = {
@@ -161,7 +169,7 @@ in
             STORAGE_LOCAL_ROOT_PATH = "/data";
 
             # secrets
-            JWT_EXPIRES_IN="1y";
+            JWT_EXPIRES_IN = "1y";
           };
 
           environmentFiles = [

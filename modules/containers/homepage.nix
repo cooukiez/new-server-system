@@ -108,6 +108,16 @@ let
 
     maxGroupColumns = 5;
     layout = {
+      "Apps" = {
+        style = "row";
+        columns = 5;
+      };
+
+      "Restricted" = {
+        style = "row";
+        columns = 5;
+      };
+
       "Groups" = {
         style = "column";
         columns = 4;
@@ -125,11 +135,6 @@ let
         "System Monitor" = {
           style = "column";
         };
-      };
-
-      "Apps" = {
-        style = "row";
-        columns = 5;
       };
     };
   };
@@ -194,12 +199,12 @@ let
         }
         {
           "AdGuard Home" = {
-            icon = icons.adguard;
-            href = globalAddress.adguard;
-            description = "Private DNS Server";
+            icon = config.myServices.adguard.icon;
+            href = config.myServices.adguard.href;
+            description = config.myServices.adguard.description;
             widget = {
               type = "adguard";
-              url = "${hostInt}:${toString ports.adguard}";
+              url = "${hostInt}:${toString config.myServices.adguard.port}";
             };
           };
         }
@@ -231,16 +236,33 @@ let
       ];
     }
     {
+      "Apps" = [
+        (mkSvc "transfer.sh" icons.transfer-sh globalAddress.transfer-sh "Convenient File Transfer")
+        (mkSvc "Immich" icons.immich globalAddress.immich "Photo Management System")
+        (mkSvc "Jellyfin" icons.jellyfin globalAddress.jellyfin "Universal Media Server")
+        (mkSvc "Papra" "papra" globalAddress.papra "Document Management System")
+        (mkSvc "Gitea" "gitea" globalAddress.gitea "Selfhosted DevOps Platform")
+        (mkSvc "ezBookkeeping" "ezbookkeeping" globalAddress.ebk "Personal Finance Management")
+        (mkSvc "Linkwarden" "linkwarden" globalAddress.ebk "Bookmark Management")
+      ];
+    }
+    {
+      "Restricted" = [
+        (mkSvc "Lidarr" "lidarr" globalAddress.lidarr "Music Tracker / Downloader")
+        (mkSvc "qBittorrent" "qbittorrent" globalAddress.qbittorrent "Torrent / Magnet Management")
+        (mkSvc "Slskd" "slskd" globalAddress.slskd "Soulseek Network Integration")
+      ];
+    }
+    {
       "Monitoring" = [
-        (mkSvc "Grafana" icons.grafana globalAddress.grafana "Container / Monitoring Dashboard")
-        (mkSvc "Glances" icons.glances globalAddress.glances "Server Usage Statistics")
+        (mkSvc "Glances" "glances" globalAddress.glances "Server Usage Statistics")
+        (mkSvc "Grafana" "grafana" globalAddress.grafana "Container / Monitoring Dashboard")
         (mkSvc "VNStat" icons.vnstat globalAddress.vnstat "VNStat Dashboard")
       ];
     }
     {
       "Services" = [
         (mkSvc "Node-RED" icons.node-red globalAddress.node-red "Automation Flow System")
-        (mkSvc "transfer.sh" icons.transfer-sh globalAddress.transfer-sh "Convenient File Transfer")
       ];
     }
     {
@@ -250,23 +272,6 @@ let
         (mkGlance "Memory Usage" "memory" false)
         (mkGlance "Network" "network:enp0s20f0u4" false)
         (mkGlance "Disk SSD" "disk:nvme0n1" false)
-      ];
-    }
-    {
-      "Apps" = [
-        # media
-        (mkSvc "Immich" icons.immich globalAddress.immich "Photo Management System")
-        (mkSvc "Jellyfin" icons.jellyfin globalAddress.jellyfin "Universal Media Server")
-        (mkSvc "Lidarr" icons.lidarr globalAddress.lidarr "Music Tracker / Downloader")
-
-        # media download
-        (mkSvc "Slskd" icons.slskd globalAddress.slskd "Soulseek Network Integration")
-        (mkSvc "qBittorrent" icons.qbittorrent globalAddress.qbittorrent "Torrent / Magnet Management")
-
-        # general
-        (mkSvc "Papra" icons.papra globalAddress.papra "Document Management System")
-        (mkSvc "Gitea" icons.gitea globalAddress.gitea "Selfhosted DevOps Platform")
-        (mkSvc "ezBookkeeping" icons.ebk globalAddress.ebk "Personal Finance Management")
       ];
     }
   ];

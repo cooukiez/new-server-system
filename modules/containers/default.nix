@@ -15,6 +15,9 @@
   ...
 }:
 let
+  uid = toString globalConfig.squ.uid;
+  gid = toString globalConfig.squ.gid;
+
   getNixFiles =
     dir:
     let
@@ -42,11 +45,26 @@ in
     };
   };
 
+  systemd.tmpfiles.rules = [
+    "Z /etc/certs 0400 ${uid} ${gid} -"
+
+    "d /certs 0755 ${uid} ${gid} -"
+    "Z /certs 0755 ${uid} ${gid} -"
+
+    "d /opt 0755 ${uid} ${gid} -"
+    "d /media 0755 ${uid} ${gid} -"
+    "d /data 0755 ${uid} ${gid} -"
+
+    "d /bak 0755 ${uid} ${gid} -"
+    "d /bak/opt 0755 ${uid} ${gid} -"
+  ];
+
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
     extraSpecialArgs = {
       inherit inputs outputs globalConfig;
+
       squConfigKeyPath = config.age.secrets.squ-config-key.path;
     };
 
@@ -68,7 +86,7 @@ in
       {
         imports = [
           inputs.quadlet-nix.homeManagerModules.quadlet
-          inputs.agenix.homeManagerModules.default
+          inputs.agenix.homeManagerModules.age
 
           ./services/media
         ]
@@ -85,38 +103,136 @@ in
           ./vpn.nix
         ];
 
-        age.identityPaths = [ squConfigKeyPath ];
+        options.myServices =
 
-        _module.args = {
-          ports = globalConfig.ports;
+        config = {
+          age.identityPaths = [ squConfigKeyPath ];
 
-          envSuffix = "${baseDir}/env";
-          envSecretsSuffix = "${baseDir}/secrets";
+          _module.args = {
+            ports = globalConfig.ports;
 
-          envPrefix = mkPath "env";
-          envSecretsPrefix = mkPath "secrets";
-        };
+            envSuffix = "${baseDir}/env";
+            envSecretsSuffix = "${baseDir}/secrets";
 
-        virtualisation.quadlet =
-          let
-            inherit (config.virtualisation.quadlet) volumes networks pods;
-          in
-          {
-            networks = {
-              internal.networkConfig.subnets = [ "10.1.1.1/24" ];
+            envPrefix = mkPath "env";
+            envSecretsPrefix = mkPath "secrets";
+          };
+
+          # container volume mounts
+          systemd.user.services."volume-provisioner" =
+            let
+              allVolumes = lib.flatten (
+                lib.mapAttrsToList (
+                  serviceName: serviceCfg: lib.attrValues serviceCfg.containerConfig.volumes
+                ) config.myServices
+              );
+
+              uniqueVolumes = lib.unique allVolumes;
+
+              provisionScript = pkgs.writeShellScript "provision-volumes" ''
+                ${lib.concatMapStringsSep "\n" (path: ''
+                  if [ ! -d "${path}" ]; then
+                    echo "Creating volume directory: ${path}"
+                    ${pkgs.coreutils}/bin/mkdir -p "${path}"
+                  fi
+                  echo "Setting permissions 755 on ${path}"
+                  ${pkgs.coreutils}/bin/chmod 755 "${path}"
+                '') uniqueVolumes}
+              '';
+            in
+            {
+              Unit = {
+                Description = "Create and set permissions for container volumes";
+                Before = [ "podman.service" ];
+              };
+
+              Service = {
+                Type = "oneshot";
+                ExecStart = provisionScript;
+                RemainAfterExit = true;
+              };
+
+              Install = {
+                WantedBy = [ "default.target" ];
+              };
+            };
+
+          # files in home directory
+          home.file = lib.concatMapAttrs (
+            serviceName: serviceCfg:
+            lib.mapAttrs' (
+              fileName: fileCfg:
+              lib.nameValuePair (fileCfg.path) {
+                source = fileCfg.source;
+              }
+
+            ) serviceCfg.containerConfig.files
+          ) config.myServices;
+
+          # files in container directories
+          systemd.user.services."file-provisioner" =
+            let
+              allFiles = lib.flatten (
+                lib.mapAttrsToList (
+                  serviceName: serviceCfg:
+                  lib.mapAttrsToList (fileName: fileCfg: fileCfg) serviceCfg.containerConfig.files
+                ) config.myServices
+              );
+
+              filesToCopy = lib.filter (f: f.copyToVolume != [ ]) allFiles;
+
+              provisionScript = pkgs.writeShellScript "provision-container-files" ''
+                ${lib.concatMapStringsSep "\n" (
+                  file:
+                  lib.concatMapStringsSep "\n" (dest: ''
+                    echo "Provisioning ${file.name} to ${dest.volume}..."
+                    ${pkgs.coreutils}/bin/cp -f "${file.fullPath}" "${dest.volume}"
+                    ${pkgs.coreutils}/bin/chmod ${dest.mode} "${dest.volume}/${file.name}"
+                  '') file.copyToVolume
+                ) filesToCopy}
+              '';
+
+              # run every time
+              timestamp = toString /.;
+            in
+            {
+              Unit = {
+                Description = "Provision configuration files to container volumes";
+                Before = [ "podman.service" ];
+              };
+
+              Service = {
+                Type = "oneshot";
+                ExecStart = "${provisionScript}";
+                RemainAfterExit = true;
+              };
+
+              Install = {
+                WantedBy = [ "default.target" ];
+              };
+            };
+
+          virtualisation.quadlet =
+            let
+              inherit (config.virtualisation.quadlet) volumes networks pods;
+            in
+            {
+              networks = {
+                internal.networkConfig.subnets = [ "10.1.1.1/24" ];
+              };
+            };
+
+          systemd.user.services."podman-user-wait-network-online" = lib.mkForce {
+            Unit.Description = "Replacement podman-user-wait-network-online to prevent quadlet hang";
+            Service = {
+              Type = "oneshot";
+              ExecStart = "${pkgs.coreutils}/bin/true";
+              RemainAfterExit = true;
             };
           };
 
-        systemd.user.services."podman-user-wait-network-online" = lib.mkForce {
-          Unit.Description = "Dummy podman-user-wait-network-online to prevent quadlet hang";
-          Service = {
-            Type = "oneshot";
-            ExecStart = "${pkgs.coreutils}/bin/true";
-            RemainAfterExit = true;
-          };
+          home.stateVersion = "25.11";
         };
-
-        home.stateVersion = "25.11";
       };
   };
 

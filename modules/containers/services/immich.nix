@@ -140,8 +140,16 @@ in
         autoStart = true;
 
         unitConfig = {
-          Requires = [ "immich-ml.service" "immich-redis.service" "immich-postgres.service" ];
-          After = [ "immich-ml.service" "immich-redis.service" "immich-postgres.service" ];
+          Requires = [
+            "immich-ml.service"
+            "immich-redis.service"
+            "immich-postgres.service"
+          ];
+          After = [
+            "immich-ml.service"
+            "immich-redis.service"
+            "immich-postgres.service"
+          ];
         };
 
         serviceConfig = {
