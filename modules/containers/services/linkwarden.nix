@@ -25,9 +25,11 @@ in
       };
     in
     {
-      link-client-key = mkSecret "auth/clients/e_link";
       link-meili-key = mkSecret "link/e_link-meili-key";
+
+      link-client-key = mkSecret "auth/clients/e_link";
       link-input-meili = mkSecret "link/e_meili-key";
+      link-next-auth = mkSecret "link/e_next-auth";
     };
 
   virtualisation.quadlet =
@@ -102,17 +104,16 @@ in
             DATABASE_URL = "postgresql://linkwarden:linkwarden@host.containers.internal:${toString ports.postgres}/linkwarden";
             
             MEILISEARCH_ENDPOINT = "http://linkwarden-meili:7700";
-            # MEILISEARCH_MASTER_KEY = "your-meili-master-key";
 
             NEXT_PUBLIC_AUTHELIA_ENABLED = "true";
             AUTHELIA_WELLKNOWN_URL = "https://auth.home.lan/.well-known/openid-configuration";
             AUTHELIA_CLIENT_ID = "linkwarden";
-            # AUTHELIA_CLIENT_SECRET=insecure_secret
           };
 
           environmentFiles = [
             "secrets/auth/clients/e_link"
             "secrets/link/e_link-meili-key"
+            "secrets/link/e_next-auth"
           ];
 
           volumes = [

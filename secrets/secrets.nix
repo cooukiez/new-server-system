@@ -79,6 +79,7 @@ in
   # linkwarden
   "link/e_meili-key.age".publicKeys = allKeys;
   "link/e_link-meili-key.age".publicKeys = allKeys;
+  "link/e_next-auth.age".publicKeys = allKeys;
 
   # papra
   "papra/e_auth-secret.age".publicKeys = allKeys;
