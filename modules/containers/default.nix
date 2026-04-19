@@ -126,7 +126,7 @@ in
                     ${pkgs.coreutils}/bin/mkdir -p "${path}"
                   fi
                   echo "Setting permissions 755 on ${path}"
-                  ${pkgs.coreutils}/bin/chmod 755 "${path}"
+                  ${pkgs.coreutils}/bin/chmod 755 "${path}" || true
                 '') uniqueVolumes}
               '';
             in

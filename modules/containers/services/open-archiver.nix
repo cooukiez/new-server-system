@@ -19,6 +19,7 @@ in
 {
   myServices.open-archiver = {
     serviceConfig = {
+      name = "Open-Archiver";
       description = "Mail Archiving System";
       serviceType = "Apps";
 
@@ -27,7 +28,7 @@ in
 
       policy = "bypass";
 
-      icon = "open-archiver";
+      icon = "https://avatars.githubusercontent.com/u/219889887?s=48&v=4";
     };
 
     containerConfig = {
@@ -213,7 +214,7 @@ in
 
             # certificates
             "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-            "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
+            # "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             "${volumes.open-archiver-data.ref}:/data"

@@ -16,6 +16,7 @@ in
 {
   myServices.transfer-sh = {
     serviceConfig = {
+      name = "transfer.sh";
       description = "Convenient File Transfer";
       serviceType = "Apps";
 
@@ -73,7 +74,7 @@ in
 
             # certificates
             "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-            "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
+            # "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             "${volumes.transfer-sh-data.ref}:/data:U"

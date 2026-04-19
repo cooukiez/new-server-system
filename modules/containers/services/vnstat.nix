@@ -16,7 +16,8 @@ in
 {
   myServices.vnstat = {
     serviceConfig = {
-      description = "VNStat Dashboard";
+      name = "VNStat Dashboard";
+      description = "View Network Statistics";
       serviceType = "Monitoring";
 
       subdomain = "vnstat";
@@ -64,7 +65,7 @@ in
 
             # certificates
             "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-            "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
+            # "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             "${volumes.vnstat-db.ref}:/var/lib/vnstat:ro"

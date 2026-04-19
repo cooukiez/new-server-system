@@ -183,6 +183,7 @@ in
   myServices = {
     grafana = {
       serviceConfig = {
+        name = "Grafana";
         description = "Container / Monitoring Dashboard";
         serviceType = "Monitoring";
 
@@ -212,8 +213,25 @@ in
       };
     };
 
+    glances = {
+      serviceConfig = {
+        name = "Glances";
+        description = "System Dashboard";
+        serviceType = "Monitoring";
+
+        subdomain = "glances";
+        port = ports.glances;
+
+        policy = "one_factor";
+        group = "admins";
+
+        icon = "glances";
+      };
+    };
+
     prometheus = {
       serviceConfig = {
+        name = "Prometheus";
         description = "System Statistics Datasource";
         serviceType = "Monitoring";
 
@@ -320,7 +338,7 @@ in
 
             # certificates
             "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-            "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
+            # "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # config
@@ -369,7 +387,7 @@ in
 
             # certificates
             "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-            "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
+            # "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # config

@@ -16,6 +16,7 @@ in
 {
   myServices.stirling = {
     serviceConfig = {
+      name = "Stirling-PDF";
       description = "PDF Editing Tool";
       serviceType = "Apps";
 

@@ -247,7 +247,7 @@ in
               "/etc/localtime:/etc/localtime:ro"
 
               # certificates
-              "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
+              # "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
               "/certs/ca.crt:/certs/ca.crt:ro"
 
               "${volumes.authelia-config.ref}:/config:U"

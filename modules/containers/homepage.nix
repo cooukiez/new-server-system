@@ -154,7 +154,7 @@ let
         {
           "Gluetun / VPN" = {
             icon = config.myServices.gluetun.serviceConfig.icon;
-            href = config.myServices.gluetun.serviceConfig.icon;
+            href = config.myServices.gluetun.serviceConfig.href;
             description = config.myServices.gluetun.serviceConfig.description;
             widget = {
               type = "gluetun";
@@ -259,7 +259,7 @@ in
 
             # certificates
             "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-            "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
+            # "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # podman socket (not used currently)

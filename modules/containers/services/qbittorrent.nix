@@ -16,6 +16,7 @@ in
 {
   myServices.qbittorrent = {
     serviceConfig = {
+      name = "qBittorrent";
       description = "Torrent / Magnet Management";
       serviceType = "Restricted";
 
@@ -83,7 +84,7 @@ in
 
             # certificates
             "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-            "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
+            # "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             "${volumes.qbittorrent-config.ref}:/config:U"

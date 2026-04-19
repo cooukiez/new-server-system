@@ -20,6 +20,7 @@ in
 {
   myServices.immich = {
     serviceConfig = {
+      name = "Immich";
       description = "Photo Management System";
       serviceType = "Apps";
 
@@ -118,7 +119,7 @@ in
             "/etc/timezone:/etc/timezone:ro"
             "/etc/localtime:/etc/localtime:ro"
 
-            "${volumes.immich-redis.ref}:/data"
+            "${volumes.immich-redis.ref}:/data:U"
           ];
         };
       };
@@ -207,7 +208,7 @@ in
 
             # certificates
             "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-            "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
+            # "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # secrets

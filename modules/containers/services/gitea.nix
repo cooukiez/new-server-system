@@ -16,6 +16,7 @@ in
 {
   myServices.gitea = {
     serviceConfig = {
+      name = "Gitea";
       description = "Selfhosted DevOps Platform";
       serviceType = "Apps";
 
@@ -65,7 +66,7 @@ in
             "auth.home.lan:host-gateway"
           ];
 
-          exec = "/bin/sh -c 'update-ca-certificates && /usr/bin/entrypoint /usr/bin/s6-svscan /etc/s6'";
+          # exec = "/bin/sh -c 'update-ca-certificates && /usr/bin/entrypoint /usr/bin/s6-svscan /etc/s6'";
 
           environments = {
             TZ = "Europe/Berlin";
@@ -83,7 +84,7 @@ in
 
             # certificates
             "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-            "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
+            # "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # volumes

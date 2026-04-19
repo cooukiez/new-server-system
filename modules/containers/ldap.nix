@@ -17,6 +17,7 @@ in
 {
   myServices.lldap = {
     serviceConfig = {
+      name = "LLDAP";
       description = "Global User Management";
       serviceType = "Services";
 
@@ -25,7 +26,7 @@ in
 
       policy = "bypass";
 
-      icon = "lldap";
+      icon = "https://avatars.githubusercontent.com/u/129409591?s=48&v=4";
     };
 
     containerConfig = {
@@ -95,7 +96,7 @@ in
 
             # certificates
             "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-            "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
+            # "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # secrets

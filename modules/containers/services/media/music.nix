@@ -125,6 +125,7 @@ in
   myServices = {
     lidarr = {
       serviceConfig = {
+        name = "Lidarr";
         description = "Music Tracker / Downloader";
         serviceType = "Restricted";
 
@@ -149,6 +150,7 @@ in
 
     slskd = {
       serviceConfig = {
+        name = "Slskd";
         description = "Soulseek Network Integration";
         serviceType = "Restricted";
 
@@ -244,7 +246,7 @@ in
 
             # certificates
             "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-            "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
+            # "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # config
@@ -303,7 +305,7 @@ in
 
             # certificates
             "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-            "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
+            # "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # config
