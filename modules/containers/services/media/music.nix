@@ -138,7 +138,7 @@ in
 
       containerConfig = {
         files."config.xml" = {
-          source = pkgs.writeText "config.xml" mkLidarrXml lidarrSettings;
+          source = pkgs.writeText "config.xml" (mkLidarrXml lidarrSettings);
         };
 
         volumes = {
@@ -153,7 +153,7 @@ in
         serviceType = "Restricted";
 
         subdomain = "slskd";
-        port = ports.slskd;
+        port = ports.slskdHttp;
 
         policy = "bypass";
 
@@ -243,6 +243,7 @@ in
             "/etc/localtime:/etc/localtime:ro"
 
             # certificates
+            "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
             "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
 
@@ -301,6 +302,7 @@ in
             "/etc/localtime:/etc/localtime:ro"
 
             # certificates
+            "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
             "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
 

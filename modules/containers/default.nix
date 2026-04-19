@@ -17,15 +17,6 @@
 let
   uid = toString globalConfig.squ.uid;
   gid = toString globalConfig.squ.gid;
-
-  getNixFiles =
-    dir:
-    let
-      contents = builtins.readDir dir;
-    in
-    map (name: dir + "/${name}") (
-      builtins.filter (name: lib.hasSuffix ".nix" name) (builtins.attrNames contents)
-    );
 in
 {
   virtualisation = {
@@ -75,9 +66,20 @@ in
           inputs.agenix.homeManagerModules.age
 
           ./services/media
-        ]
-        ++ (getNixFiles ./services)
-        ++ [
+
+          ./services/ebk.nix
+          ./services/gitea.nix
+          ./services/immich.nix
+          ./services/linkwarden.nix
+          ./services/node-red.nix
+          ./services/open-archiver.nix
+          ./services/papra.nix
+          ./services/qbittorrent.nix
+          ./services/radicale.nix
+          ./services/stirling.nix
+          ./services/transfer-sh.nix
+          ./services/vnstat.nix
+
           ./auth.nix
           ./backup.nix
           ./database.nix
@@ -101,6 +103,9 @@ in
 
             envPrefix = mkPath "env";
             envSecretsPrefix = mkPath "secrets";
+
+            allServices = config.myServices;
+            publicServices = lib.filterAttrs (name: value: value.serviceConfig != null) config.myServices;
           };
 
           # container volume mounts

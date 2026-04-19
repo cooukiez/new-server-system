@@ -262,6 +262,6 @@ in
   home.file = dashboardFiles;
 
   myServices.grafana.containerConfig.files."provisioning/dashboards/dashboards.yaml" = {
-    source = (pkgs.formats.ini { }).generate "dashboards.yaml" dashboardFiles;
+    source = (pkgs.formats.yaml { }).generate "dashboards.yaml" grafanaDashboardSettings;
   };
 }

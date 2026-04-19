@@ -25,7 +25,7 @@ let
       http_port = 8080;
 
       domain = "finance.home.lan";
-      root_url = "https://finance.home.lan/";
+      root_url = config.myServices.ebk.serviceConfig.href;
       static_root_path = "public";
 
       cert_file = "";
@@ -204,6 +204,7 @@ in
 {
   myServices.ebk = {
     serviceConfig = {
+      name = "ezBookkeeping";
       description = "Personal Finance Management";
       serviceType = "Apps";
 
@@ -287,6 +288,7 @@ in
             "/etc/localtime:/etc/localtime:ro"
 
             # certificates
+            "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
             "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
 

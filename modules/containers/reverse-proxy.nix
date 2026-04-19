@@ -11,30 +11,32 @@
   lib,
   globalConfig,
   ports,
+  publicServices,
   ...
 }:
 let
   caddyVersion = "latest";
 
-  publicServices = lib.filterAttrs (_: svc: svc.serviceConfig != { }) config.myServices;
   sortedServiceList = lib.sort (a: b: a.serviceConfig.subdomain < b.serviceConfig.subdomain) (
     lib.attrValues publicServices
   );
 
-  serviceHandlers = lib.concatStringsSep "\n" (
-    map (
-      svc:
-      let
-        cfg = svc.serviceConfig;
-      in
-      ''
-        @${cfg.name} host ${cfg.subdomain}.home.lan
-        handle @${cfg.name} {
-          import auth_verify
-          reverse_proxy host.containers.internal:${toString cfg.port}
-        }
-      ''
-    ) sortedServiceList
+  serviceHandlers = lib.trim (
+    lib.concatStringsSep "\n" (
+      map (
+        svc:
+        let
+          cfg = svc.serviceConfig;
+        in
+        ''
+          @${cfg.name} host ${cfg.subdomain}.home.lan
+          handle @${cfg.name} {
+            import auth_verify
+            reverse_proxy host.containers.internal:${toString cfg.port}
+          }
+        ''
+      ) sortedServiceList
+    )
   );
 in
 {
@@ -45,66 +47,66 @@ in
 
       files."Caddyfile" = {
         source = pkgs.writeText "Caddyfile" ''
-          {
-            # enable admin API
-            admin 0.0.0.0:2019
-          }
-
-          (my_tls) {
-            tls /certs/home.lan.crt /certs/home.lan.key
-          }
-
-          https://${globalConfig.staticIP} {
-            import my_tls
-            redir http://{host}{uri}
-          }
-
-          http://${globalConfig.staticIP} {
-            handle /cert {
-              header Content-Disposition "attachment; filename=root-ca.crt"
-              header Content-Type "application/x-x509-ca-cert"
-              
-              root * /certs
-              rewrite * /ca.crt
-              file_server
+            {
+              # enable admin API
+              admin 0.0.0.0:2019
             }
 
-            handle {
-              redir https://home.lan
-            }
-          }
-
-          (auth_verify) {
-            forward_auth host.containers.internal:${toString ports.authelia} {
-              uri /api/verify?rd=https://auth.home.lan/
-              copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
-            }
-          }
-
-          home.lan {
-            import my_tls
-            reverse_proxy host.containers.internal:${toString ports.homepage}
-          }
-
-          *.home.lan {
-            import my_tls
-
-            @auth host auth.home.lan
-            handle @auth {
-              reverse_proxy host.containers.internal:${toString ports.authelia}
+            (my_tls) {
+              tls /certs/home.lan.crt /certs/home.lan.key
             }
 
-            @ldap host ldap.home.lan
-            handle @ldap {
-              reverse_proxy host.containers.internal:${toString ports.lldapWeb}
+            https://${globalConfig.staticIP} {
+              import my_tls
+              redir http://{host}{uri}
             }
 
-            ${serviceHandlers}
-            
-            handle {
-              abort
+            http://${globalConfig.staticIP} {
+              handle /cert {
+                header Content-Disposition "attachment; filename=root-ca.crt"
+                header Content-Type "application/x-x509-ca-cert"
+                
+                root * /certs
+                rewrite * /ca.crt
+                file_server
+              }
+
+              handle {
+                redir https://home.lan
+              }
             }
-          }
+
+            (auth_verify) {
+              forward_auth host.containers.internal:${toString ports.authelia} {
+                uri /api/verify?rd=https://auth.home.lan/
+                copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+              }
+            }
+
+            home.lan {
+              import my_tls
+              reverse_proxy host.containers.internal:${toString ports.homepage}
+            }
+
+            *.home.lan {
+              import my_tls
+
+              @auth host auth.home.lan
+              handle @auth {
+                reverse_proxy host.containers.internal:${toString ports.authelia}
+              }
+
+              @ldap host ldap.home.lan
+              handle @ldap {
+                reverse_proxy host.containers.internal:${toString ports.lldapWeb}
+              }
+
+          ${serviceHandlers}
+
+              handle {
+                abort
+              }
+            }
         '';
       };
     };

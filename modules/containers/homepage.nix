@@ -11,6 +11,7 @@
   lib,
   globalConfig,
   ports,
+  publicServices,
   ...
 }:
 let
@@ -18,12 +19,11 @@ let
 
   hostInt = "http://host.containers.internal";
 
-  publicServices = lib.filterAttrs (n: s: s.serviceConfig != null) config.myServices;
   groupedData = lib.groupBy (s: s.serviceConfig.serviceType) (lib.attrValues publicServices);
 
   autoGroups = lib.mapAttrsToList (name: services: {
     "${name}" = map (
-      s: mkSvc s.name s.serviceConfig.icon s.serviceConfig.href s.serviceConfig.description
+      s: mkSvc s.serviceConfig.name s.serviceConfig.icon s.serviceConfig.href s.serviceConfig.description
     ) services;
   }) (lib.removeAttrs groupedData [ "Networking" ]);
 
@@ -135,7 +135,7 @@ let
             description = config.myServices.adguard.serviceConfig.description;
             widget = {
               type = "adguard";
-              url = "${hostInt}:${toString config.myServices.adguard.port}";
+              url = "${hostInt}:${toString config.myServices.adguard.serviceConfig.port}";
             };
           };
         }
@@ -258,6 +258,7 @@ in
             "/etc/localtime:/etc/localtime:ro"
 
             # certificates
+            "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
             "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
 

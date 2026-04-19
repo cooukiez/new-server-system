@@ -10,12 +10,12 @@
   pkgs,
   lib,
   ports,
+  publicServices,
   ...
 }:
 let
   autheliaVersion = "latest";
 
-  publicServices = lib.filterAttrs (_: svc: svc.serviceConfig != { }) config.myServices;
   sortedServiceList = lib.sort (a: b: a.serviceConfig.subdomain < b.serviceConfig.subdomain) (
     lib.attrValues publicServices
   );
@@ -57,7 +57,7 @@ let
           policy = "bypass";
         }
       ]
-      ++ (lib.mapAttrsToList (
+      ++ (map (
         svc:
         let
           cfg = svc.serviceConfig;
@@ -169,6 +169,7 @@ in
 {
   myServices.authelia = {
     serviceConfig = {
+      name = "Authelia";
       description = "OpenID Authentication System";
       serviceType = "Apps";
 
@@ -226,7 +227,7 @@ in
           ExecStartPre = [
             "${pkgs.coreutils}/bin/cp ${
               config.myServices.authelia.containerConfig.files."configuration.yml".fullPath
-            }/ /opt/authelia/config/configuration.yml"
+            } /opt/authelia/config/configuration.yml"
             "${pkgs.yq-go}/bin/yq -i '.identity_providers.oidc.jwks[0].key = load_str(\"${config.age.secrets.auth-oidc-jwk.path}\")' /opt/authelia/config/configuration.yml"
             "${pkgs.coreutils}/bin/chmod 644 /opt/authelia/config/configuration.yml"
           ];
