@@ -15,7 +15,6 @@
   imports = [
     ./certificate.nix
     ./metrics.nix
-    ./structure.nix
   ];
 
   services.openssh = {

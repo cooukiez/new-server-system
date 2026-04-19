@@ -103,7 +103,7 @@ in
           ./vpn.nix
         ];
 
-        options.myServices =
+        options.myServices = import ./service-config.nix { inherit config lib; };
 
         config = {
           age.identityPaths = [ squConfigKeyPath ];
