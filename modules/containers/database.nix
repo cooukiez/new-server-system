@@ -46,6 +46,12 @@ let
       dbs = [ "open-archiver" ];
       pass = "archiver";
     }
+    {
+      name = "linkwarden";
+      user = "linkwarden";
+      dbs = [ "linkwarden" ];
+      pass = "linkwarden";
+    }
 
     {
       name = "lidarr";
