@@ -58,6 +58,7 @@ let
     "immich"
     "immich/db"
     "immich/ml-cache"
+    "immich/redis"
 
     "jellyfin"
     "jellyfin/config"
@@ -88,6 +89,13 @@ let
     "ebk/log"
     "gitea"
     "gitea/data"
+    "linkwarden"
+    "linkwarden/data"
+    "linkwarden/meili"
+    "open-archiver"
+    "open-archiver/data"
+    "open-archiver/meili"
+    "open-archiver/redis"
     "papra"
     "papra/data"
     "radicale"
@@ -95,11 +103,9 @@ let
     "radicale/data"
     "stirling"
     "stirling/config"
-    "stirling/tessdata"
-    "stirling/pipeline"
     "stirling/log"
-    "open-archiver"
-    "open-archiver/data"
+    "stirling/pipeline"
+    "stirling/tessdata"
   ];
 
   mediaDirs = [

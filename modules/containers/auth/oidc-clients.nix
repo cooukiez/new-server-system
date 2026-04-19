@@ -7,34 +7,9 @@
 
 [
   {
-    client_id = "immich";
-    client_name = "Immich";
-    client_secret = "$pbkdf2-sha512$310000$X5CgmGSCM2XEmtT0jqohVA$H8TqZ1CSfnrr8M.zzjO7VAuNQtaZf2saqVBwCrTzNeHlVpaAhuQV8nhNUJ8p8jktsvT7oJBdsHa7ftQfbGynVQ";
-
-    public = false;
-    authorization_policy = "two_factor";
-    require_pkce = false;
-
-    redirect_uris = [
-      "https://immich.home.lan/auth/login"
-      "https://immich.home.lan/user-settings"
-      "app.immich:///oauth-callback"
-    ];
-
-    scopes = [
-      "openid"
-      "profile"
-      "email"
-    ];
-
-    response_types = [ "code" ];
-    grant_types = [ "authorization_code" ];
-
-    access_token_signed_response_alg = "none";
-    userinfo_signed_response_alg = "none";
-    token_endpoint_auth_method = "client_secret_post";
-  }
-  {
+    #
+    # system
+    #
     client_id = "grafana";
     client_name = "Grafana";
     client_secret = "$pbkdf2-sha512$310000$j//xOaGDVHfltGPTrdpXAg$cjNHWiElFa8S2PlanW1.5BzjgBYsev2POF.LPdPzYGgabkC.HNEUZbP4Rs2GfpONTmIS/WcVgjDpZAlIW5FtdQ";
@@ -61,6 +36,37 @@
     grant_types = [ "authorization_code" ];
 
     access_token_signed_response_alg = "RS256";
+    userinfo_signed_response_alg = "none";
+    token_endpoint_auth_method = "client_secret_basic";
+  }
+
+  #
+  # services
+  #
+  {
+    client_id = "ezbookkeeping";
+    client_name = "ezBookkeeping";
+    client_secret = "$pbkdf2-sha512$310000$W7MPEUwmQzHXWrMF3IAN/A$PqcNQkyzkLHFbqeNQmglL13dVKGqv5VAocgcb/w2VXYrojUB7tKPqA6QvqmIFzkQ9RmVfzrRXEQZaHjqTiLGnw";
+
+    public = false;
+    authorization_policy = "two_factor";
+    require_pkce = true;
+    pkce_challenge_method = "S256";
+
+    redirect_uris = [
+      "https://finance.home.lan/oauth2/callback"
+    ];
+
+    scopes = [
+      "openid"
+      "profile"
+      "email"
+    ];
+
+    response_types = [ "code" ];
+    grant_types = [ "authorization_code" ];
+
+    access_token_signed_response_alg = "none";
     userinfo_signed_response_alg = "none";
     token_endpoint_auth_method = "client_secret_basic";
   }
@@ -92,6 +98,34 @@
     token_endpoint_auth_method = "client_secret_basic";
   }
   {
+    client_id = "immich";
+    client_name = "Immich";
+    client_secret = "$pbkdf2-sha512$310000$X5CgmGSCM2XEmtT0jqohVA$H8TqZ1CSfnrr8M.zzjO7VAuNQtaZf2saqVBwCrTzNeHlVpaAhuQV8nhNUJ8p8jktsvT7oJBdsHa7ftQfbGynVQ";
+
+    public = false;
+    authorization_policy = "two_factor";
+    require_pkce = false;
+
+    redirect_uris = [
+      "https://immich.home.lan/auth/login"
+      "https://immich.home.lan/user-settings"
+      "app.immich:///oauth-callback"
+    ];
+
+    scopes = [
+      "openid"
+      "profile"
+      "email"
+    ];
+
+    response_types = [ "code" ];
+    grant_types = [ "authorization_code" ];
+
+    access_token_signed_response_alg = "none";
+    userinfo_signed_response_alg = "none";
+    token_endpoint_auth_method = "client_secret_post";
+  }
+  {
     client_id = "papra";
     client_name = "Papra";
     client_secret = "$pbkdf2-sha512$310000$iZcRHLNCaLQRucCZQiaSpQ$uxJSCJi1ZmpwwVUjA2BCjSbLvl34KVFnv2N11wWSTUupDkucRGnXbIvNU/v00ln9cogBVl2DMiWcicYa7IeS3w";
@@ -119,23 +153,24 @@
     token_endpoint_auth_method = "client_secret_post";
   }
   {
-    client_id = "ezbookkeeping";
-    client_name = "ezBookkeeping";
-    client_secret = "$pbkdf2-sha512$310000$W7MPEUwmQzHXWrMF3IAN/A$PqcNQkyzkLHFbqeNQmglL13dVKGqv5VAocgcb/w2VXYrojUB7tKPqA6QvqmIFzkQ9RmVfzrRXEQZaHjqTiLGnw";
+    client_id = "linkwarden";
+    client_name = "Linkwarden";
+    client_secret = "$pbkdf2-sha512$310000$JdzSF/citkF8uBU2cvc7hQ$a1L4OeJsiD9Fm5Ec9egEu2X0ugk9SXFnSBBfabMg46U8L5mvzwjLVi4GyNbZgLbdNfJx7TWKWigJK6gN9zEfjw";
 
     public = false;
     authorization_policy = "two_factor";
-    require_pkce = true;
-    pkce_challenge_method = "S256";
+    require_pkce = false;
+    pkce_challenge_method = "";
 
     redirect_uris = [
-      "https://finance.home.lan/oauth2/callback"
+      "https://link.home.lan/api/v1/auth/callback/authelia"
     ];
 
     scopes = [
       "openid"
-      "profile"
+      "groups"
       "email"
+      "profile"
     ];
 
     response_types = [ "code" ];

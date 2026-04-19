@@ -41,14 +41,19 @@ in
         device = photosPath;
       };
 
-      volumes.immich-db.volumeConfig = {
-        type = "bind";
-        device = dbPath;
-      };
-
       volumes.immich-ml-cache.volumeConfig = {
         type = "bind";
         device = mlCachePath;
+      };
+
+      volumes.immich-redis.volumeConfig = {
+        type = "bind";
+        device = mlCachePath;
+      };
+
+      volumes.immich-db.volumeConfig = {
+        type = "bind";
+        device = dbPath;
       };
 
       # machine learning container
@@ -93,6 +98,8 @@ in
           volumes = [
             "/etc/timezone:/etc/timezone:ro"
             "/etc/localtime:/etc/localtime:ro"
+
+            "${volumes.immich-redis.ref}:/data"
           ];
         };
       };

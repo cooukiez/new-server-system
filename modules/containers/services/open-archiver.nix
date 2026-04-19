@@ -5,7 +5,7 @@
   ...
 }:
 let
-  meiliSearchVersion = "latest";
+  meiliVersion = "latest";
   redisVersion = "alpine";
   openArchiverVersion = "latest";
 in
@@ -35,6 +35,16 @@ in
         };
       };
 
+      volumes.open-archiver-meili.volumeConfig = {
+        type = "bind";
+        device = "/opt/open-archiver/meili";
+      };
+
+      volumes.open-archiver-redis.volumeConfig = {
+        type = "bind";
+        device = "/opt/open-archiver/redis";
+      };
+
       volumes.open-archiver-data.volumeConfig = {
         type = "bind";
         device = "/opt/open-archiver/data";
@@ -48,7 +58,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/getmeili/meilisearch:${meiliSearchVersion}";
+          image = "docker.io/getmeili/meilisearch:${meiliVersion}";
           name = "open-archiver-meili";
           networks = [ "open-archiver-net" ];
 
@@ -58,6 +68,13 @@ in
 
           environmentFiles = [
             "secrets/archiver/e_meili-key"
+          ];
+
+          volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            "${volumes.open-archiver-meili.ref}:/meili_data"
           ];
         };
       };
@@ -83,6 +100,8 @@ in
           volumes = [
             "/etc/timezone:/etc/timezone:ro"
             "/etc/localtime:/etc/localtime:ro"
+
+            "${volumes.open-archiver-redis.ref}:/data"
           ];
         };
       };

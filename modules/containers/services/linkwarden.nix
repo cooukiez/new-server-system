@@ -8,7 +8,7 @@
 {
   config,
   ports,
-  envSecretsPrefix
+  envSecretsPrefix,
   ...
 }:
 let
@@ -43,12 +43,12 @@ in
 
       volumes.linkwarden-data.volumeConfig = {
         type = "bind";
-        device = "/var/lib/linkwarden/data";
+        device = "/opt/linkwarden/data";
       };
 
-      volumes.meilisearch-data.volumeConfig = {
+      volumes.linkwarden-meili.volumeConfig = {
         type = "bind";
-        device = "/var/lib/linkwarden/meili";
+        device = "/opt/linkwarden/meili";
       };
 
       containers.linkwarden-meili = {
@@ -59,7 +59,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/getmeili/meilisearch:${meiliSearchVersion}";
+          image = "docker.io/getmeili/meilisearch:${meiliVersion}";
           name = "linkwarden-meili";
           networks = [ "linkwarden-net" ];
 
@@ -69,6 +69,13 @@ in
 
           environmentFiles = [
             "secrets/link/e_meili-key"
+          ];
+
+          volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            "${volumes.linkwarden-meili.ref}:/meili_data"
           ];
         };
       };
