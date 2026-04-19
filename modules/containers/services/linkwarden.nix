@@ -31,8 +31,8 @@ in
 
     containerConfig = {
       volumes = {
-        linkwarden-data = "/opt/linkwarden/data";
         linkwarden-meili = "/opt/linkwarden/meili";
+        linkwarden-data = "/opt/linkwarden/data";
       };
     };
   };

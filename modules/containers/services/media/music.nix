@@ -218,7 +218,9 @@ in
           Restart = "always";
           RestartSec = "10";
           ExecStartPre = [
-            "${pkgs.coreutils}/bin/cp ${config.myServices.lidarr.containerConfig.files."config.xml".fullPath} /opt/lidarr/data/config.xml"
+            "${pkgs.coreutils}/bin/cp ${
+              config.myServices.lidarr.containerConfig.files."config.xml".fullPath
+            } /opt/lidarr/data/config.xml"
             "${pkgs.coreutils}/bin/chmod 644 /opt/lidarr/data/config.xml"
           ];
         };

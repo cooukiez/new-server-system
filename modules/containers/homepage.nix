@@ -14,11 +14,18 @@
   ...
 }:
 let
-  settingsFormat = pkgs.formats.yaml { };
-
   homepageVersion = "latest";
 
   hostInt = "http://host.containers.internal";
+
+  publicServices = filterAttrs (n: s: s.serviceConfig != null) config.myServices;
+  groupedData = groupBy (s: s.serviceConfig.serviceType) (attrValues activeServices);
+
+  autoGroups = mapAttrsToList (name: services: {
+    "${name}" = map (
+      s: mkSvc s.name s.serviceConfig.icon s.serviceConfig.href s.serviceConfig.description
+    ) services;
+  }) (removeAttrs groupedData [ "Networking" ]);
 
   mkSvc = name: icon: href: desc: {
     "${name}" = {
@@ -40,52 +47,7 @@ let
     fritzbox = "http://192.168.178.1";
 
     homepage = "https://home.lan";
-
-    adguard = "https://dns.home.lan";
     tailscale = "https://login.tailscale.com/admin/machines";
-    gluetun = "https://vpn.home.lan";
-
-    grafana = "https://monitor.home.lan";
-    glances = "https://glances.home.lan";
-    vnstat = "https://vnstat.home.lan";
-
-    transfer-sh = "https://transfer.home.lan";
-    node-red = "https://flow.home.lan";
-
-    immich = "https://immich.home.lan";
-    jellyfin = "https://jellyfin.home.lan";
-
-    lidarr = "https://lidarr.home.lan";
-    slskd = "https://slskd.home.lan";
-    qbittorrent = "https://torrent.home.lan";
-
-    papra = "https://papra.home.lan";
-    gitea = "https://git.home.lan";
-    ebk = "https://finance.home.lan";
-  };
-
-  icons = {
-    caddy = "caddy";
-    adguard = "adguard-home";
-    tailscale = "tailscale";
-    gluetun = "gluetun";
-
-    grafana = "grafana";
-    glances = "glances";
-    vnstat = "mdi-chart-timeline-variant";
-
-    immich = "immich";
-    jellyfin = "jellyfin";
-    lidarr = "lidarr";
-    slskd = "slskd";
-    qbittorrent = "qbittorrent";
-
-    papra = "papra";
-    gitea = "gitea";
-    ebk = "ezbookkeeping";
-
-    transfer-sh = "https://avatars.githubusercontent.com/u/5444419?s=48&v=4";
-    node-red = "https://avatars.githubusercontent.com/u/5375661?s=48&v=4";
   };
 
   # homepage settings
@@ -122,19 +84,10 @@ let
         style = "column";
         columns = 4;
 
-        "Networking" = {
-          style = "column";
-        };
-        "Monitoring" = {
-          style = "column";
-        };
-        "Services" = {
-          style = "column";
-        };
-
-        "System Monitor" = {
-          style = "column";
-        };
+        "Networking".style = "column";
+        "Monitoring".style = "column";
+        "Services".style = "column";
+        "System Monitor".style = "column";
       };
     };
   };
@@ -159,28 +112,6 @@ let
         showSearchSuggestions = true;
       };
     }
-    /*
-      {
-        datetime = {
-          format = {
-            date = "long";
-            time = "short";
-            hour12 = false;
-          };
-        };
-      }
-    */
-    /*
-      {
-        openmeteo = {
-          label = "Weather";
-          latitude = "52.52";
-          longitude = "13.40";
-          units = "metric";
-          cache = 5;
-        };
-      }
-    */
   ];
 
   homepageServices = [
@@ -188,7 +119,7 @@ let
       "Networking" = [
         {
           "Caddy" = {
-            icon = icons.caddy;
+            icon = "caddy";
             href = globalAddress.homepage;
             description = "Server Reverse Proxy";
             widget = {
@@ -199,9 +130,9 @@ let
         }
         {
           "AdGuard Home" = {
-            icon = config.myServices.adguard.icon;
-            href = config.myServices.adguard.href;
-            description = config.myServices.adguard.description;
+            icon = config.myServices.adguard.serviceConfig.icon;
+            href = config.myServices.adguard.serviceConfig.href;
+            description = config.myServices.adguard.serviceConfig.description;
             widget = {
               type = "adguard";
               url = "${hostInt}:${toString config.myServices.adguard.port}";
@@ -210,7 +141,7 @@ let
         }
         {
           "Tailscale" = {
-            icon = icons.tailscale;
+            icon = "tailscale";
             href = globalAddress.tailscale;
             description = "Bridge Internal Network";
             widget = {
@@ -222,9 +153,9 @@ let
         }
         {
           "Gluetun / VPN" = {
-            icon = icons.gluetun;
-            href = globalAddress.gluetun;
-            description = "Server VPN Provider";
+            icon = config.myServices.gluetun.serviceConfig.icon;
+            href = config.myServices.gluetun.serviceConfig.icon;
+            description = config.myServices.gluetun.serviceConfig.description;
             widget = {
               type = "gluetun";
               url = "${hostInt}:${toString ports.gluetun}";
@@ -235,36 +166,9 @@ let
         }
       ];
     }
-    {
-      "Apps" = [
-        (mkSvc "transfer.sh" icons.transfer-sh globalAddress.transfer-sh "Convenient File Transfer")
-        (mkSvc "Immich" icons.immich globalAddress.immich "Photo Management System")
-        (mkSvc "Jellyfin" icons.jellyfin globalAddress.jellyfin "Universal Media Server")
-        (mkSvc "Papra" "papra" globalAddress.papra "Document Management System")
-        (mkSvc "Gitea" "gitea" globalAddress.gitea "Selfhosted DevOps Platform")
-        (mkSvc "ezBookkeeping" "ezbookkeeping" globalAddress.ebk "Personal Finance Management")
-        (mkSvc "Linkwarden" "linkwarden" globalAddress.ebk "Bookmark Management")
-      ];
-    }
-    {
-      "Restricted" = [
-        (mkSvc "Lidarr" "lidarr" globalAddress.lidarr "Music Tracker / Downloader")
-        (mkSvc "qBittorrent" "qbittorrent" globalAddress.qbittorrent "Torrent / Magnet Management")
-        (mkSvc "Slskd" "slskd" globalAddress.slskd "Soulseek Network Integration")
-      ];
-    }
-    {
-      "Monitoring" = [
-        (mkSvc "Glances" "glances" globalAddress.glances "Server Usage Statistics")
-        (mkSvc "Grafana" "grafana" globalAddress.grafana "Container / Monitoring Dashboard")
-        (mkSvc "VNStat" icons.vnstat globalAddress.vnstat "VNStat Dashboard")
-      ];
-    }
-    {
-      "Services" = [
-        (mkSvc "Node-RED" icons.node-red globalAddress.node-red "Automation Flow System")
-      ];
-    }
+  ]
+  ++ autoGroups
+  ++ [
     {
       "System Monitor" = [
         (mkGlance "Info" "info" null)
@@ -293,20 +197,25 @@ let
   ];
 in
 {
-  home.file =
-    lib.mapAttrs'
-      (name: value: {
-        name = "containers/homepage/${name}.yaml";
-        value = {
-          source = settingsFormat.generate "${name}.yaml" value;
-        };
-      })
-      {
-        settings = homepageSettings;
-        widgets = homepageWidgets;
-        services = homepageServices;
-        bookmarks = homepageBookmarks;
-      };
+
+  myServices.homepage = {
+    containerConfig = {
+      files =
+        lib.mapAttrs'
+          (name: value: {
+            name = "${name}.yaml";
+            value = {
+              source = (pkgs.formats.yaml { }).generate "${name}.yaml" value;
+            };
+          })
+          {
+            settings = homepageSettings;
+            widgets = homepageWidgets;
+            services = homepageServices;
+            bookmarks = homepageBookmarks;
+          };
+    };
+  };
 
   age.secrets =
     let
@@ -356,10 +265,18 @@ in
             "/run/user/10000/podman/podman.sock:/run/podman/podman.sock:ro,U"
 
             # config
-            "${config.home.homeDirectory}/containers/homepage/settings.yaml:/app/config/settings.yaml:ro,U"
-            "${config.home.homeDirectory}/containers/homepage/widgets.yaml:/app/config/widgets.yaml:ro,U"
-            "${config.home.homeDirectory}/containers/homepage/services.yaml:/app/config/services.yaml:ro,U"
-            "${config.home.homeDirectory}/containers/homepage/bookmarks.yaml:/app/config/bookmarks.yaml:ro,U"
+            "${
+              config.myServices.homepage.containerConfig.files."settings.yaml".fullPath
+            }:/app/config/settings.yaml:ro,U"
+            "${
+              config.myServices.homepage.containerConfig.files."widgets.yaml".fullPath
+            }:/app/config/widgets.yaml:ro,U"
+            "${
+              config.myServices.homepage.containerConfig.files."services.yaml".fullPath
+            }:/app/config/services.yaml:ro,U"
+            "${
+              config.myServices.homepage.containerConfig.files."bookmarks.yaml".fullPath
+            }:/app/config/bookmarks.yaml:ro,U"
 
             # background
             "${./assets/background-fullres-compressed.jpg}:/app/public/images/background.jpg:ro"

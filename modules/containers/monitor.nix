@@ -276,7 +276,7 @@ in
             grafana-log = config.myServices.grafana.containerConfig.volumes.grafana-log;
 
             prometheus-data = config.myServices.prometheus.containerConfig.volumes.prometheus-data;
-            loki-data = config.myServices.prometheus.containerConfig.volumes.loki-data;
+            loki-data = config.myServices.loki.containerConfig.volumes.loki-data;
           };
 
       containers.grafana = {

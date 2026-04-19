@@ -45,20 +45,6 @@ in
     };
   };
 
-  systemd.tmpfiles.rules = [
-    "Z /etc/certs 0400 ${uid} ${gid} -"
-
-    "d /certs 0755 ${uid} ${gid} -"
-    "Z /certs 0755 ${uid} ${gid} -"
-
-    "d /opt 0755 ${uid} ${gid} -"
-    "d /media 0755 ${uid} ${gid} -"
-    "d /data 0755 ${uid} ${gid} -"
-
-    "d /bak 0755 ${uid} ${gid} -"
-    "d /bak/opt 0755 ${uid} ${gid} -"
-  ];
-
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;

@@ -105,7 +105,6 @@ in
     containerConfig = {
       files."AdGuardHome.yaml" = {
         source = (pkgs.formats.yaml { }).generate "AdGuardHome.yaml" adguardSettings;
-        copyToVolume = [ { volume = config.myServices.adguard.containerConfig.volumes.adguard-conf; } ];
       };
 
       volumes = {
