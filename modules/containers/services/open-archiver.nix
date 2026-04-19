@@ -10,7 +10,6 @@ let
   openArchiverVersion = "latest";
 in
 {
-
   age.secrets =
     let
       mkSecret = name: {
@@ -20,7 +19,7 @@ in
       };
     in
     {
-      meily-key = mkSecret "archiver/e_meili-key";
+      archiver-meily-key = mkSecret "archiver/e_meili-key";
       encrypt-key = mkSecret "archiver/e_encrypt-key";
       jwt-secret = mkSecret "archiver/e_jwt-secret";
     };
@@ -113,6 +112,7 @@ in
           environments = {
             NODE_ENV = "production";
 
+            # backend configuration
             PORT_BACKEND = "4000";
 
             NEXT_PUBLIC_API_URL = "http://127.0.0.1:4000";
@@ -121,8 +121,10 @@ in
             PROTOCOL_HEADER = "x-forwarded-proto";
             HOST_HEADER = "x-forwarded-host";
 
+            # frontend
             PORT_FRONTEND = "3000";
 
+            # connections
             DATABASE_URL = "postgresql://archiver:archiver@host.containers.internal:${toString ports.postgres}/open-archiver";
             POSTGRES_DB = "open-archiver";
             POSTGRES_USER = "archiver";
@@ -135,9 +137,11 @@ in
             MEILI_HOST = "http://open-archiver-meili:7700";
             MEILI_INDEXING_BATCH = "500";
 
+            # storage
             STORAGE_TYPE = "local";
             STORAGE_LOCAL_ROOT_PATH = "/data";
 
+            # secrets
             JWT_EXPIRES_IN="1y";
           };
 

@@ -137,6 +137,11 @@ let
       policy = "one_factor";
       group = "users";
     };
+
+    link = {
+      port = ports.linkwarden;
+      policy = "bypass";
+    };
   };
 
   autheliaRules = [

@@ -57,6 +57,7 @@ in
   "auth/clients/s_ebk.age".publicKeys = allKeys;
   "auth/clients/e_ebk.age".publicKeys = allKeys;
   "auth/clients/s_grafana.age".publicKeys = allKeys;
+  "auth/clients/e_link.age".publicKeys = allKeys;
   "auth/clients/s_papra.age".publicKeys = allKeys;
 
   # ebk
@@ -74,6 +75,10 @@ in
   "ldap/s_admin-pass.age".publicKeys = allKeys;
   "ldap/s_jwt-secret.age".publicKeys = allKeys;
   "ldap/s_key-seed.age".publicKeys = allKeys;
+
+  # linkwarden
+  "link/e_meili-key.age".publicKeys = allKeys;
+  "link/e_link-meili-key.age".publicKeys = allKeys;
 
   # papra
   "papra/e_auth-secret.age".publicKeys = allKeys;
