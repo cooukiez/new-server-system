@@ -1,6 +1,7 @@
 {
   config,
   ports,
+  envSecretsPrefix,
   ...
 }:
 let
@@ -15,10 +16,11 @@ in
       mkSecret = name: {
         file = ../../../secrets/${name}.age;
         path = "${envSecretsPrefix}/${name}";
+        mode = "444";
       };
     in
     {
-      meily-key = mkSecret "archiver/e_meili_key";
+      meily-key = mkSecret "archiver/e_meili-key";
       encrypt-key = mkSecret "archiver/e_encrypt-key";
       jwt-secret = mkSecret "archiver/e_jwt-secret";
     };
@@ -40,6 +42,12 @@ in
       };
 
       containers.open-archiver-meili = {
+        autoStart = true;
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
+        };
+
         containerConfig = {
           image = "docker.io/getmeili/meilisearch:${meiliSearchVersion}";
           name = "open-archiver-meili";
@@ -49,9 +57,9 @@ in
             MEILI_NO_ANALYTICS = "true";
           };
 
-          environmentFiles = {
-            "secrets/archiver/e_meili_key"
-          };
+          environmentFiles = [
+            "secrets/archiver/e_meili-key"
+          ];
         };
       };
 
@@ -67,6 +75,12 @@ in
           name = "open-archiver-redis";
           networks = [ "open-archiver-net" ];
 
+          exec = [
+            "valkey-server"
+            "--requirepass"
+            "archiver"
+          ];
+
           volumes = [
             "/etc/timezone:/etc/timezone:ro"
             "/etc/localtime:/etc/localtime:ro"
@@ -76,39 +90,62 @@ in
 
       containers.open-archiver = {
         autoStart = true;
+
+        unitConfig = {
+          Requires = [ "postgres.service" "open-archiver-meili.service" "open-archiver-redis.service" ];
+          After = [ "postgres.service" "open-archiver-meili.service" "open-archiver-redis.service" ];
+        };
+
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
+        };
+
         containerConfig = {
           image = "docker.io/logiclabshq/open-archiver:${openArchiverVersion}";
           name = "open-archiver";
           networks = [ "open-archiver-net" ];
-          
+
+          addHosts = [
+            "auth.home.lan:host-gateway"
+          ];
+
           environments = {
             NODE_ENV = "production";
+
+            PORT_BACKEND = "4000";
+
+            NEXT_PUBLIC_API_URL = "http://127.0.0.1:4000";
+            API_URL = "http://127.0.0.1:4000";
+
+            PROTOCOL_HEADER = "x-forwarded-proto";
+            HOST_HEADER = "x-forwarded-host";
+
             PORT_FRONTEND = "3000";
 
-            DATABASE_URL = "postgresql://host.containers.internal:${toString ports.postgres}/open_archiver";
+            DATABASE_URL = "postgresql://archiver:archiver@host.containers.internal:${toString ports.postgres}/open-archiver";
             POSTGRES_DB = "open-archiver";
-            POSTGRES_USER = "open-archiver";
-            POSTGRES_PASSWORD = "open-archiver";
-            
-            REDIS_HOST = "valkey";
+            POSTGRES_USER = "archiver";
+            POSTGRES_PASSWORD = "archiver";
+
+            REDIS_HOST = "open-archiver-redis";
             REDIS_PORT = "6379";
-            REDIS_PASSWORD = "";
+            REDIS_PASSWORD = "archiver";
 
             MEILI_HOST = "http://open-archiver-meili:7700";
             MEILI_INDEXING_BATCH = "500";
-            
-            ENCRYPTION_KEY = encryptionKey;
-            JWT_SECRET = jwtSecret;
 
             STORAGE_TYPE = "local";
             STORAGE_LOCAL_ROOT_PATH = "/data";
+
+            JWT_EXPIRES_IN="1y";
           };
 
-          environmentFiles = {
-            "secrets/archiver/e_meili_key"
+          environmentFiles = [
+            "secrets/archiver/e_meili-key"
             "secrets/archiver/e_encrypt-key"
             "secrets/archiver/e_jwt-secret"
-          };
+          ];
 
           volumes = [
             "${volumes.open-archiver-data.ref}:/data"

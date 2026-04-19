@@ -239,6 +239,11 @@ in
       containers.ebk = {
         autoStart = true;
 
+        unitConfig = {
+          Requires = [ "postgres.service" ];
+          After = [ "postgres.service" ];
+        };
+
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";

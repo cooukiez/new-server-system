@@ -134,7 +134,8 @@ let
 
     archiver = {
       port = ports.open-archiver;
-      policy = "bypass";
+      policy = "one_factor";
+      group = "users";
     };
   };
 

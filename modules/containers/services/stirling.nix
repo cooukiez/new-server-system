@@ -59,7 +59,7 @@ in
           volumes = [
             "/etc/timezone:/etc/timezone:ro"
             "/etc/localtime:/etc/localtime:ro"
-            
+
             "${volumes.stirling-config.ref}:/configs"
             "${volumes.stirling-tessdata.ref}:/usr/share/tessdata"
             "${volumes.stirling-pipeline.ref}:/pipeline"

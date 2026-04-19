@@ -27,6 +27,7 @@ let
       dbs = [ "lldap" ];
       pass = "lldap";
     }
+
     {
       name = "gitea";
       user = "gitea";
@@ -39,6 +40,13 @@ let
       dbs = [ "ebk" ];
       pass = "ebk";
     }
+    {
+      name = "open-archiver";
+      user = "archiver";
+      dbs = [ "open-archiver" ];
+      pass = "archiver";
+    }
+
     {
       name = "lidarr";
       user = "lidarr";

@@ -131,6 +131,12 @@ in
       # main immich server
       containers.immich-server = {
         autoStart = true;
+
+        unitConfig = {
+          Requires = [ "immich-ml.service" "immich-redis.service" "immich-postgres.service" ];
+          After = [ "immich-ml.service" "immich-redis.service" "immich-postgres.service" ];
+        };
+
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";

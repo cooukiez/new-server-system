@@ -94,5 +94,5 @@
   borg = 8081;
 
   stirling = 9010;
-  open-arciver = 3010;
+  open-archiver = 3010;
 }
