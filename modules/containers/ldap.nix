@@ -15,6 +15,26 @@ let
   lldapVersion = "stable";
 in
 {
+  myServices.lldap = {
+    serviceConfig = {
+      description = "Global User Management";
+      serviceType = "Services";
+
+      subdomain = "ldap";
+      port = ports.lldap;
+
+      policy = "bypass";
+
+      icon = "lldap";
+    };
+
+    containerConfig = {
+      volumes = {
+        lldap-data = "/opt/lldap/data";
+      };
+    };
+  };
+
   age.secrets = {
     lldap-jwt.file = ../../secrets/ldap/s_jwt-secret.age;
     lldap-seed.file = ../../secrets/ldap/s_key-seed.age;
@@ -30,7 +50,7 @@ in
     {
       volumes.lldap-data.volumeConfig = {
         type = "bind";
-        device = "/opt/lldap/data";
+        device = config.myServices.lldap.containerConfig.volumes.lldap-data;
       };
 
       containers.lldap = {

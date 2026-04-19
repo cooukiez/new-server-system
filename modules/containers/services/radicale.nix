@@ -11,8 +11,6 @@
   ...
 }:
 let
-  settingsFormat = pkgs.formats.ini { };
-
   radicaleImageVersion = "master";
 
   # radicale settings
@@ -49,8 +47,28 @@ let
   };
 in
 {
-  home.file."containers/radicale/config" = {
-    source = settingsFormat.generate "config" radicaleSettings;
+  myServices.radicale = {
+    serviceConfig = {
+      description = "Lightweight Cal / Card DAV";
+      serviceType = "Apps";
+
+      subdomain = "dav";
+      port = ports.radicale;
+
+      policy = "bypass";
+
+      icon = "radicale";
+    };
+
+    containerConfig = {
+      files."config" = {
+        source = (pkgs.formats.ini { }).generate "config" radicaleSettings;
+      };
+
+      volumes = {
+        radicale-data = "/opt/radicale/data";
+      };
+    };
   };
 
   age.secrets =
@@ -91,7 +109,7 @@ in
 
       volumes.radicale-data.volumeConfig = {
         type = "bind";
-        device = "/opt/radicale/data";
+        device = config.myServices.radicale.containerConfig.volumes.radicale-data;
       };
 
       containers.radicale = {
@@ -132,7 +150,7 @@ in
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # config
-            "${config.home.homeDirectory}/containers/radicale/config:/etc/radicale/config:ro,U"
+            "${config.myServices.radicale.containerConfig.files."config".fullPath}:/etc/radicale/config:ro,U"
 
             # secrets
             "${config.age.secrets.radicale-ldap-pw.path}:/run/secrets/LDAP_PASSWORD:ro"

@@ -25,6 +25,29 @@ in
     musicPath = musicPath;
   };
 
+  myServices.jellyfin = {
+    serviceConfig = {
+      description = "Universal Media Serve";
+      serviceType = "Apps";
+
+      subdomain = "jellyfin";
+      port = ports.jellyfin;
+
+      policy = "bypass";
+
+      icon = "jellyfin";
+    };
+
+    containerConfig = {
+      volumes = {
+        jellyfin-config = "/opt/jellyfin/config";
+        jellyfin-data = "/opt/jellyfin/data";
+        jellyfin-cache = "/opt/jellyfin/cache";
+        jellyfin-log = "/opt/jellyfin/log";
+      };
+    };
+  };
+
   virtualisation.quadlet =
     let
       inherit (config.virtualisation.quadlet) volumes networks pods;
@@ -50,22 +73,22 @@ in
       # jellyfin volumes
       volumes.jellyfin-config.volumeConfig = {
         type = "bind";
-        device = "/opt/jellyfin/config";
+        device = config.myServices.jellyfin.containerConfig.volumes.jellyfin-config;
       };
 
       volumes.jellyfin-data.volumeConfig = {
         type = "bind";
-        device = "/opt/jellyfin/data";
+        device = config.myServices.jellyfin.containerConfig.volumes.jellyfin-data;
       };
 
       volumes.jellyfin-cache.volumeConfig = {
         type = "bind";
-        device = "/opt/jellyfin/cache";
+        device = config.myServices.jellyfin.containerConfig.volumes.jellyfin-cache;
       };
 
       volumes.jellyfin-log.volumeConfig = {
         type = "bind";
-        device = "/opt/jellyfin/log";
+        device = config.myServices.jellyfin.containerConfig.volumes.jellyfin-log;
       };
 
       containers.jellyfin = {

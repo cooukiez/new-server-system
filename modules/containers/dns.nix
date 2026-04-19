@@ -135,6 +135,14 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            # adguardhome requires read and write
+            "${pkgs.coreutils}/bin/cp ${
+              config.myServices.adguard.containerConfig.files."AdGuardHome.yaml".fullPath
+            } /opt/adguardhome/conf/AdGuardHome.yaml"
+            "${pkgs.coreutils}/bin/chmod 644 /opt/adguardhome/conf/AdGuardHome.yaml"
+          ];
         };
 
         containerConfig = {

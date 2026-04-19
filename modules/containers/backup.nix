@@ -15,6 +15,27 @@ let
   redisVersion = "alpine";
 in
 {
+  myServices.borg-backup = {
+    serviceConfig = {
+      description = "Backup Management System";
+      serviceType = "Services";
+
+      subdomain = "bak";
+      port = ports.borg;
+
+      policy = "bypass";
+
+      icon = "borg-backup";
+    };
+
+    containerConfig = {
+      volumes = {
+        borg-data = "/opt/borg/data";
+        borg-cache = "/opt/borg/cache";
+      };
+    };
+  };
+
   virtualisation.quadlet =
     let
       inherit (config.virtualisation.quadlet) volumes networks pods;
@@ -39,12 +60,12 @@ in
       # borg volumes
       volumes.borg-data.volumeConfig = {
         type = "bind";
-        device = "/opt/borg/data";
+        device = config.myServices.borg-backup.containerConfig.volumes.borg-data;
       };
 
       volumes.borg-cache.volumeConfig = {
         type = "bind";
-        device = "/opt/borg/cache";
+        device = config.myServices.borg-backup.containerConfig.volumes.borg-cache;
       };
 
       # borg redis

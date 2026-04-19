@@ -169,59 +169,6 @@ in
             ) serviceCfg.containerConfig.files
           ) config.myServices;
 
-          # files in container directories
-          systemd.user.services."file-provisioner" =
-            let
-              allFiles = lib.flatten (
-                lib.mapAttrsToList (
-                  serviceName: serviceCfg:
-                  lib.mapAttrsToList (fileName: fileCfg: fileCfg) serviceCfg.containerConfig.files
-                ) config.myServices
-              );
-
-              filesToCopy = lib.filter (f: f.copyToVolume != [ ]) allFiles;
-
-              provisionScript = pkgs.writeShellScript "provision-container-files" ''
-                ${lib.concatMapStringsSep "\n" (
-                  file:
-                  lib.concatMapStringsSep "\n" (dest: ''
-                    echo "Provisioning ${file.name} to ${dest.volume}..."
-                    ${pkgs.coreutils}/bin/cp -f "${file.fullPath}" "${dest.volume}"
-                    ${pkgs.coreutils}/bin/chmod ${dest.mode} "${dest.volume}/${file.name}"
-                  '') file.copyToVolume
-                ) filesToCopy}
-              '';
-
-              # run every time
-              timestamp = toString /.;
-            in
-            {
-              Unit = {
-                Description = "Provision configuration files to container volumes";
-                Before = [ "podman.service" ];
-              };
-
-              Service = {
-                Type = "oneshot";
-                ExecStart = "${provisionScript}";
-                RemainAfterExit = true;
-              };
-
-              Install = {
-                WantedBy = [ "default.target" ];
-              };
-            };
-
-          virtualisation.quadlet =
-            let
-              inherit (config.virtualisation.quadlet) volumes networks pods;
-            in
-            {
-              networks = {
-                internal.networkConfig.subnets = [ "10.1.1.1/24" ];
-              };
-            };
-
           systemd.user.services."podman-user-wait-network-online" = lib.mkForce {
             Unit.Description = "Replacement podman-user-wait-network-online to prevent quadlet hang";
             Service = {

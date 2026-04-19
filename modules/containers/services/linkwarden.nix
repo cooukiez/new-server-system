@@ -16,6 +16,27 @@ let
   linkwardenVersion = "latest";
 in
 {
+  myServices.linkwarden = {
+    serviceConfig = {
+      description = "Bookmark Management System";
+      serviceType = "Apps";
+
+      subdomain = "links";
+      port = ports.linkwarden;
+
+      policy = "bypass";
+
+      icon = "linkwarden";
+    };
+
+    containerConfig = {
+      volumes = {
+        linkwarden-data = "/opt/linkwarden/data";
+        linkwarden-meili = "/opt/linkwarden/meili";
+      };
+    };
+  };
+
   age.secrets =
     let
       mkSecret = name: {
@@ -43,14 +64,14 @@ in
         };
       };
 
-      volumes.linkwarden-data.volumeConfig = {
-        type = "bind";
-        device = "/opt/linkwarden/data";
-      };
-
       volumes.linkwarden-meili.volumeConfig = {
         type = "bind";
-        device = "/opt/linkwarden/meili";
+        device = config.myServices.linkwarden.containerConfig.volumes.linkwarden-meili;
+      };
+
+      volumes.linkwarden-data.volumeConfig = {
+        type = "bind";
+        device = config.myServices.linkwarden.containerConfig.volumes.linkwarden-data;
       };
 
       containers.linkwarden-meili = {

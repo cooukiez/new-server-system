@@ -14,19 +14,39 @@ let
   qBittorrentVersion = "latest";
 in
 {
+  myServices.qbittorrent = {
+    serviceConfig = {
+      description = "Torrent / Magnet Management";
+      serviceType = "Restricted";
+
+      subdomain = "torrent";
+      port = ports.qbittorrent;
+
+      policy = "bypass";
+
+      icon = "qbittorrent";
+    };
+
+    containerConfig = {
+      volumes = {
+        qbittorrent-config = "/opt/qbittorrent/data";
+      };
+    };
+  };
+
   virtualisation.quadlet =
     let
       inherit (config.virtualisation.quadlet) volumes networks pods;
     in
     {
-      volumes.qbittorrent-config.volumeConfig = {
-        type = "bind";
-        device = "/opt/qbittorrent/data";
-      };
-
       volumes.qbittorrent-download.volumeConfig = {
         type = "bind";
         device = "/media/download/qbittorrent";
+      };
+
+      volumes.qbittorrent-config.volumeConfig = {
+        type = "bind";
+        device = config.myServices.qbittorrent.containerConfig.volumes.qbittorrent-config;
       };
 
       containers.qbittorrent = {

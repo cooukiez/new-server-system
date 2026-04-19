@@ -13,6 +13,27 @@ let
   nodeRedVersion = "latest";
 in
 {
+  myServices.node-red = {
+    serviceConfig = {
+      description = "Automation Flow System";
+      serviceType = "Services";
+
+      subdomain = "flow";
+      port = ports.node-red;
+
+      policy = "one_factor";
+      group = "admins";
+
+      icon = "https://avatars.githubusercontent.com/u/5375661?s=48&v=4";
+    };
+
+    containerConfig = {
+      volumes = {
+        node-red-data = "/opt/node-red/data";
+      };
+    };
+  };
+
   age.secrets =
     let
       mkSecret = name: {
@@ -20,9 +41,7 @@ in
         path = "${envSecretsPrefix}/${name}";
       };
     in
-    {
-
-    };
+    { };
 
   virtualisation.quadlet =
     let
@@ -31,7 +50,7 @@ in
     {
       volumes.node-red-data.volumeConfig = {
         type = "bind";
-        device = "/opt/node-red/data";
+        device = config.myServices.node-red.containerConfig.volumes.node-red-data;
       };
 
       containers.node-red = {
@@ -62,9 +81,7 @@ in
             GIT_SSL_CAINFO = "/certs/ca.crt";
           };
 
-          environmentFiles = [
-
-          ];
+          environmentFiles = [ ];
 
           volumes = [
             "/etc/timezone:/etc/timezone:ro"

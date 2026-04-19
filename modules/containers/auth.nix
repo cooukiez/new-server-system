@@ -13,8 +13,6 @@
   ...
 }:
 let
-  settingsFormat = pkgs.formats.yaml { };
-
   autheliaVersion = "latest";
 
   publicServices = lib.filterAttrs (_: svc: svc.serviceConfig != { }) config.myServices;
@@ -169,12 +167,28 @@ let
   };
 in
 {
-  imports = [
-    ./auth/users.nix
-  ];
+  myServices.authelia = {
+    serviceConfig = {
+      description = "OpenID Authentication System";
+      serviceType = "Apps";
 
-  home.file."containers/authelia/configuration.yml" = {
-    source = settingsFormat.generate "configuration.yml" autheliaSettings;
+      subdomain = "auth";
+      port = ports.authelia;
+
+      policy = "bypass";
+
+      icon = "authelia";
+    };
+
+    containerConfig = {
+      files."configuration.yml" = {
+        source = (pkgs.formats.yaml { }).generate "configuration.yml" autheliaSettings;
+      };
+
+      volumes = {
+        authelia-config = "/opt/authelia/config";
+      };
+    };
   };
 
   age.secrets = builtins.mapAttrs (_: name: {
@@ -194,7 +208,7 @@ in
 
       volumes.authelia-config.volumeConfig = {
         type = "bind";
-        device = "/opt/authelia/config";
+        device = config.myServices.authelia.containerConfig.volumes.authelia-config;
       };
 
       containers.authelia = {
@@ -210,13 +224,11 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/configuration.yml /opt/authelia/config/configuration.yml"
-            "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/users.yml /opt/authelia/config/users.yml"
-
+            "${pkgs.coreutils}/bin/cp ${
+              config.myServices.authelia.containerConfig.files."configuration.yml".fullPath
+            }/ /opt/authelia/config/configuration.yml"
             "${pkgs.yq-go}/bin/yq -i '.identity_providers.oidc.jwks[0].key = load_str(\"${config.age.secrets.auth-oidc-jwk.path}\")' /opt/authelia/config/configuration.yml"
-
             "${pkgs.coreutils}/bin/chmod 644 /opt/authelia/config/configuration.yml"
-            "${pkgs.coreutils}/bin/chmod 644 /opt/authelia/config/users.yml"
           ];
         };
 

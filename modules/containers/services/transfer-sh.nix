@@ -14,6 +14,26 @@ let
   transferSHVersion = "latest-noroot";
 in
 {
+  myServices.transfer-sh = {
+    serviceConfig = {
+      description = "Convenient File Transfer";
+      serviceType = "Apps";
+
+      subdomain = "transfer";
+      port = ports.transfer-sh;
+
+      policy = "bypass";
+
+      icon = "https://avatars.githubusercontent.com/u/5444419?s=48&v=4";
+    };
+
+    containerConfig = {
+      volumes = {
+        transfer-sh-data = "/opt/transfer-sh/data";
+      };
+    };
+  };
+
   virtualisation.quadlet =
     let
       inherit (config.virtualisation.quadlet) volumes networks pods;
@@ -21,7 +41,7 @@ in
     {
       volumes.transfer-sh-data.volumeConfig = {
         type = "bind";
-        device = "/opt/transfer-sh/data";
+        device = config.myServices.transfer-sh.containerConfig.volumes.transfer-sh-data;
       };
 
       containers.transfer-sh = {

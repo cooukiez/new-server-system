@@ -13,14 +13,33 @@
 let
   photosPath = "/media/photos";
 
-  dbPath = "/opt/immich/db";
-  mlCachePath = "/opt/immich/ml-cache";
-
   redisVersion = "alpine";
   immichDbVersion = "14-vectorchord0.5.3";
   immichVersion = "release";
 in
 {
+  myServices.immich = {
+    serviceConfig = {
+      description = "Photo Management System";
+      serviceType = "Apps";
+
+      subdomain = "immich";
+      port = ports.immich;
+
+      policy = "bypass";
+
+      icon = "immich";
+    };
+
+    containerConfig = {
+      volumes = {
+        immich-ml-cache = "/opt/immich/ml-cache";
+        immich-redis = "/opt/immich/redis";
+        immich-db = "/opt/immich/db";
+      };
+    };
+  };
+
   age.secrets = {
     immich-db-pw.file = ../../../secrets/s_postgres-pw.age;
   };
@@ -43,17 +62,17 @@ in
 
       volumes.immich-ml-cache.volumeConfig = {
         type = "bind";
-        device = mlCachePath;
+        device = config.myServices.immich.containerConfig.volumes.immich-ml-cache;
       };
 
       volumes.immich-redis.volumeConfig = {
         type = "bind";
-        device = mlCachePath;
+        device = config.myServices.immich.containerConfig.volumes.immich-redis;
       };
 
       volumes.immich-db.volumeConfig = {
         type = "bind";
-        device = dbPath;
+        device = config.myServices.immich.containerConfig.volumes.immich-db;
       };
 
       # machine learning container

@@ -23,6 +23,26 @@ let
   papraAuthPatchedPath = "${envSecretsSuffix}/papra/auth-client-config-patched";
 in
 {
+  myServices.papra = {
+    serviceConfig = {
+      description = "Document Management System";
+      serviceType = "Apps";
+
+      subdomain = "papra";
+      port = ports.papra;
+
+      policy = "bypass";
+
+      icon = "papra";
+    };
+
+    containerConfig = {
+      volumes = {
+        papra-data = "/opt/papra/data";
+      };
+    };
+  };
+
   home.file."${papraAuthUnpatchedPath}" = {
     text = ''
       AUTH_PROVIDERS_CUSTOMS=${papraAuthJson}
@@ -56,7 +76,7 @@ in
 
       volumes.papra-data.volumeConfig = {
         type = "bind";
-        device = "/opt/papra/data";
+        device = config.myServices.papra.containerConfig.volumes.papra-data;
       };
 
       containers.papra = {

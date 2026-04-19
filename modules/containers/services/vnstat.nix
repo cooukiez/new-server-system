@@ -14,6 +14,21 @@ let
   vnstatDashboardVersion = "latest";
 in
 {
+  myServices.vnstat = {
+    serviceConfig = {
+      description = "VNStat Dashboard";
+      serviceType = "Monitoring";
+
+      subdomain = "vnstat";
+      port = ports.vnstat;
+
+      policy = "one_factor";
+      group = "admins";
+
+      icon = "mdi-chart-timeline-variant";
+    };
+  };
+
   virtualisation.quadlet =
     let
       inherit (config.virtualisation.quadlet) volumes networks pods;

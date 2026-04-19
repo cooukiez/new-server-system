@@ -14,6 +14,26 @@ let
   giteaVersion = "1.25.5";
 in
 {
+  myServices.gitea = {
+    serviceConfig = {
+      description = "Selfhosted DevOps Platform";
+      serviceType = "Apps";
+
+      subdomain = "git";
+      port = ports.gitea;
+
+      policy = "bypass";
+
+      icon = "gitea";
+    };
+
+    containerConfig = {
+      volumes = {
+        gitea-data = "/opt/gitea/data";
+      };
+    };
+  };
+
   virtualisation.quadlet =
     let
       inherit (config.virtualisation.quadlet) volumes networks pods;
@@ -21,7 +41,7 @@ in
     {
       volumes.gitea-data.volumeConfig = {
         type = "bind";
-        device = "/opt/gitea/data";
+        device = config.myServices.gitea.containerConfig.volumes.gitea-data;
       };
 
       containers.gitea = {

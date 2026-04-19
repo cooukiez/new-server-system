@@ -10,6 +10,28 @@ let
   openArchiverVersion = "latest";
 in
 {
+  myServices.open-archiver = {
+    serviceConfig = {
+      description = "Mail Archiving System";
+      serviceType = "Apps";
+
+      subdomain = "archiver";
+      port = ports.open-archiver;
+
+      policy = "bypass";
+
+      icon = "open-archiver";
+    };
+
+    containerConfig = {
+      volumes = {
+        open-archiver-meili = "/opt/open-archiver/meili";
+        open-archiver-redis = "/opt/open-archiver/redis";
+        open-archiver-data = "/opt/open-archiver/data";
+      };
+    };
+  };
+
   age.secrets =
     let
       mkSecret = name: {
@@ -37,17 +59,17 @@ in
 
       volumes.open-archiver-meili.volumeConfig = {
         type = "bind";
-        device = "/opt/open-archiver/meili";
+        device = config.myServices.open-archiver.containerConfig.volumes.open-archiver-meili;
       };
 
       volumes.open-archiver-redis.volumeConfig = {
         type = "bind";
-        device = "/opt/open-archiver/redis";
+        device = config.myServices.open-archiver.containerConfig.volumes.open-archiver-redis;
       };
 
       volumes.open-archiver-data.volumeConfig = {
         type = "bind";
-        device = "/opt/open-archiver/data";
+        device = config.myServices.open-archiver.containerConfig.volumes.open-archiver-data;
       };
 
       containers.open-archiver-meili = {

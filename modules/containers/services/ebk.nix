@@ -13,10 +13,7 @@
   ...
 }:
 let
-  settingsFormat = pkgs.formats.ini { };
-
   ebkVersion = "latest";
-  ebkUID = "297607";
 
   # ezbookkeeping settings
   ebkSettings = {
@@ -205,8 +202,29 @@ let
   };
 in
 {
-  home.file."containers/ebk/ezbookkeeping.ini" = {
-    source = settingsFormat.generate "ezbookkeeping.ini" ebkSettings;
+  myServices.ebk = {
+    serviceConfig = {
+      description = "Personal Finance Management";
+      serviceType = "Apps";
+
+      subdomain = "finance";
+      port = ports.ebk;
+
+      policy = "bypass";
+
+      icon = "ezbookkeeping";
+    };
+
+    containerConfig = {
+      files."ezbookkeeping.ini" = {
+        source = (pkgs.formats.ini { }).generate "ezbookkeeping.ini" ebkSettings;
+      };
+
+      volumes = {
+        ebk-data = "/opt/ebk/data";
+        ebk-log = "/opt/ebk/log";
+      };
+    };
   };
 
   age.secrets =
@@ -228,12 +246,12 @@ in
     {
       volumes.ebk-data.volumeConfig = {
         type = "bind";
-        device = "/opt/ebk/data";
+        device = config.myServices.ebk.containerConfig.volumes.ebk-data;
       };
 
       volumes.ebk-log.volumeConfig = {
         type = "bind";
-        device = "/opt/ebk/log";
+        device = config.myServices.ebk.containerConfig.volumes.ebk-log;
       };
 
       containers.ebk = {
@@ -273,7 +291,9 @@ in
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # config
-            "${config.home.homeDirectory}/containers/ebk/ezbookkeeping.ini:/ezbookkeeping/conf/ezbookkeeping.ini:ro,U"
+            "${
+              config.myServices.ebk.containerConfig.files."ezbookkeeping.ini".fullPath
+            }:/ezbookkeeping/conf/ezbookkeeping.ini:ro,U"
 
             # secrets
             "${config.age.secrets.ebk-client-key.path}:/run/secrets/EBK_CLIENT_KEY:ro"

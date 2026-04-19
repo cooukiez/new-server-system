@@ -90,6 +90,27 @@ let
   '';
 in
 {
+  myServices.postgres = {
+    serviceConfig = {
+      description = "Centralized Relational Database";
+      serviceType = "Services";
+
+      subdomain = "db";
+      port = ports.pgadmin;
+
+      policy = "bypass";
+
+      icon = "postgresql";
+    };
+
+    containerConfig = {
+      volumes = {
+        postgres-data = "/opt/postgres/data";
+        pgadmin-data = "/opt/postgres/pgadmin";
+      };
+    };
+  };
+
   age.secrets =
     let
       mkSecret = name: {
@@ -128,12 +149,12 @@ in
 
       volumes.postgres-data.volumeConfig = {
         type = "bind";
-        device = "/opt/postgres/data";
+        device = config.myServices.postgres.containerConfig.volumes.postgres-data;
       };
 
       volumes.pgadmin-data.volumeConfig = {
         type = "bind";
-        device = "/opt/postgres/pgadmin";
+        device = config.myServices.postgres.containerConfig.volumes.pgadmin-data;
       };
 
       containers.postgres = {

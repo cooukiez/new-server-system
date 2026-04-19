@@ -122,29 +122,55 @@ let
   };
 in
 {
-  home.file."containers/lidarr/config.xml" = {
-    text = mkLidarrXml lidarrSettings;
-  };
+  myServices = {
+    lidarr = {
+      serviceConfig = {
+        description = "Music Tracker / Downloader";
+        serviceType = "Restricted";
 
-  home.file."containers/slskd/slskd.yml" = {
-    source = slskdSettingsFormat.generate "slskd.yml" slskdSettings;
-  };
+        subdomain = "lidarr";
+        port = ports.lidarr;
 
-  home.file."containers/lidarr/lidarr-lists.conf" = {
-    text = ''
-      server {
-        listen 80;
-        server_name localhost;
+        policy = "bypass";
 
-        location / {
-          root /lists;
-          autoindex on;
-          autoindex_exact_size off;
-          autoindex_localtime on;
-          default_type application/json;
-        }
-      }
-    '';
+        icon = "lidarr";
+      };
+
+      containerConfig = {
+        files."config.xml" = {
+          source = pkgs.writeText "config.xml" mkLidarrXml lidarrSettings;
+        };
+
+        volumes = {
+          lidarr-data = "/opt/lidarr/data";
+        };
+      };
+    };
+
+    slskd = {
+      serviceConfig = {
+        description = "Soulseek Network Integration";
+        serviceType = "Restricted";
+
+        subdomain = "slskd";
+        port = ports.slskd;
+
+        policy = "bypass";
+
+        icon = "slskd";
+      };
+
+      containerConfig = {
+        files."slskd.yml" = {
+          source = (pkgs.formats.yaml { }).generate "slskd.yml" slskdSettings;
+        };
+
+        volumes = {
+          slskd-data = "/opt/slskd/data";
+          slskd-download = "/media/download/slskd";
+        };
+      };
+    };
   };
 
   age.secrets =
@@ -167,22 +193,7 @@ in
     {
       volumes.lidarr-data.volumeConfig = {
         type = "bind";
-        device = "/opt/lidarr/data";
-      };
-
-      volumes.lidarr-lists.volumeConfig = {
-        type = "bind";
-        device = "/opt/lidarr/lists";
-      };
-
-      volumes.cmdarr-data.volumeConfig = {
-        type = "bind";
-        device = "/opt/cmdarr/data";
-      };
-
-      volumes.slskd-data.volumeConfig = {
-        type = "bind";
-        device = "/opt/slskd/data";
+        device = config.myServices.lidarr.containerConfig.volumes.lidarr-data;
       };
 
       volumes.slskd-download.volumeConfig = {
@@ -190,11 +201,15 @@ in
         device = "/media/download/slskd";
       };
 
+      volumes.slskd-data.volumeConfig = {
+        type = "bind";
+        device = config.myServices.slskd.containerConfig.volumes.slskd-data;
+      };
+
       containers.lidarr = {
         autoStart = true;
 
         unitConfig = {
-          # requires database
           Requires = [ "postgres.service" ];
           After = [ "postgres.service" ];
         };
@@ -203,7 +218,7 @@ in
           Restart = "always";
           RestartSec = "10";
           ExecStartPre = [
-            "${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/lidarr/config.xml /opt/lidarr/data/config.xml"
+            "${pkgs.coreutils}/bin/cp ${config.myServices.lidarr.containerConfig.files."config.xml".fullPath} /opt/lidarr/data/config.xml"
             "${pkgs.coreutils}/bin/chmod 644 /opt/lidarr/data/config.xml"
           ];
         };
@@ -242,43 +257,6 @@ in
           ];
         };
       };
-
-      /*
-        containers.cmdarr = {
-          autoStart = true;
-          serviceConfig = {
-            Restart = "always";
-            RestartSec = "10";
-          };
-
-          containerConfig = {
-            image = "docker.io/nginx:${lidarrListsNginxVersion}";
-            name = "cmdarr";
-            networks = [ "media-net" ];
-
-            environments = {
-              TZ = "Europe/Berlin";
-
-              LIDARR_URL = "http://lidarr:8686";
-            };
-
-            volumes = [
-              "/etc/timezone:/etc/timezone:ro"
-              "/etc/localtime:/etc/localtime:ro"
-
-              # certificates
-              "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
-              "/certs/ca.crt:/certs/ca.crt:ro"
-
-              "${volumes.cmdarr-data.ref}:/app/data:ro"
-            ];
-
-            publishPorts = [
-              "${toString ports.cmdarr}:8080/tcp"
-            ];
-          };
-        };
-      */
 
       containers.slskd = {
         autoStart = true;
@@ -325,7 +303,7 @@ in
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # config
-            "${config.home.homeDirectory}/containers/slskd/slskd.yml:/app/slskd.yml:ro"
+            "${config.myServices.slskd.containerConfig.files."slskd.yml".fullPath}:/app/slskd.yml:ro"
 
             # volumes
             "${volumes.slskd-data.ref}:/app"

@@ -18,24 +18,22 @@ let
 in
 {
   myServices = {
+    serviceConfig = {
+      description = "Server VPN Provider";
+      serviceType = "Networking";
+
+      subdomain = "vpn";
+      port = ports.gluetun-webui;
+
+      policy = "one_factor";
+      policy = "admins";
+
+      icon = "gluetun";
+    };
+
     gluetun = {
       volumes = {
         gluetun-data = "/opt/gluetun/data";
-      };
-    };
-
-    gluetun-webui = {
-      serviceConfig = {
-        description = "Server VPN Provider";
-        serviceType = "Networking";
-
-        subdomain = "vpn";
-        port = ports.gluetun-webui;
-
-        policy = "one_factor";
-        policy = "admins";
-
-        icon = "gluetun";
       };
     };
   };
