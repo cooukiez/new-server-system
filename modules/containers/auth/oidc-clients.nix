@@ -233,4 +233,32 @@
     userinfo_signed_response_alg = "none";
     token_endpoint_auth_method = "client_secret_post";
   }
+  {
+    client_id = "trek";
+    client_name = "TREK";
+    client_secret = "$pbkdf2-sha512$310000$vyE3uE/bQsfUDyLCSbaTAA$AGf1SOfIuV2lEefCpuTKjNlRsJ73q/6Dbi3KVNgCBTO0vVPXir5NqfBF628R/NGMZpTkaVdJNuP/dlO3/HcV2g";
+
+    public = false;
+    authorization_policy = "two_factor";
+    require_pkce = false;
+    pkce_challenge_method = "";
+
+    redirect_uris = [
+      "https://trek.home.lan/api/auth/callback/authelia"
+    ];
+
+    scopes = [
+      "openid"
+      "profile"
+      "email"
+      "groups"
+    ];
+
+    response_types = [ "code" ];
+    grant_types = [ "authorization_code" ];
+
+    access_token_signed_response_alg = "none";
+    userinfo_signed_response_alg = "none";
+    token_endpoint_auth_method = "client_secret_basic";
+  }
 ]

@@ -141,7 +141,7 @@ in
           ];
 
           publishPorts = [
-            "${toString ports.mail-archiver}:5000/tcp"
+            "${toString ports.mailArchiver}:5000/tcp"
           ];
         };
       };

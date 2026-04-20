@@ -99,7 +99,7 @@ in
           ];
 
           publishPorts = [
-            "${toString ports.node-red}:1880/tcp"
+            "${toString ports.nodeRed}:1880/tcp"
           ];
         };
       };
