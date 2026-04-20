@@ -54,27 +54,25 @@ in
   "auth/s_storage-key.age".publicKeys = allKeys;
 
   # auth clients
-  "auth/clients/e_ebk.age".publicKeys = allKeys;
-
   "auth/clients/s_ebk.age".publicKeys = allKeys;
   "auth/clients/s_grafana.age".publicKeys = allKeys;
   "auth/clients/e_link.age".publicKeys = allKeys;
   "auth/clients/e_mail-archiver.age".publicKeys = allKeys;
   "auth/clients/e_opengist.age".publicKeys = allKeys;
   "auth/clients/s_papra.age".publicKeys = allKeys;
+  "auth/clients/e_trek.age".publicKeys = allKeys;
 
   # ebk
-  "ebk/e_secret-key.age".publicKeys = allKeys;
-
   "ebk/s_secret-key.age".publicKeys = allKeys;
 
   # homepage
 
   # archiver
+  /*
   "archiver/e_meili-key.age".publicKeys = allKeys;
   "archiver/e_encrypt-key.age".publicKeys = allKeys;
   "archiver/e_jwt-secret.age".publicKeys = allKeys;
-
+  */
   "archiver/e_admin-pass.age".publicKeys = allKeys;
 
   # ldap

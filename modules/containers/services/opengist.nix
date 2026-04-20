@@ -89,6 +89,7 @@ in
             OG_DB_URI = "postgres://opengist:opengist@host.containers.internal:${toString ports.postgres}/opengist";
             OG_EXTERNAL_URL = config.myServices.opengist.serviceConfig.href;
 
+            # authelia oidc configuration
             OG_OIDC_PROVIDER_NAME = "authelia";
             OG_OIDC_CLIENT_KEY = "opengist";
             OG_OIDC_DISCOVERY_URL = "https://auth.home.lan/.well-known/openid-configuration";

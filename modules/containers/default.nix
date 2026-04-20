@@ -73,6 +73,7 @@ in
           ./services/immich.nix
           ./services/linkwarden.nix
           ./services/mail-archiver.nix
+          ./services/memos.nix
           ./services/node-red.nix
           ./services/opengist.nix
           ./services/papra.nix
@@ -80,6 +81,7 @@ in
           ./services/radicale.nix
           ./services/stirling.nix
           ./services/transfer-sh.nix
+          ./services/trek.nix
           ./services/vnstat.nix
 
           ./auth.nix

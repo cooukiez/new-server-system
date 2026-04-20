@@ -1,0 +1,121 @@
+/*
+  modules/containers/services/trek.nix
+  part of der-home-server
+*/
+
+{
+  config,
+  pkgs,
+  ports,
+  envSecretsPrefix,
+  ...
+}:
+let
+  trekVersion = "latest";
+in
+{
+  myServices.trek = {
+    serviceConfig = {
+      name = "TREK";
+      description = "Travel Tracking and Planning";
+      serviceType = "Apps";
+
+      subdomain = "trek";
+      port = ports.trek;
+
+      policy = "bypass";
+      icon = "https://avatars.githubusercontent.com/u/61554723?s=48&v=4";
+    };
+
+    containerConfig = {
+      volumes = {
+        trek-data = "/opt/trek/data";
+        trek-uploads = "/opt/trek/uploads";
+      };
+    };
+  };
+
+  age.secrets =
+    let
+      mkSecret = name: {
+        file = ../../../secrets/${name}.age;
+        path = "${envSecretsPrefix}/${name}";
+      };
+    in
+    {
+      trek-admin-password = mkSecret "trek/e_admin-password";
+    };
+
+  virtualisation.quadlet =
+    let
+      inherit (config.virtualisation.quadlet) volumes;
+    in
+    {
+      volumes.trek-data.volumeConfig = {
+        type = "bind";
+        device = config.myServices.trek.containerConfig.volumes.trek-data;
+      };
+
+      volumes.trek-uploads.volumeConfig = {
+        type = "bind";
+        device = config.myServices.trek.containerConfig.volumes.trek-uploads;
+      };
+
+      containers.trek = {
+        autoStart = true;
+
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
+        };
+
+        containerConfig = {
+          image = "docker.io/mauriceboe/trek:${trekVersion}";
+          name = "trek";
+
+          addHosts = [
+            "auth.home.lan:host-gateway"
+          ];
+
+          environments = {
+            TZ = "Europe/Berlin";
+
+            NODE_ENV = "production";
+            PORT = "3000";
+            APP_URL = config.myServices.trek.serviceConfig.href;
+
+            # ADMIN_EMAIL = "management.homeserver@mailbox.org"; 
+
+            # authelia oidc configuration
+            OIDC_ISSUER = "https://auth.home.lan/realms/main";
+            OIDC_CLIENT_ID = "trek";
+            
+            OIDC_DISPLAY_NAME = "Authelia";
+            OIDC_ONLY = "true";
+            OIDC_ADMIN_CLAIM = "groups";
+            OIDC_ADMIN_VALUE = "admins";
+          };
+
+          environmentFiles = [
+            "secrets/trek/e_admin-password"
+          ];
+
+          volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # certificates
+            "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
+            "/certs/ca.crt:/certs/ca.crt:ro"
+            
+            "${volumes.trek-data.ref}:/app/data:U"
+            "${volumes.trek-uploads.ref}:/app/uploads:U"
+          ];
+
+          publishPorts = [
+            "${toString ports.trek}:3000/tcp"
+          ];
+        };
+      };
+    };
+}

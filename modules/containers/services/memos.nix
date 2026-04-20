@@ -86,7 +86,7 @@ in
             MEMOS_DRIVER = "postgres";
             MEMOS_INSTANCE_URL = config.myServices.memos.serviceConfig.href;
             
-            MEMOS_DSN = "postgres://memos:memos@host.containers.internal:${toString ports.postgres}/memos";
+            MEMOS_DSN = "postgres://memos:memos@host.containers.internal:${toString ports.postgres}/memos?sslmode=disable";
 
             MEMOS_DATA = "/data";
           };
@@ -107,7 +107,7 @@ in
           ];
 
           publishPorts = [
-            "${toString ports.memosHttp}:5230/tcp"
+            "${toString ports.memos}:5230/tcp"
           ];
         };
       };

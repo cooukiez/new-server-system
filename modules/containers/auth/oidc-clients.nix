@@ -181,35 +181,8 @@
     token_endpoint_auth_method = "client_secret_post";
   }
   {
-    client_id = "mail-archiver";
-    client_name = "Mail-Archiver";
-    client_secret = "$pbkdf2-sha512$310000$HAJtQDSok3NZE7hORA1UHg$gaMZiME5KX4El4UcsllFgLf40wz36/ANgLuI1c/NAH2eeFDOtZFmh74mVqw/yAq93ZHieMN3PoHw4A/r3oP4yw";
-
-    public = false;
-    authorization_policy = "two_factor";
-    require_pkce = false;
-
-    redirect_uris = [
-      "https://mail.home.lan/oidc-signin-completed"
-    ];
-
-    scopes = [
-      "openid"
-      "profile"
-      "email"
-      "groups"
-    ];
-
-    response_types = [ "code" ];
-    grant_types = [ "authorization_code" ];
-
-    access_token_signed_response_alg = "none";
-    userinfo_signed_response_alg = "none";
-    token_endpoint_auth_method = "client_secret_post";
-  }
-  {
     client_id = "memos";
-    client_name = "memos";
+    client_name = "Memos";
     client_secret = "$pbkdf2-sha512$310000$uFbkn5MGHwfzwbAA27iV7Q$b78L0MN.V/9vTtuNkXagYRsaOUkicZJ2AFWtPqIPMbHcIUWgMKkg04fJhPqzTlSDi0XgV1Kr9.rpOzEWh1EVBQ";
 
     public = false;
