@@ -14,7 +14,7 @@
 }:
 let
   ebkVersion = "latest";
-  ebkSettings = (import ./ebk-config.nix).ebkSettings;
+  ebkSettings = (import ./ebk-config.nix { inherit config ports; }).ebkSettings;
 in
 {
   myServices.ebk = {

@@ -1,6 +1,6 @@
 {
   config,
-  ports
+  ports,
   ...
 }:
 {

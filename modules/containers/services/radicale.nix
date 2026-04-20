@@ -14,7 +14,7 @@
 }:
 let
   radicaleImageVersion = "master";
-  radicaleSettings = (import ./radicale-config.nix).radicaleSettings;
+  radicaleSettings = (import ./radicale-config.nix { inherit ports; }).radicaleSettings;
 in
 {
   myServices.radicale = {
