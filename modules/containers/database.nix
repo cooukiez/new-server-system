@@ -28,7 +28,6 @@ let
       pass = "lldap";
     }
 
-
     {
       name = "atuin";
       user = "atuin";
@@ -46,6 +45,12 @@ let
       user = "ebk";
       dbs = [ "ebk" ];
       pass = "ebk";
+    }
+    {
+      name = "mail-archiver";
+      user = "archiver";
+      dbs = [ "mail-archiver" ];
+      pass = "archiver";
     }
     {
       name = "open-archiver";

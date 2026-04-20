@@ -94,8 +94,11 @@
   borg = 8081;
 
   stirling = 9010;
+
   open-archiver = 3010;
+
   linkwarden = 3020;
+  mail-archiver = 5000;
 
   atuin = 8989;
 }

@@ -70,7 +70,7 @@ in
             ATUIN_HOST = "0.0.0.0";
             ATUIN_PORT = "8888";
 
-            ATUIN_OPEN_REGISTRATION  = "true";
+            ATUIN_OPEN_REGISTRATION = "true";
             ATUIN_DB_URI = "postgres://atuin:atuin@host.containers.internal:${toString ports.postgres}/atuin";
 
             RUST_LOG = "info,atuin_server=debug";

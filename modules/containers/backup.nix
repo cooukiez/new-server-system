@@ -70,7 +70,6 @@ in
         device = "/bak/git";
       };
 
-
       volumes.external-opt.volumeConfig = {
         type = "bind";
         device = "/bak/opt";
