@@ -5,6 +5,7 @@
 
 {
   config,
+  pkgs,
   ports,
   ...
 }:
@@ -36,7 +37,7 @@ in
 
   virtualisation.quadlet =
     let
-      inherit (config.virtualisation.quadlet) volumes;
+      inherit (config.virtualisation.quadlet) volumes networks pods;
     in
     {
       volumes.crontab-data.volumeConfig = {

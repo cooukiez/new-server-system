@@ -33,9 +33,9 @@
 
   services.cron = {
     enable = true;
-    extraConfig = ''
-      &include /home/squ/.crontab-ui/squ_crontab
-    '';
+    cronFiles = [
+      "&include /home/squ/.crontab-ui/squ_crontab"
+    ];
   };
 
   services.samba = {
