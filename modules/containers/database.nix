@@ -35,16 +35,22 @@ let
       pass = "atuin";
     }
     {
+      name = "ebk";
+      user = "ebk";
+      dbs = [ "ebk" ];
+      pass = "ebk";
+    }
+    {
       name = "gitea";
       user = "gitea";
       dbs = [ "gitea" ];
       pass = "gitea";
     }
     {
-      name = "ebk";
-      user = "ebk";
-      dbs = [ "ebk" ];
-      pass = "ebk";
+      name = "linkwarden";
+      user = "linkwarden";
+      dbs = [ "linkwarden" ];
+      pass = "linkwarden";
     }
     {
       name = "mail-archiver";
@@ -53,17 +59,19 @@ let
       pass = "archiver";
     }
     {
+      name = "opengist";
+      user = "opengist";
+      dbs = [ "opengist" ];
+      pass = "opengist";
+    }
+    /*
+    {
       name = "open-archiver";
       user = "archiver";
       dbs = [ "open-archiver" ];
       pass = "archiver";
     }
-    {
-      name = "linkwarden";
-      user = "linkwarden";
-      dbs = [ "linkwarden" ];
-      pass = "linkwarden";
-    }
+    */
 
     {
       name = "lidarr";

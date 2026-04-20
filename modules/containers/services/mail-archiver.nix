@@ -45,8 +45,7 @@ in
       };
     in
     {
-      archiver-admin-pass = mkSecret "archiver/e_admin-pass";
-      archiver-admin-pass = mkSecret "auth//e_client-key";
+      archiver-client-key = mkSecret "auth/clients/e_mail-archiver";
     };
 
   virtualisation.quadlet =
@@ -87,6 +86,8 @@ in
             ConnectionStrings__DefaultConnection = "Host=host.containers.internal;Port=5432;Database=mail-archiver;Username=archiver;Password=archiver";
 
             Authentication__Username = "admin";
+            # will be replaced at first login
+            Authentication__Password = "admin";
             Authentication__SessionTimeoutMinutes = "60";
 
             BandwidthTracking__Enabled = "false";
@@ -104,21 +105,28 @@ in
             # authelia oidc configuration
             OAuth__Enabled = "true";
             OAuth__Authority = "https://auth.home.lan";
-            OAuth__ClientId = "mail-archiver";        
-            
+            OAuth__ClientId = "mail-archiver";
+
             # scopes defined as indexed keys
             OAuth__ClientScopes__0 = "openid";
             OAuth__ClientScopes__1 = "profile";
             OAuth__ClientScopes__2 = "email";
             OAuth__ClientScopes__3 = "groups";
 
-            OAuth__DisablePasswordLogin = "false";
-            
+            Kestrel__Limits__MaxRequestHeadersTotalSize = "65536";
+            Kestrel__Limits__MaxRequestHeaderFieldSize = "32768";
+            Kestrel__Endpoints__Http__Url = "http://0.0.0.0:5000";
+
+            OAuth__DisablePasswordLogin = "true";
+            OAuth__AutoApproveUsers = "true";
+
+            # automatic admins
+            OAuth__AdminEmails__0 = "management.homeserver@mailbox.org";
+            OAuth__AdminEmails__1 = "ludwig.geyer@mailbox.org";
           };
 
           environmentFiles = [
-            "secrets/archiver/e_admin-pass"
-            "secrets/archiver/e_client-key"
+            "secrets/auth/clients/e_mail-archiver"
           ];
 
           volumes = [

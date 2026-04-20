@@ -162,13 +162,14 @@
     require_pkce = false;
 
     redirect_uris = [
-      "https://mail-archive.home.lan/oidc-signin-completed"
+      "https://mail.home.lan/oidc-signin-completed"
     ];
 
     scopes = [
       "openid"
       "profile"
       "email"
+      "groups"
     ];
 
     response_types = [ "code" ];

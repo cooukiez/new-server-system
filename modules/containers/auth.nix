@@ -25,6 +25,10 @@ let
 
     server = {
       address = "tcp://0.0.0.0:9091";
+      buffers = {
+        read = 32768;
+        write = 32768;
+      };
     };
 
     log = {

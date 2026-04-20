@@ -50,6 +50,10 @@ in
             {
               # enable admin API
               admin 0.0.0.0:2019
+
+              servers {
+                max_header_size 32768
+              }
             }
 
             (my_tls) {

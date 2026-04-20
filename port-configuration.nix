@@ -100,5 +100,8 @@
   linkwarden = 3020;
   mail-archiver = 5000;
 
+  opengist = 2222;
+  opengistHttp = 6157;
+
   atuin = 8989;
 }
