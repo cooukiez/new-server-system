@@ -177,10 +177,4 @@ in
         };
       };
   };
-
-  # [get exec command]
-  # podman inspect --format '{{.Config.Entrypoint}} {{.Config.Cmd}}' <container_name_or_id>
-
-  # [find wrong permissions]
-  # sudo find /opt/ -maxdepth 4 ! -user 10000 -o ! -group 10000
 }

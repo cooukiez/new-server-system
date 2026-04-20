@@ -26,7 +26,7 @@ in
       port = ports.trek;
 
       policy = "bypass";
-      icon = "https://avatars.githubusercontent.com/u/61554723?s=48&v=4";
+      icon = "https://trek.home.lan/icons/icon-white.svg";
     };
 
     containerConfig = {
