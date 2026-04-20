@@ -24,8 +24,6 @@ in
         {
           options = {
             serviceConfig = lib.mkOption {
-              description = "Public service configuration";
-              default = null;
               type = lib.types.nullOr (
                 lib.types.submodule (
                   { config, ... }:
@@ -33,8 +31,8 @@ in
                     options = {
                       serviceName = lib.mkOption {
                         type = lib.types.str;
-                        readOnly = true;
                         default = serviceName;
+                        readOnly = true;
                       };
 
                       name = lib.mkOption {
@@ -52,8 +50,8 @@ in
                           "Monitoring"
                           "Services"
                         ];
+
                         default = "Apps";
-                        description = "The category this service belongs to on the homepage";
                       };
 
                       port = lib.mkOption { type = lib.types.int; };
@@ -61,21 +59,18 @@ in
                       subdomain = lib.mkOption {
                         type = lib.types.str;
                         default = "subdomain";
-                        description = "The external subdomain for the service";
                       };
 
                       domain = lib.mkOption {
                         type = lib.types.str;
-                        readOnly = true;
                         default = "${config.subdomain}.home.lan";
-                        description = "The external domain for the service (read-only)";
+                        readOnly = true;
                       };
 
                       href = lib.mkOption {
                         type = lib.types.str;
-                        readOnly = true;
                         default = "https://${config.domain}";
-                        description = "The external URL for the service (read-only)";
+                        readOnly = true;
                       };
 
                       policy = lib.mkOption {
@@ -84,14 +79,13 @@ in
                           "one_factor"
                           "two_factor"
                         ];
+
                         default = "one_factor";
-                        description = "Auth policy for the reverse proxy";
                       };
 
                       group = lib.mkOption {
                         type = lib.types.nullOr lib.types.str;
                         default = null;
-                        description = "LDAP group allowed to access this service";
                       };
 
                       icon = lib.mkOption { type = lib.types.str; };
@@ -99,12 +93,12 @@ in
                   }
                 )
               );
+
+              default = null;
             };
 
             containerConfig = {
               files = lib.mkOption {
-                description = "Configuration files for the container";
-                default = { };
                 type = lib.types.attrsOf (
                   lib.types.submodule (
                     { config, name, ... }:
@@ -117,59 +111,49 @@ in
 
                         source = lib.mkOption {
                           type = lib.types.either lib.types.path lib.types.package;
-                          description = "The source path or generated file derivation";
                         };
 
                         path = lib.mkOption {
                           type = lib.types.str;
-                          readOnly = true;
                           default = "containers/${serviceName}/${config.name}";
-                          description = "The relative path in home directory where the file is stored (read-only)";
+                          readOnly = true;
                         };
 
                         fullPath = lib.mkOption {
                           type = lib.types.str;
-                          readOnly = true;
                           default = "${homeDir}/${config.path}";
-                          description = "The absolute path where the file is stored (read-only)";
+                          readOnly = true;
                         };
 
                         copyToVolume = lib.mkOption {
-                          description = "List of volumes to copy the file to";
-                          default = [ ];
                           type = lib.types.listOf (
                             lib.types.submodule {
                               options = {
                                 volume = lib.mkOption {
                                   type = lib.types.str;
-                                  description = "The target volume name or pate";
-                                  example = "/opt/service/volume";
                                 };
 
                                 mode = lib.mkOption {
                                   type = lib.types.str;
                                   default = "0644";
-                                  description = "The permissions mode for chmod";
-                                  example = "0644";
                                 };
                               };
                             }
                           );
+
+                          default = [ ];
                         };
                       };
                     }
                   )
                 );
+
+                default = { };
               };
 
               volumes = lib.mkOption {
                 type = lib.types.attrsOf lib.types.str;
                 default = { };
-                description = "Mapping of volume names to host paths";
-
-                example = {
-                  volume-data = "/opt/service/volume";
-                };
               };
             };
           };
