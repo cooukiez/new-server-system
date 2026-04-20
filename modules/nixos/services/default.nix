@@ -31,6 +31,13 @@
     };
   };
 
+  services.cron = {
+    enable = true;
+    extraConfig = ''
+      &include /home/squ/.crontab-ui/squ_crontab
+    '';
+  };
+
   services.samba = {
     enable = true;
     openFirewall = true;

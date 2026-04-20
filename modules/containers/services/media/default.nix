@@ -19,6 +19,7 @@ in
 {
   imports = [
     ./music.nix
+    ./qbittorrent.nix
   ];
 
   _module.args = {

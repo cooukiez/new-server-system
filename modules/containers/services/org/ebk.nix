@@ -46,7 +46,7 @@ in
   age.secrets =
     let
       mkSecret = name: {
-        file = ../../../secrets/${name}.age;
+        file = ../../../../secrets/${name}.age;
         mode = "444";
       };
     in

@@ -39,7 +39,7 @@ in
   age.secrets =
     let
       mkSecret = name: {
-        file = ../../../secrets/${name}.age;
+        file = ../../../../secrets/${name}.age;
         path = "${envSecretsPrefix}/${name}";
         mode = "444";
       };

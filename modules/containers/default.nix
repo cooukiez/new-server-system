@@ -67,18 +67,19 @@ in
 
           ./services/media
 
+          ./services/org/ebk.nix
+          ./services/org/mail-archiver.nix
+          ./services/org/radicale.nix
+
           ./services/atuin.nix
-          ./services/ebk.nix
+          ./services/crontab.nix
           ./services/gitea.nix
           ./services/immich.nix
           ./services/linkwarden.nix
-          ./services/mail-archiver.nix
           ./services/memos.nix
           ./services/node-red.nix
           ./services/opengist.nix
           ./services/papra.nix
-          ./services/qbittorrent.nix
-          ./services/radicale.nix
           ./services/stirling.nix
           ./services/transfer-sh.nix
           ./services/trek.nix

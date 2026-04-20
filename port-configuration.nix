@@ -49,6 +49,7 @@
 
   # automization
   nodeRed = 1880;
+  crontab = 8030;
 
   # documents
   atuin = 8989;
