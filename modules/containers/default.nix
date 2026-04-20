@@ -72,6 +72,7 @@ in
           ./services/gitea.nix
           ./services/immich.nix
           ./services/linkwarden.nix
+          ./services/mail-archiver.nix
           ./services/node-red.nix
           ./services/open-archiver.nix
           ./services/papra.nix

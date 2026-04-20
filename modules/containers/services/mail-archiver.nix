@@ -72,7 +72,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/s1t5/mailarchiver:${openArchiverVersion}";
+          image = "docker.io/s1t5/mailarchiver:${mailArchiverVersion}";
           name = "mail-archiver";
 
           addHosts = [

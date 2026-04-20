@@ -70,6 +70,7 @@ in
   "archiver/e_meili-key.age".publicKeys = allKeys;
   "archiver/e_encrypt-key.age".publicKeys = allKeys;
   "archiver/e_jwt-secret.age".publicKeys = allKeys;
+  "archiver/e_admin-pass.age".publicKeys = allKeys;
 
   # ldap
   "ldap/s_admin-pass.age".publicKeys = allKeys;
