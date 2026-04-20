@@ -149,12 +149,6 @@ in
     ${builtins.concatStringsSep "\n" (map mkSql services)}
   '';
 
-  # [access postgres database]
-  # podman exec -it postgres psql -U admin -d app_db
-
-  # [run init script]
-  # cat ~/containers/postgres/init-all-db.sql | podman exec -i postgres psql -U admin -d postgres
-
   virtualisation.quadlet =
     let
       inherit (config.virtualisation.quadlet) volumes networks pods;

@@ -207,6 +207,33 @@
     token_endpoint_auth_method = "client_secret_post";
   }
   {
+    client_id = "opengist";
+    client_name = "Opengist";
+    client_secret = "$pbkdf2-sha512$310000$wX7aZ2/8eWwCdm6NRuIo9g$GZDOlfO39o9tB9m/97xbHC/HRQmXpDAlSDSgdbMsaPEpfFBvvwUhadp5I1urVltCdFe6KKp2EAA7n0vghhvVgA";
+
+    public = false;
+    authorization_policy = "two_factor";
+    require_pkce = false;
+
+    redirect_uris = [
+      "https://gists.home.lan/oauth/openid-connect/callback"
+    ];
+
+    scopes = [
+      "openid"
+      "profile"
+      "email"
+      "groups"
+    ];
+
+    response_types = [ "code" ];
+    grant_types = [ "authorization_code" ];
+
+    access_token_signed_response_alg = "none";
+    userinfo_signed_response_alg = "none";
+    token_endpoint_auth_method = "client_secret_post";
+  }
+  {
     client_id = "papra";
     client_name = "Papra";
     client_secret = "$pbkdf2-sha512$310000$iZcRHLNCaLQRucCZQiaSpQ$uxJSCJi1ZmpwwVUjA2BCjSbLvl34KVFnv2N11wWSTUupDkucRGnXbIvNU/v00ln9cogBVl2DMiWcicYa7IeS3w";
