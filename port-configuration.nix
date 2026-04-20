@@ -40,15 +40,15 @@
   gluetun = 8888;
   gluetunWebUI = 9888;
 
+  # backup
+  borg = 8081;
+
   #
   # services
   #
 
   # automization
   nodeRed = 1880;
-
-  # backup
-  borg = 8081;
 
   # documents
   atuin = 8989;

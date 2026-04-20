@@ -80,7 +80,6 @@ in
           ];
 
           environments = {
-            TZ = "Europe/Berlin";
             TimeZone__DisplayTimeZoneId = "Europe/Berlin";
 
             ConnectionStrings__DefaultConnection = "Host=host.containers.internal;Port=${toString ports.postgres};Database=mail-archiver;Username=archiver;Password=archiver";

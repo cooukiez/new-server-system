@@ -44,9 +44,7 @@ in
         path = "${envSecretsPrefix}/${name}";
       };
     in
-    {
-
-    };
+    { };
 
   virtualisation.quadlet =
     let
