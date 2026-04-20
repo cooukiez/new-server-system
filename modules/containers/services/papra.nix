@@ -130,7 +130,6 @@ in
 
           environmentFiles = [
             "secrets/papra/e_auth-secret"
-            "secrets/papra/e_storage-key"
             "secrets/papra/e_webhook-secret"
 
             "secrets/papra/auth-client-config-patched"
