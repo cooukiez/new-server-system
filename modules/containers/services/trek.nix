@@ -84,17 +84,23 @@ in
             PORT = "3000";
             APP_URL = config.myServices.trek.serviceConfig.href;
 
+            NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
+
             # temporary on startup
-            ADMIN_EMAIL = "trek@local"; 
+            ADMIN_EMAIL = "trek@local";
 
             # authelia oidc configuration
-            OIDC_ISSUER = "https://auth.home.lan/realms/main";
+            OIDC_ISSUER = "https://auth.home.lan";
             OIDC_CLIENT_ID = "trek";
             
             OIDC_DISPLAY_NAME = "Authelia";
             OIDC_ONLY = "true";
+
             OIDC_ADMIN_CLAIM = "groups";
             OIDC_ADMIN_VALUE = "admins";
+
+            OIDC_SCOPE = "openid email profile groups";
+            OIDC_DISCOVERY_URL = "https://auth.home.lan/.well-known/openid-configuration";
           };
 
           environmentFiles = [

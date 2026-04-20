@@ -244,7 +244,7 @@
     pkce_challenge_method = "";
 
     redirect_uris = [
-      "https://trek.home.lan/api/auth/callback/authelia"
+      "https://trek.home.lan/api/auth/oidc/callback"
     ];
 
     scopes = [
@@ -259,6 +259,6 @@
 
     access_token_signed_response_alg = "none";
     userinfo_signed_response_alg = "none";
-    token_endpoint_auth_method = "client_secret_basic";
+    token_endpoint_auth_method = "client_secret_post";
   }
 ]
