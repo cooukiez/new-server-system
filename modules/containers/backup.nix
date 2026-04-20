@@ -48,12 +48,30 @@ in
         };
       };
 
-      volumes.opt-data.volumeConfig = {
+      # source
+      volumes.data-documents.volumeConfig = {
+        type = "bind";
+        device = "/data/documents";
+      };
+
+      volumes.data-opt.volumeConfig = {
         type = "bind";
         device = "/opt";
       };
 
-      volumes.external-data.volumeConfig = {
+      # backup
+      volumes.external-documents.volumeConfig = {
+        type = "bind";
+        device = "/bak/documents";
+      };
+
+      volumes.external-git.volumeConfig = {
+        type = "bind";
+        device = "/bak/git";
+      };
+
+
+      volumes.external-opt.volumeConfig = {
         type = "bind";
         device = "/bak/opt";
       };
@@ -124,8 +142,12 @@ in
             "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
 
-            "${volumes.opt-data.ref}:/local:ro"
-            "${volumes.external-data.ref}:/external:U"
+            "${volumes.data-documents.ref}:/local/documents:ro"
+            "${volumes.data-opt.ref}:/local/opt:ro"
+
+            "${volumes.external-documents.ref}:/external/documents:U"
+            "${volumes.external-git.ref}:/external/git:U"
+            "${volumes.external-opt.ref}:/external/opt:U"
 
             "${volumes.borg-data.ref}:/data:U"
             "${volumes.borg-cache.ref}:/home/borg/.cache/borg:U"

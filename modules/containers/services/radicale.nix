@@ -52,7 +52,7 @@ in
   myServices.radicale = {
     serviceConfig = {
       name = "Radicale";
-      description = "Lightweight Cal / Card DAV";
+      description = "Lightweight DAV Server";
       serviceType = "Apps";
 
       subdomain = "dav";

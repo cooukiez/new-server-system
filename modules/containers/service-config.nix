@@ -31,6 +31,12 @@ in
                   { config, ... }:
                   {
                     options = {
+                      serviceName = lib.mkOption {
+                        type = lib.types.str;
+                        readOnly = true;
+                        default = serviceName;
+                      };
+
                       name = lib.mkOption {
                         type = lib.types.str;
                         default = serviceName;

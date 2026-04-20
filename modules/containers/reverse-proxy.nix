@@ -29,8 +29,8 @@ let
           cfg = svc.serviceConfig;
         in
         ''
-          @${cfg.name} host ${cfg.subdomain}.home.lan
-          handle @${cfg.name} {
+          @${cfg.serviceName} host ${cfg.subdomain}.home.lan
+          handle @${cfg.serviceName} {
             import auth_verify
             reverse_proxy host.containers.internal:${toString cfg.port}
           }

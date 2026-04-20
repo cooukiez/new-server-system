@@ -39,6 +39,11 @@ in
     "d /opt 0755 ${uid} ${gid} -"
     "d /media 0755 ${uid} ${gid} -"
     "d /data 0755 ${uid} ${gid} -"
+
+    "d /bak 0755 ${uid} ${gid} -"
+    "d /bak/documents 0755 ${uid} ${gid} -"
+    "d /bak/git 0755 ${uid} ${gid} -"
+    "d /bak/opt 0755 ${uid} ${gid} -"
   ]
   ++ (mkRules "media" mediaDirs)
   ++ (mkRules "data" dataDirs);

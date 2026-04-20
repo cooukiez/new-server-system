@@ -15,6 +15,19 @@ let
 in
 {
   myServices.atuin = {
+    serviceConfig = {
+      name = "Atuin";
+      description = "Syncing Shell History";
+      serviceType = "Apps";
+
+      subdomain = "atuin";
+      port = ports.atuin;
+
+      policy = "bypass";
+
+      icon = "atuin";
+    };
+
     containerConfig = {
       volumes = {
         atuin-config = "/opt/atuin/config";
@@ -34,6 +47,12 @@ in
 
       containers.atuin = {
         autoStart = true;
+
+        unitConfig = {
+          Requires = [ "postgres.service" ];
+          After = [ "postgres.service" ];
+        };
+
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
@@ -42,6 +61,8 @@ in
         containerConfig = {
           image = "ghcr.io/atuinsh/atuin:${atuinVersion}";
           name = "atuin";
+
+          exec = [ "start" ];
 
           environments = {
             TZ = "Europe/Berlin";
@@ -63,7 +84,7 @@ in
             "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
 
-            "${volumes.atuin-config.ref}:/config:ro"
+            "${volumes.atuin-config.ref}:/config:U"
           ];
 
           publishPorts = [
