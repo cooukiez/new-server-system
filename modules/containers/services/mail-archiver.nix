@@ -83,7 +83,7 @@ in
             TZ = "Europe/Berlin";
             TimeZone__DisplayTimeZoneId = "Europe/Berlin";
 
-            ConnectionStrings__DefaultConnection = "Host=host.containers.internal;Port=5432;Database=mail-archiver;Username=archiver;Password=archiver";
+            ConnectionStrings__DefaultConnection = "Host=host.containers.internal;Port=${toString ports.postgres};Database=mail-archiver;Username=archiver;Password=archiver";
 
             Authentication__Username = "admin";
             # will be replaced at first login

@@ -60,6 +60,7 @@ in
   "auth/clients/s_grafana.age".publicKeys = allKeys;
   "auth/clients/e_link.age".publicKeys = allKeys;
   "auth/clients/e_mail-archiver.age".publicKeys = allKeys;
+  "auth/clients/e_opengist.age".publicKeys = allKeys;
   "auth/clients/s_papra.age".publicKeys = allKeys;
 
   # ebk
