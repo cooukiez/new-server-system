@@ -2,7 +2,7 @@
   modules/containers/services/mail-archiver.nix
 
   part of der-home-server
-  created 2026-04-19
+  created 2026-04-20
 */
 
 {

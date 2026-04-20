@@ -2,18 +2,10 @@
   port-configuration.nix
 
   part of der-home-server
-  created 2026-04-12
+  created 2026-04-20
 */
 
 {
-  #
-  # system level
-  #
-  nodeExporter = 9100;
-  promtailExporter = 9080;
-
-  glances = 61208;
-
   #
   # core
   #
@@ -24,25 +16,25 @@
   lldapWeb = 17170;
 
   # database
-  postgres = 5432;
   pgadmin = 5434;
+  postgres = 5432;
 
   # dns
-  dns = 53;
   adguard = 3000;
+  dns = 53;
 
   # homepage
   homepage = 8000;
 
   # monitor
   grafana = 3005;
-  prometheus = 9090;
   loki = 3100;
+  prometheus = 9090;
 
   # reverse proxy
+  caddyAdmin = 2019;
   caddyHttp = 80;
   caddyHttps = 443;
-  caddyAdmin = 2019;
 
   # vpn
   gluetun = 8888;
@@ -52,36 +44,42 @@
   # services
   #
 
-  # media
-  jellyfin = 8096;
-
-  # git
-  giteaHttp = 3030;
-  gitea = 222;
-
   # automization
   nodeRed = 1880;
 
+  # backup
+  borg = 8081;
+
   # documents
-  papra = 1221;
-
+  atuin = 8989;
   ebk = 8040;
-
+  linkwarden = 3020;
+  mailArchiver = 5000;
+  memos = 5230;
+  papra = 1221;
   radicale = 5232;
+  stirling = 9010;
+  trek = 3010;
 
-  # music
-  lidarr = 8686;
-  lidarrLists = 18686;
-  cmdarr = 8688;
-  slskdHttp = 5030;
-  slskdHttps = 5031;
-  slskdPeer = 50300;
+  # git
+  gitea = 222;
+  giteaHttp = 3030;
+  opengist = 2222;
+  opengistHttp = 6157;
 
   # immich
   immich = 2283;
 
-  # vnstat
-  vnstat = 5010;
+  # media
+  jellyfin = 8096;
+
+  # music
+  cmdarr = 8688;
+  lidarr = 8686;
+  lidarrLists = 18686;
+  slskdHttp = 5030;
+  slskdHttps = 5031;
+  slskdPeer = 50300;
 
   # qbittorrent
   qBittorrent = 6880;
@@ -90,20 +88,13 @@
   # transfer-sh
   transferSH = 8010;
 
-  # borg
-  borg = 8081;
+  # vnstat
+  vnstat = 5010;
 
-  stirling = 9010;
-
-  linkwarden = 3020;
-  mailArchiver = 5000;
-
-  opengist = 2222;
-  opengistHttp = 6157;
-
-  atuin = 8989;
-
-  memos = 5230;
-
-  trek = 3010;
+  #
+  # system level
+  #
+  glances = 61208;
+  nodeExporter = 9100;
+  promtailExporter = 9080;
 }

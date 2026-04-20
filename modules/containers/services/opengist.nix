@@ -1,8 +1,8 @@
 /*
-  modules/containers/services/vnstat.nix
+  modules/containers/services/opengist.nix
 
   part of der-home-server
-  created 2026-04-16
+  created 2026-04-20
 */
 
 {
@@ -79,7 +79,7 @@ in
           addHosts = [
             "auth.home.lan:host-gateway"
           ];
-          
+
           environments = {
             TZ = "Europe/Berlin";
             UID = "0";

@@ -5,8 +5,6 @@
   created 2026-04-16
 */
 
-# der-home-server configuration
-
 {
   description = "system configuration for home server";
 

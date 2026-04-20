@@ -1,8 +1,8 @@
 /*
-  modules/containers/services/vnstat.nix
+  modules/containers/services/atuin.nix
 
   part of der-home-server
-  created 2026-04-16
+  created 2026-04-20
 */
 
 {

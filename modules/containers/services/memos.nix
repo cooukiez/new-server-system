@@ -1,8 +1,8 @@
 /*
-  modules/containers/services/vnstat.nix
+  modules/containers/services/memos.nix
 
   part of der-home-server
-  created 2026-04-16
+  created 2026-04-20
 */
 
 {
@@ -78,14 +78,14 @@ in
           addHosts = [
             "auth.home.lan:host-gateway"
           ];
-          
+
           environments = {
             TZ = "Europe/Berlin";
-            
+
             MEMOS_PORT = "5230";
             MEMOS_DRIVER = "postgres";
             MEMOS_INSTANCE_URL = config.myServices.memos.serviceConfig.href;
-            
+
             MEMOS_DSN = "postgres://memos:memos@host.containers.internal:${toString ports.postgres}/memos?sslmode=disable";
 
             MEMOS_DATA = "/data";

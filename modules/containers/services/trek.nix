@@ -1,6 +1,8 @@
 /*
   modules/containers/services/trek.nix
+
   part of der-home-server
+  created 2026-04-20
 */
 
 {
@@ -92,7 +94,7 @@ in
             # authelia oidc configuration
             OIDC_ISSUER = "https://auth.home.lan";
             OIDC_CLIENT_ID = "trek";
-            
+
             OIDC_DISPLAY_NAME = "Authelia";
             OIDC_ONLY = "true";
 
@@ -114,7 +116,7 @@ in
             # certificates
             "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
-            
+
             "${volumes.trek-data.ref}:/app/data:U"
             "${volumes.trek-uploads.ref}:/app/uploads:U"
           ];
