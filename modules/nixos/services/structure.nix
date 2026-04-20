@@ -26,6 +26,8 @@ let
     "download/deezer"
 
     "download/qbittorrent"
+
+    "download/youtube"
   ];
 
   dataDirs = [
