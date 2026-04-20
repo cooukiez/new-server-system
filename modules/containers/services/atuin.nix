@@ -47,8 +47,9 @@ in
             TZ = "Europe/Berlin";
 
             ATUIN_HOST = "0.0.0.0";
-            ATUIN_OPEN_REGISTRATION  = "true";
+            ATUIN_PORT = "8888";
 
+            ATUIN_OPEN_REGISTRATION  = "true";
             ATUIN_DB_URI = "postgres://atuin:atuin@host.containers.internal:${toString ports.postgres}/atuin";
 
             RUST_LOG = "info,atuin_server=debug";

@@ -28,6 +28,13 @@ let
       pass = "lldap";
     }
 
+
+    {
+      name = "atuin";
+      user = "atuin";
+      dbs = [ "atuin" ];
+      pass = "atuin";
+    }
     {
       name = "gitea";
       user = "gitea";

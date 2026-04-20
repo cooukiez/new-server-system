@@ -67,6 +67,7 @@ in
 
           ./services/media
 
+          ./services/atuin.nix
           ./services/ebk.nix
           ./services/gitea.nix
           ./services/immich.nix
