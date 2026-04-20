@@ -185,7 +185,6 @@ in
 
             # certificates
             "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-            # "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # secrets
@@ -236,7 +235,6 @@ in
 
             # certificates
             "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-            # "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # secrets

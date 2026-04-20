@@ -11,22 +11,14 @@
   ...
 }:
 let
-  vnstatDashboardVersion = "latest";
+  atuinVersion = "latest";
 in
 {
-  myServices.vnstat = {
-    serviceConfig = {
-      name = "VNStat Dashboard";
-      description = "View Network Statistics";
-      serviceType = "Monitoring";
-
-      subdomain = "vnstat";
-      port = ports.vnstat;
-
-      policy = "one_factor";
-      group = "admins";
-
-      icon = "mdi-chart-timeline-variant";
+  myServices.atuin = {
+    containerConfig = {
+      volumes = {
+        atuin-config = "/opt/atuin/config";
+      };
     };
   };
 
@@ -35,13 +27,12 @@ in
       inherit (config.virtualisation.quadlet) volumes networks pods;
     in
     {
-      # vnstat database volume
-      volumes.vnstat-db.volumeConfig = {
+      volumes.atuin-config.volumeConfig = {
         type = "bind";
-        device = "/var/lib/vnstat";
+        device = config.myServices.atuin.containerConfig.volumes.atuin-config;
       };
 
-      containers.vnstat-dashboard = {
+      containers.atuin = {
         autoStart = true;
         serviceConfig = {
           Restart = "always";
@@ -49,14 +40,18 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/kshitizb/vnstat-dashboard:${vnstatDashboardVersion}";
-          name = "vnstat-dashboard";
+          image = "ghcr.io/atuinsh/atuin:${atuinVersion}";
+          name = "atuin";
 
           environments = {
             TZ = "Europe/Berlin";
 
-            PORT = "80";
-            ALLOWED_PREFIXES = "enp";
+            ATUIN_HOST = "0.0.0.0";
+            ATUIN_OPEN_REGISTRATION  = "true";
+
+            ATUIN_DB_URI = "postgres://atuin:atuin@host.containers.internal:${toString ports.postgres}/atuin";
+
+            RUST_LOG = "info,atuin_server=debug";
           };
 
           volumes = [
@@ -67,11 +62,11 @@ in
             "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
 
-            "${volumes.vnstat-db.ref}:/var/lib/vnstat:ro"
+            "${volumes.atuin-config.ref}:/config:ro"
           ];
 
           publishPorts = [
-            "${toString ports.vnstat}:80/tcp"
+            "${toString ports.atuin}:8888/tcp"
           ];
         };
       };

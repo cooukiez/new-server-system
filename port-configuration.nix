@@ -96,4 +96,6 @@
   stirling = 9010;
   open-archiver = 3010;
   linkwarden = 3020;
+
+  atuin = 8989;
 }
