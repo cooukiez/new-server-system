@@ -46,6 +46,7 @@ in
     in
     {
       archiver-admin-pass = mkSecret "archiver/e_admin-pass";
+      archiver-admin-pass = mkSecret "auth//e_client-key";
     };
 
   virtualisation.quadlet =
@@ -99,10 +100,25 @@ in
 
             View__DefaultToPlainText = "true";
             View__BlockExternalResources = "false";
+
+            # authelia oidc configuration
+            OAuth__Enabled = "true";
+            OAuth__Authority = "https://auth.home.lan";
+            OAuth__ClientId = "mail-archiver";        
+            
+            # scopes defined as indexed keys
+            OAuth__ClientScopes__0 = "openid";
+            OAuth__ClientScopes__1 = "profile";
+            OAuth__ClientScopes__2 = "email";
+            OAuth__ClientScopes__3 = "groups";
+
+            OAuth__DisablePasswordLogin = "false";
+            
           };
 
           environmentFiles = [
             "secrets/archiver/e_admin-pass"
+            "secrets/archiver/e_client-key"
           ];
 
           volumes = [

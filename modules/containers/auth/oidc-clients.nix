@@ -153,6 +153,32 @@
     token_endpoint_auth_method = "client_secret_post";
   }
   {
+    client_id = "mail-archiver";
+    client_name = "Mail-Archiver";
+    client_secret = "$pbkdf2-sha512$310000$HAJtQDSok3NZE7hORA1UHg$gaMZiME5KX4El4UcsllFgLf40wz36/ANgLuI1c/NAH2eeFDOtZFmh74mVqw/yAq93ZHieMN3PoHw4A/r3oP4yw";
+
+    public = false;
+    authorization_policy = "two_factor";
+    require_pkce = false;
+
+    redirect_uris = [
+      "https://mail-archive.home.lan/oidc-signin-completed"
+    ];
+
+    scopes = [
+      "openid"
+      "profile"
+      "email"
+    ];
+
+    response_types = [ "code" ];
+    grant_types = [ "authorization_code" ];
+
+    access_token_signed_response_alg = "none";
+    userinfo_signed_response_alg = "none";
+    token_endpoint_auth_method = "client_secret_post";
+  }
+  {
     client_id = "linkwarden";
     client_name = "Linkwarden";
     client_secret = "$pbkdf2-sha512$310000$JdzSF/citkF8uBU2cvc7hQ$a1L4OeJsiD9Fm5Ec9egEu2X0ugk9SXFnSBBfabMg46U8L5mvzwjLVi4GyNbZgLbdNfJx7TWKWigJK6gN9zEfjw";
