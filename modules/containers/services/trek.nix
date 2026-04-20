@@ -43,7 +43,7 @@ in
       };
     in
     {
-      trek-admin-password = mkSecret "trek/e_admin-password";
+      trek-admin-password = mkSecret "auth/clients/e_trek";
     };
 
   virtualisation.quadlet =
@@ -84,7 +84,8 @@ in
             PORT = "3000";
             APP_URL = config.myServices.trek.serviceConfig.href;
 
-            # ADMIN_EMAIL = "management.homeserver@mailbox.org"; 
+            # temporary on startup
+            ADMIN_EMAIL = "trek@local"; 
 
             # authelia oidc configuration
             OIDC_ISSUER = "https://auth.home.lan/realms/main";
@@ -97,7 +98,7 @@ in
           };
 
           environmentFiles = [
-            "secrets/trek/e_admin-password"
+            "secrets/auth/clients/e_trek"
           ];
 
           volumes = [

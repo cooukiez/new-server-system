@@ -60,7 +60,7 @@
   gitea = 222;
 
   # automization
-  node-red = 1880;
+  nodeRed = 1880;
 
   # documents
   papra = 1221;
@@ -96,7 +96,7 @@
   stirling = 9010;
 
   linkwarden = 3020;
-  mail-archiver = 5000;
+  mailArchiver = 5000;
 
   opengist = 2222;
   opengistHttp = 6157;

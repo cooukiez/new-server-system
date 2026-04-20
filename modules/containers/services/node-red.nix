@@ -15,14 +15,14 @@ let
   nodeRedVersion = "latest";
 in
 {
-  myServices.node-red = {
+  myServices.nodeRed = {
     serviceConfig = {
       name = "Node-RED";
       description = "Automation Flow System";
       serviceType = "Services";
 
       subdomain = "flow";
-      port = ports.node-red;
+      port = ports.nodeRed;
 
       policy = "one_factor";
       group = "admins";
@@ -53,7 +53,7 @@ in
     {
       volumes.node-red-data.volumeConfig = {
         type = "bind";
-        device = config.myServices.node-red.containerConfig.volumes.node-red-data;
+        device = config.myServices.nodeRed.containerConfig.volumes.node-red-data;
       };
 
       containers.node-red = {

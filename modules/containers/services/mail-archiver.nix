@@ -15,14 +15,14 @@ let
   mailArchiverVersion = "latest";
 in
 {
-  myServices.mail-archiver = {
+  myServices.mailArchiver = {
     serviceConfig = {
       name = "Mail-Archiver";
       description = "Mail Archiving System";
       serviceType = "Apps";
 
       subdomain = "mail";
-      port = ports.mail-archiver;
+      port = ports.mailArchiver;
 
       policy = "bypass";
 
@@ -55,7 +55,7 @@ in
     {
       volumes.mail-archiver-protection-keys.volumeConfig = {
         type = "bind";
-        device = config.myServices.mail-archiver.containerConfig.volumes.mail-archiver-protection-keys;
+        device = config.myServices.mailArchiver.containerConfig.volumes.mail-archiver-protection-keys;
       };
 
       containers.mail-archiver = {
@@ -93,7 +93,7 @@ in
             BandwidthTracking__Enabled = "false";
             BandwidthTracking__DailyLimitMb = "25000";
 
-            AllowedHosts = config.myServices.mail-archiver.serviceConfig.domain;
+            AllowedHosts = config.myServices.mailArchiver.serviceConfig.domain;
 
             DatabaseMaintenance__Enabled = "true";
             DatabaseMaintenance__DailyExecutionTime = "01:00";
