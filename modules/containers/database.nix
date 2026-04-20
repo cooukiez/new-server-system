@@ -59,19 +59,17 @@ let
       pass = "archiver";
     }
     {
+      name = "memos";
+      user = "memos";
+      dbs = [ "memos" ];
+      pass = "memos";
+    }
+    {
       name = "opengist";
       user = "opengist";
       dbs = [ "opengist" ];
       pass = "opengist";
     }
-    /*
-    {
-      name = "open-archiver";
-      user = "archiver";
-      dbs = [ "open-archiver" ];
-      pass = "archiver";
-    }
-    */
 
     {
       name = "lidarr";

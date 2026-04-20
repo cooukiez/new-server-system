@@ -95,8 +95,6 @@
 
   stirling = 9010;
 
-  open-archiver = 3010;
-
   linkwarden = 3020;
   mail-archiver = 5000;
 
@@ -104,4 +102,6 @@
   opengistHttp = 6157;
 
   atuin = 8989;
+
+  memos = 5230;
 }

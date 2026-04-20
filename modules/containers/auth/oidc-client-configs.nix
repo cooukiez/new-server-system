@@ -6,6 +6,9 @@
 */
 
 {
+  #
+  # monitoring
+  #
   grafana = {
     enabled = true;
     name = "Authelia";
@@ -34,6 +37,9 @@
     role_attribute_path = "contains(groups, 'admins') && 'Admin' || contains(groups, 'editors') && 'Editor' || 'Viewer'";
   };
 
+  #
+  # services
+  #
   ebk = {
     enable_internal_auth = false;
     enable_oauth2_auth = true;
@@ -60,6 +66,15 @@
 
     enable_oidc_display_name = true;
     oidc_custom_display_name = "Authelia";
+  };
+
+  opengist = {
+    provider-name = "authelia";
+    client-key = "opengist";
+    discovery-url = "https://auth.home.lan/.well-known/openid-configuration";
+
+    group-claim-name = "groups";
+    admin-group = "admins";
   };
 
   papra = {

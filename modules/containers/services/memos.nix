@@ -13,26 +13,26 @@
   ...
 }:
 let
-  opengistVersion = "latest";
+  memosVersion = "stable";
 in
 {
-  myServices.opengist = {
+  myServices.memos = {
     serviceConfig = {
-      name = "Opengist";
-      description = "Unstructured Code Storage";
+      name = "Memos";
+      description = "Lightweight Note-Taking Service";
       serviceType = "Apps";
 
-      subdomain = "gists";
-      port = ports.opengistHttp;
+      subdomain = "memos";
+      port = ports.memos;
 
       policy = "bypass";
 
-      icon = "opengist";
+      icon = "memos";
     };
 
     containerConfig = {
       volumes = {
-        opengist-data = "/opt/opengist/data";
+        memos-data = "/opt/memos/data";
       };
     };
   };
@@ -45,7 +45,7 @@ in
       };
     in
     {
-      opengist-client-key = mkSecret "auth/clients/e_opengist";
+
     };
 
   virtualisation.quadlet =
@@ -53,12 +53,12 @@ in
       inherit (config.virtualisation.quadlet) volumes networks pods;
     in
     {
-      volumes.opengist-data.volumeConfig = {
+      volumes.memos-data.volumeConfig = {
         type = "bind";
-        device = config.myServices.opengist.containerConfig.volumes.opengist-data;
+        device = config.myServices.memos.containerConfig.volumes.memos-data;
       };
 
-      containers.opengist = {
+      containers.memos = {
         autoStart = true;
 
         unitConfig = {
@@ -72,9 +72,8 @@ in
         };
 
         containerConfig = {
-          image = "ghcr.io/thomiceli/opengist:${opengistVersion}";
-          name = "opengist";
-          user = "0:0";
+          image = "docker.io/neosmemo/memos:${memosVersion}";
+          name = "memos";
 
           addHosts = [
             "auth.home.lan:host-gateway"
@@ -82,23 +81,18 @@ in
           
           environments = {
             TZ = "Europe/Berlin";
-            UID = "0";
-            GID = "0";
+            
+            MEMOS_PORT = "5230";
+            MEMOS_DRIVER = "postgres";
+            MEMOS_INSTANCE_URL = config.myServices.memos.serviceConfig.href;
+            
+            MEMOS_DSN = "postgres://memos:memos@host.containers.internal:${toString ports.postgres}/memos";
 
-            OG_OPENGIST_HOME = "/opengist";
-            OG_DB_URI = "postgres://opengist:opengist@host.containers.internal:${toString ports.postgres}/opengist";
-            OG_EXTERNAL_URL = config.myServices.opengist.serviceConfig.href;
-
-            OG_OIDC_PROVIDER_NAME = "authelia";
-            OG_OIDC_CLIENT_KEY = "opengist";
-            OG_OIDC_DISCOVERY_URL = "https://auth.home.lan/.well-known/openid-configuration";
-
-            OG_OIDC_GROUP_CLAIM_NAME = "groups";
-            OG_OIDC_ADMIN_GROUP = "admins";
+            MEMOS_DATA = "/data";
           };
 
           environmentFiles = [
-            "secrets/auth/clients/e_opengist"
+
           ];
 
           volumes = [
@@ -109,12 +103,11 @@ in
             "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
 
-            "${volumes.opengist-data.ref}:/opengist:U"
+            "${volumes.memos-data.ref}:/data:U"
           ];
 
           publishPorts = [
-            "${toString ports.opengist}:2222/tcp"
-            "${toString ports.opengistHttp}:6157/tcp"
+            "${toString ports.memosHttp}:5230/tcp"
           ];
         };
       };

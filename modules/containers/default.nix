@@ -74,7 +74,7 @@ in
           ./services/linkwarden.nix
           ./services/mail-archiver.nix
           ./services/node-red.nix
-          ./services/open-archiver.nix
+          ./services/opengist.nix
           ./services/papra.nix
           ./services/qbittorrent.nix
           ./services/radicale.nix
