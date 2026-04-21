@@ -68,16 +68,16 @@ let
 
     disableUpdateCheck = true;
 
-    maxGroupColumns = 5;
+    maxGroupColumns = 6;
     layout = {
       "Apps" = {
         style = "row";
-        columns = 5;
+        columns = 6;
       };
 
       "Restricted" = {
         style = "row";
-        columns = 5;
+        columns = 6;
       };
 
       "Groups" = {
