@@ -16,7 +16,7 @@
   ];
 
   boot = {
-    kernelPackages = pkgs.linuxPackages_latest;
+    kernelPackages = pkgs.linuxPackages_6_19;
     consoleLogLevel = 0;
 
     initrd.verbose = false;
