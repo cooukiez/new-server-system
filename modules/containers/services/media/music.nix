@@ -106,7 +106,7 @@ let
       no_remote_configuration = true;
     };
 
-    integration = {
+    integrations = {
       vpn = {
         enabled = true;
         portForwarding = false;
@@ -285,6 +285,10 @@ in
             "media-net"
             "vpn-service-net"
           ];
+
+          labels = {
+            "io.containers.autoupdate" = "registry";
+          };
 
           environments = {
             TZ = "Europe/Berlin";
