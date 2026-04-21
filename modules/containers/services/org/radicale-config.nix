@@ -1,3 +1,10 @@
+/*
+  modules/containers/services/org/radicale-config.nix
+
+  part of der-home-server
+  created 2026-04-20
+*/
+
 {
   ports,
   ...

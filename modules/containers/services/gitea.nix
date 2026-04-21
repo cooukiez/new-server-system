@@ -66,8 +66,6 @@ in
             "auth.home.lan:host-gateway"
           ];
 
-          # exec = "/bin/sh -c 'update-ca-certificates && /usr/bin/entrypoint /usr/bin/s6-svscan /etc/s6'";
-
           environments = {
             TZ = "Europe/Berlin";
 

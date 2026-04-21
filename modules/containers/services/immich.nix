@@ -76,7 +76,6 @@ in
         device = config.myServices.immich.containerConfig.volumes.immich-db;
       };
 
-      # machine learning container
       containers.immich-ml = {
         autoStart = true;
         serviceConfig = {
@@ -102,7 +101,6 @@ in
         };
       };
 
-      # immich redis
       containers.immich-redis = {
         autoStart = true;
         serviceConfig = {
@@ -124,7 +122,6 @@ in
         };
       };
 
-      # immich database
       containers.immich-postgres = {
         autoStart = true;
         serviceConfig = {
@@ -155,7 +152,6 @@ in
         };
       };
 
-      # main immich server
       containers.immich-server = {
         autoStart = true;
 

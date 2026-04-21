@@ -1,5 +1,5 @@
 /*
-  modules/containers/services/qbittorrent.nix
+  modules/containers/services/media/qbittorrent.nix
 
   part of der-home-server
   created 2026-04-17

@@ -1,3 +1,10 @@
+/*
+  modules/containers/services/org/ebk-config.nix
+
+  part of der-home-server
+  created 2026-04-20
+*/
+
 {
   config,
   ports,

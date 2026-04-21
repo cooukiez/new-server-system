@@ -1,5 +1,5 @@
 /*
-  modules/containers/services/radicale.nix
+  modules/containers/services/org/radicale.nix
 
   part of der-home-server
   created 2026-04-16
@@ -69,6 +69,7 @@ in
           file = "${pkgs.writeText "radicale.Dockerfile" (
             builtins.readFile ../../builds/radicale.Dockerfile
           )}";
+
           tag = "localhost/radicale-ldap:internal";
 
           buildArgs = {

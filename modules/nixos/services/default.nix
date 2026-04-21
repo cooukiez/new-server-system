@@ -30,7 +30,7 @@
       PasswordAuthentication = true;
     };
   };
-  
+
   services.samba = {
     enable = true;
     openFirewall = true;
