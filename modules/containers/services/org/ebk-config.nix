@@ -121,7 +121,7 @@
       max_failures_per_user_per_minute = 5;
     };
 
-    auth = (import ../auth/oidc-client-configs.nix).ebk;
+    auth = (import ../../auth/oidc-client-configs.nix).ebk;
 
     user = {
       enable_register = true;

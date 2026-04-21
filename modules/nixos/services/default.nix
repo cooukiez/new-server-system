@@ -30,14 +30,7 @@
       PasswordAuthentication = true;
     };
   };
-
-  services.cron = {
-    enable = true;
-    cronFiles = [
-      "&include /home/squ/.crontab-ui/squ_crontab"
-    ];
-  };
-
+  
   services.samba = {
     enable = true;
     openFirewall = true;
