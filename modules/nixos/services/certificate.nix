@@ -60,16 +60,4 @@
       DNS.2 = *.home.lan
     '';
   };
-
-  /*
-    cd /etc/certs &&
-
-    sudo openssl genrsa -out ca.key 4096 &&
-    sudo openssl req -x509 -new -nodes -key ca.key -sha256 -days 3650 -out ca.crt -config ca.cnf &&
-
-    sudo openssl genrsa -out home.lan.key 2048 &&
-    sudo openssl req -new -key home.lan.key -out home.lan.csr -config home.lan.cnf &&
-    sudo openssl x509 -req -in home.lan.csr -CA ca.crt -CAkey ca.key -CAcreateserial \
-      -out home.lan.crt -days 825 -sha256 -extfile home.lan.cnf -extensions v3_ext
-  */
 }
