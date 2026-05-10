@@ -1,4 +1,11 @@
 {
+  config,
+  pkgs,
+  lib,
+  hostConfig,
+  ...
+}:
+{
   # boot configuration
   boot = {
     kernelPackages = pkgs.linuxPackages_6_19;
@@ -32,14 +39,14 @@
   services.timesyncd.enable = true;
 
   networking = {
-    hostName = globalConfig.hostname;
+    hostName = hostConfig.hostname;
     hostId = "deaf25e4";
     useDHCP = false;
 
-    nameservers = globalConfig.dnsServers;
+    nameservers = hostConfig.dnsServers;
     interfaces.enp0s20f0u4.ipv4.addresses = [
       {
-        address = globalConfig.staticIP;
+        address = hostConfig.staticIP;
         prefixLength = 24;
       }
     ];

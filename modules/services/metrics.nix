@@ -6,6 +6,7 @@
 */
 
 {
+  config,
   lib,
   hostConfig,
   ...

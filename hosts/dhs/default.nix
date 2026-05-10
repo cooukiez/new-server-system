@@ -24,6 +24,9 @@
     inputs.nixos-system.systemModules.network
     inputs.nixos-system.systemModules.packages
 
+    inputs.self.containerModules
+    inputs.self.serviceModules
+
     inputs.agenix.nixosModules.default
     inputs.home-manager.nixosModules.home-manager
   ];
