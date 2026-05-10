@@ -14,7 +14,38 @@
 }:
 let
   radicaleImageVersion = "master";
-  radicaleSettings = (import ./radicale-config.nix { inherit ports; }).radicaleSettings;
+
+  radicaleSettings = {
+    server = {
+      hosts = "0.0.0.0:5232";
+    };
+
+    auth = {
+      type = "ldap";
+
+      ldap_uri = "ldap://ldap.home.lan:${toString ports.lldap}";
+      ldap_base = "ou=people,dc=ldap,dc=home,dc=lan";
+
+      ldap_reader_dn = "uid=admin,ou=people,dc=ldap,dc=home,dc=lan";
+      ldap_secret_file = "/run/secrets/LDAP_PASSWORD";
+
+      ldap_filter = "(&(objectClass=person)(memberOf=cn=users,ou=groups,dc=ldap,dc=home,dc=lan)(uid={0}))";
+
+      ldap_user_attribute = "uid";
+      ldap_groups_attribute = "memberOf";
+
+      ldap_security = "tls";
+      ldap_ssl_ca_file = "/certs/ca.crt";
+    };
+
+    storage = {
+      filesystem_folder = "/radicale/data";
+    };
+
+    logging = {
+      level = "info";
+    };
+  };
 in
 {
   myServices.radicale = {
@@ -30,17 +61,11 @@ in
 
       icon = "radicale";
     };
-
-    containerConfig = {
-      files."config" = {
-        source = (pkgs.formats.ini { }).generate "config" radicaleSettings;
-      };
-
-      volumes = {
-        radicale-data = "/opt/radicale/data";
-      };
-    };
   };
+
+  home.file."containers/radicale/config".source =
+    (pkgs.formats.ini { }).generate "config"
+      radicaleSettings;
 
   age.secrets =
     let
@@ -81,7 +106,7 @@ in
 
       volumes.radicale-data.volumeConfig = {
         type = "bind";
-        device = config.myServices.radicale.containerConfig.volumes.radicale-data;
+        device = "/opt/radicale/data";
       };
 
       containers.radicale = {
@@ -95,6 +120,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/radicale/data"
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -109,7 +140,7 @@ in
           environments = {
             TZ = "Europe/Berlin";
 
-            RADICALE_CONFIG = "/etc/radicale/config";
+            RADICALE_CONFIG = "/radicale/config";
             GIT_SSL_CAINFO = "/certs/ca.crt";
           };
 
@@ -122,13 +153,13 @@ in
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # config
-            "${config.myServices.radicale.containerConfig.files."config".fullPath}:/etc/radicale/config:ro,U"
+            "${config.home.homeDirectory}:/radicale/config:ro,U"
 
             # secrets
             "${config.age.secrets.radicale-ldap-pw.path}:/run/secrets/LDAP_PASSWORD:ro"
 
             # volumes
-            "${volumes.radicale-data.ref}:/var/lib/radicale:U"
+            "${volumes.radicale-data.ref}:/radicale/data:U"
           ];
 
           publishPorts = [

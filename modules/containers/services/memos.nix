@@ -13,6 +13,7 @@
   ...
 }:
 let
+  # todo: disable non oidc login
   memosVersion = "stable";
 in
 {
@@ -28,12 +29,6 @@ in
       policy = "bypass";
 
       icon = "memos";
-    };
-
-    containerConfig = {
-      volumes = {
-        memos-data = "/opt/memos/data";
-      };
     };
   };
 
@@ -53,7 +48,7 @@ in
     {
       volumes.memos-data.volumeConfig = {
         type = "bind";
-        device = config.myServices.memos.containerConfig.volumes.memos-data;
+        device = "/opt/memos/data";
       };
 
       containers.memos = {
@@ -67,6 +62,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/memos/data"
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -84,14 +85,13 @@ in
             MEMOS_DRIVER = "postgres";
             MEMOS_INSTANCE_URL = config.myServices.memos.serviceConfig.href;
 
+            # todo: private db password
             MEMOS_DSN = "postgres://memos:memos@host.containers.internal:${toString ports.postgres}/memos?sslmode=disable";
 
             MEMOS_DATA = "/data";
           };
 
-          environmentFiles = [
-
-          ];
+          environmentFiles = [ ];
 
           volumes = [
             "/etc/timezone:/etc/timezone:ro"

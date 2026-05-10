@@ -87,6 +87,7 @@ in
 
             LLDAP_KEY_FILE = "";
 
+            # todo: priavte db password
             LLDAP_DATABASE_URL = "postgres://lldap:lldap@host.containers.internal:${toString ports.postgres}/lldap";
           };
 

@@ -29,12 +29,6 @@ in
 
       icon = "https://avatars.githubusercontent.com/u/5375661?s=48&v=4";
     };
-
-    containerConfig = {
-      volumes = {
-        node-red-data = "/opt/node-red/data";
-      };
-    };
   };
 
   age.secrets =
@@ -53,7 +47,7 @@ in
     {
       volumes.node-red-data.volumeConfig = {
         type = "bind";
-        device = config.myServices.nodeRed.containerConfig.volumes.node-red-data;
+        device = "/opt/node-red/data";
       };
 
       containers.node-red = {
@@ -62,6 +56,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/node-red/data"
+            ''}"
+          ];
         };
 
         containerConfig = {

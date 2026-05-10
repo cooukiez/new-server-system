@@ -30,12 +30,6 @@ in
 
       icon = "https://avatars.githubusercontent.com/u/1242542?s=48&v=4";
     };
-
-    containerConfig = {
-      volumes = {
-        crontab-data = "/opt/crontab/data";
-      };
-    };
   };
 
   virtualisation.quadlet =
@@ -45,16 +39,20 @@ in
     {
       volumes.crontab-data.volumeConfig = {
         type = "bind";
-        device = config.myServices.crontab.containerConfig.volumes.crontab-data;
+        device = "/opt/crontab/data";
       };
 
+      # todo: check if github issue is resolved
       builds.crontab-image = {
         serviceConfig = {
           ExecStartPre = [
-            "-${pkgs.coreutils}/bin/rm -rf ${buildDir}"
-            "${pkgs.git}/bin/git clone ${gitRepo} ${buildDir}"
-            "${pkgs.coreutils}/bin/cp ${../builds/crontab.Dockerfile} ${buildDir}/crontab.Dockerfile"
-            "${pkgs.coreutils}/bin/chmod -R u+rw ${buildDir}"
+            "${pkgs.writeShellScript "build" ''
+              -${pkgs.coreutils}/bin/rm -rf ${buildDir}
+
+              ${pkgs.git}/bin/git clone ${gitRepo} ${buildDir}
+              ${pkgs.coreutils}/bin/cp ${../builds/crontab.Dockerfile} ${buildDir}/crontab.Dockerfile
+              ${pkgs.coreutils}/bin/chmod -R u+rw ${buildDir}
+            ''}"
           ];
         };
 
@@ -77,6 +75,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/crontab/data"
+            ''}"
+          ];
         };
 
         containerConfig = {

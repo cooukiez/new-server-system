@@ -69,7 +69,7 @@ in
   age.secrets =
     let
       mkSecret = name: {
-        file = ../../../secrets/${name}.age;
+        file = ../../../../secrets/${name}.age;
         path = "${envSecretsPrefix}/${name}";
       };
     in
@@ -78,7 +78,7 @@ in
       papra-storage-key = mkSecret "papra/e_storage-key";
       papra-webhook-secret = mkSecret "papra/e_webhook-secret";
 
-      papra-client-secret.file = ../../../secrets/auth/clients/s_papra.age;
+      papra-client-secret.file = ../../../../secrets/auth/clients/s_papra.age;
     };
 
   virtualisation.quadlet =

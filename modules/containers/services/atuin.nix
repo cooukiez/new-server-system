@@ -27,12 +27,6 @@ in
 
       icon = "atuin";
     };
-
-    containerConfig = {
-      volumes = {
-        atuin-config = "/opt/atuin/config";
-      };
-    };
   };
 
   virtualisation.quadlet =
@@ -42,7 +36,7 @@ in
     {
       volumes.atuin-config.volumeConfig = {
         type = "bind";
-        device = config.myServices.atuin.containerConfig.volumes.atuin-config;
+        device = "/opt/atuin/config";
       };
 
       containers.atuin = {
@@ -56,6 +50,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/atuin/config"
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -71,6 +71,8 @@ in
             ATUIN_PORT = "8888";
 
             ATUIN_OPEN_REGISTRATION = "true";
+
+            # todo: private db password
             ATUIN_DB_URI = "postgres://atuin:atuin@host.containers.internal:${toString ports.postgres}/atuin";
 
             RUST_LOG = "info,atuin_server=debug";

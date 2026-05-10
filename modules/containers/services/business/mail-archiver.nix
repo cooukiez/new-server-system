@@ -28,12 +28,6 @@ in
 
       icon = "mail-archiver";
     };
-
-    containerConfig = {
-      volumes = {
-        mail-archiver-protection-keys = "/opt/mail-archiver/protection-keys";
-      };
-    };
   };
 
   age.secrets =
@@ -55,7 +49,7 @@ in
     {
       volumes.mail-archiver-protection-keys.volumeConfig = {
         type = "bind";
-        device = config.myServices.mailArchiver.containerConfig.volumes.mail-archiver-protection-keys;
+        device = "/opt/mail-archiver/protection-keys";
       };
 
       containers.mail-archiver = {
@@ -69,6 +63,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/mail-archiver/protection-keys"
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -82,10 +82,11 @@ in
           environments = {
             TimeZone__DisplayTimeZoneId = "Europe/Berlin";
 
+            # todo: private db password
             ConnectionStrings__DefaultConnection = "Host=host.containers.internal;Port=${toString ports.postgres};Database=mail-archiver;Username=archiver;Password=archiver";
 
+            # fallback credentials first login
             Authentication__Username = "admin";
-            # will be replaced at first login
             Authentication__Password = "admin";
             Authentication__SessionTimeoutMinutes = "60";
 

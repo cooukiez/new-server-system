@@ -27,12 +27,6 @@ in
 
       icon = "gitea";
     };
-
-    containerConfig = {
-      volumes = {
-        gitea-data = "/opt/gitea/data";
-      };
-    };
   };
 
   virtualisation.quadlet =
@@ -42,7 +36,7 @@ in
     {
       volumes.gitea-data.volumeConfig = {
         type = "bind";
-        device = config.myServices.gitea.containerConfig.volumes.gitea-data;
+        device = "/opt/gitea/data";
       };
 
       containers.gitea = {
@@ -56,6 +50,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/gitea/data"
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -73,6 +73,8 @@ in
             GITEA__database__HOST = "host.containers.internal:${toString ports.postgres}";
             GITEA__database__NAME = "gitea";
             GITEA__database__USER = "gitea";
+
+            # todo: private db password
             GITEA__database__PASSWD = "gitea";
           };
 

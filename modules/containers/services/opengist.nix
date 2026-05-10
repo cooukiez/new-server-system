@@ -86,6 +86,7 @@ in
             GID = "0";
 
             OG_OPENGIST_HOME = "/opengist";
+            # todo: private db password
             OG_DB_URI = "postgres://opengist:opengist@host.containers.internal:${toString ports.postgres}/opengist";
             OG_EXTERNAL_URL = config.myServices.opengist.serviceConfig.href;
 

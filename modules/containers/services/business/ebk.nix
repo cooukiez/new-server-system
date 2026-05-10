@@ -14,6 +14,9 @@
 }:
 let
   ebkVersion = "latest";
+
+  # todo: switch to environment variables
+  # todo: switch to private db password
   ebkSettings = (import ./ebk-config.nix { inherit config ports; }).ebkSettings;
 in
 {
@@ -30,18 +33,11 @@ in
 
       icon = "ezbookkeeping";
     };
-
-    containerConfig = {
-      files."ezbookkeeping.ini" = {
-        source = (pkgs.formats.ini { }).generate "ezbookkeeping.ini" ebkSettings;
-      };
-
-      volumes = {
-        ebk-data = "/opt/ebk/data";
-        ebk-log = "/opt/ebk/log";
-      };
-    };
   };
+
+  home.file."containers/ebk/ezbookkeeping.ini".source =
+    (pkgs.formats.ini { }).generate "ezbookkeeping.ini"
+      ebkSettings;
 
   age.secrets =
     let
@@ -62,12 +58,12 @@ in
     {
       volumes.ebk-data.volumeConfig = {
         type = "bind";
-        device = config.myServices.ebk.containerConfig.volumes.ebk-data;
+        device = "/opt/ebk/data";
       };
 
       volumes.ebk-log.volumeConfig = {
         type = "bind";
-        device = config.myServices.ebk.containerConfig.volumes.ebk-log;
+        device = "/opt/ebk/log";
       };
 
       containers.ebk = {
@@ -81,6 +77,13 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/ebk/data"
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/ebk/log"
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -107,9 +110,7 @@ in
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # config
-            "${
-              config.myServices.ebk.containerConfig.files."ezbookkeeping.ini".fullPath
-            }:/ezbookkeeping/conf/ezbookkeeping.ini:ro,U"
+            "${config.home.homeDirectory}/containers/ebk/ezbookkeeping.ini:/ezbookkeeping/conf/ezbookkeeping.ini:ro,U"
 
             # secrets
             "${config.age.secrets.ebk-client-key.path}:/run/secrets/EBK_CLIENT_KEY:ro"

@@ -31,16 +31,9 @@ in
 
       icon = "immich";
     };
-
-    containerConfig = {
-      volumes = {
-        immich-ml-cache = "/opt/immich/ml-cache";
-        immich-redis = "/opt/immich/redis";
-        immich-db = "/opt/immich/db";
-      };
-    };
   };
 
+  # todo: change immich database password to something different
   age.secrets = {
     immich-db-pw.file = ../../../secrets/s_postgres-pw.age;
   };
@@ -63,17 +56,17 @@ in
 
       volumes.immich-ml-cache.volumeConfig = {
         type = "bind";
-        device = config.myServices.immich.containerConfig.volumes.immich-ml-cache;
+        device = "/opt/immich/ml-cache";
       };
 
       volumes.immich-redis.volumeConfig = {
         type = "bind";
-        device = config.myServices.immich.containerConfig.volumes.immich-redis;
+        device = "/opt/immich/redis";
       };
 
       volumes.immich-db.volumeConfig = {
         type = "bind";
-        device = config.myServices.immich.containerConfig.volumes.immich-db;
+        device = "/opt/immich/db";
       };
 
       containers.immich-ml = {
@@ -81,6 +74,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/immich/ml-cache"
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -106,6 +105,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/immich/redis"
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -127,6 +132,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/immich/db"
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -161,6 +172,7 @@ in
             "immich-redis.service"
             "immich-postgres.service"
           ];
+
           After = [
             "immich-ml.service"
             "immich-redis.service"

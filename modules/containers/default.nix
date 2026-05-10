@@ -32,9 +32,10 @@ in
 
         ./services/media
 
-        ./services/org/ebk.nix
-        ./services/org/mail-archiver.nix
-        ./services/org/radicale.nix
+        ./services/business/ebk.nix
+        ./services/business/mail-archiver.nix
+        ./services/business/papra.nix
+        ./services/business/radicale.nix
 
         ./services/atuin.nix
         ./services/crontab.nix
@@ -44,7 +45,6 @@ in
         ./services/memos.nix
         ./services/node-red.nix
         ./services/opengist.nix
-        ./services/papra.nix
         ./services/stirling.nix
         ./services/transfer-sh.nix
         ./services/trek.nix

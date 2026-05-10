@@ -29,13 +29,6 @@ in
 
       icon = "linkwarden";
     };
-
-    containerConfig = {
-      volumes = {
-        linkwarden-meili = "/opt/linkwarden/meili";
-        linkwarden-data = "/opt/linkwarden/data";
-      };
-    };
   };
 
   age.secrets =
@@ -67,12 +60,12 @@ in
 
       volumes.linkwarden-meili.volumeConfig = {
         type = "bind";
-        device = config.myServices.linkwarden.containerConfig.volumes.linkwarden-meili;
+        device = "/opt/linkwarden/meili";
       };
 
       volumes.linkwarden-data.volumeConfig = {
         type = "bind";
-        device = config.myServices.linkwarden.containerConfig.volumes.linkwarden-data;
+        device = "/opt/linkwarden/data";
       };
 
       containers.linkwarden-meili = {
@@ -80,6 +73,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/linkwarden/meili"
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -112,6 +111,7 @@ in
             "postgres.service"
             "linkwarden-meili.service"
           ];
+
           After = [
             "postgres.service"
             "linkwarden-meili.service"
@@ -121,6 +121,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/linkwarden/data"
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -133,6 +139,7 @@ in
           ];
 
           environments = {
+            # todo: private db password
             DATABASE_URL = "postgresql://linkwarden:linkwarden@host.containers.internal:${toString ports.postgres}/linkwarden";
 
             MEILISEARCH_ENDPOINT = "http://linkwarden-meili:7700";
