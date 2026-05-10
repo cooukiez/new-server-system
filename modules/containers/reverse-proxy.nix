@@ -40,80 +40,85 @@ let
   );
 in
 {
-  myServices.caddy = {
-    containerConfig = {
-      volumes.caddy-config = "/opt/caddy/config";
-      volumes.caddy-data = "/opt/caddy/data";
+  home.file."containers/caddy/Caddyfile" = {
+    text = ''
+        {
+          # enable admin API
+          admin 0.0.0.0:2019
 
-      files."Caddyfile" = {
-        source = pkgs.writeText "Caddyfile" ''
-            {
-              # enable admin API
-              admin 0.0.0.0:2019
+          servers {
+            max_header_size 32768
+          }
+        }
 
-              servers {
-                max_header_size 32768
-              }
-            }
+        (my_tls) {
+          tls /certs/home.lan.crt /certs/home.lan.key
+        }
 
-            (my_tls) {
-              tls /certs/home.lan.crt /certs/home.lan.key
-            }
+        https://${hostConfig.staticIP} {
+          import my_tls
+          redir http://{host}{uri}
+        }
 
-            https://${hostConfig.staticIP} {
-              import my_tls
-              redir http://{host}{uri}
-            }
+        http://${hostConfig.staticIP} {
+          handle /cert {
+            header Content-Disposition "attachment; filename=root-ca.crt"
+            header Content-Type "application/x-x509-ca-cert"
+            
+            root * /certs
+            rewrite * /ca.crt
+            file_server
+          }
 
-            http://${hostConfig.staticIP} {
-              handle /cert {
-                header Content-Disposition "attachment; filename=root-ca.crt"
-                header Content-Type "application/x-x509-ca-cert"
-                
-                root * /certs
-                rewrite * /ca.crt
-                file_server
-              }
+          handle /papra* {
+            reverse_proxy http://host.containers.internal:${toString ports.papra}
+          }
 
-              handle {
-                redir https://home.lan
-              }
-            }
+          handle /immich* {
+            reverse_proxy http://host.containers.internal:${toString ports.immich}
+          }
 
-            (auth_verify) {
-              forward_auth host.containers.internal:${toString ports.authelia} {
-                uri /api/verify?rd=https://auth.home.lan/
-                copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
-              }
-            }
+          handle /jellyfin* {
+            reverse_proxy http://host.containers.internal:${toString ports.jellyfin}
+          }
 
-            home.lan {
-              import my_tls
-              reverse_proxy host.containers.internal:${toString ports.homepage}
-            }
+          handle {
+            redir https://home.lan
+          }
+        }
 
-            *.home.lan {
-              import my_tls
+        (auth_verify) {
+          forward_auth host.containers.internal:${toString ports.authelia} {
+            uri /api/verify?rd=https://auth.home.lan/
+            copy_headers Remote-User Remote-Groups Remote-Name Remote-Email
+          }
+        }
 
-              @auth host auth.home.lan
-              handle @auth {
-                reverse_proxy host.containers.internal:${toString ports.authelia}
-              }
+        home.lan {
+          import my_tls
+          reverse_proxy host.containers.internal:${toString ports.homepage}
+        }
 
-              @ldap host ldap.home.lan
-              handle @ldap {
-                reverse_proxy host.containers.internal:${toString ports.lldapWeb}
-              }
+        *.home.lan {
+          import my_tls
 
-          ${serviceHandlers}
+          @auth host auth.home.lan
+          handle @auth {
+            reverse_proxy host.containers.internal:${toString ports.authelia}
+          }
 
-              handle {
-                abort
-              }
-            }
-        '';
-      };
-    };
+          @ldap host ldap.home.lan
+          handle @ldap {
+            reverse_proxy host.containers.internal:${toString ports.lldapWeb}
+          }
+
+      ${serviceHandlers}
+
+          handle {
+            abort
+          }
+        }
+    '';
   };
 
   virtualisation.quadlet =
@@ -128,12 +133,12 @@ in
 
       volumes.caddy-config.volumeConfig = {
         type = "bind";
-        device = config.myServices.caddy.containerConfig.volumes.caddy-config;
+        device = "/opt/caddy/config";
       };
 
       volumes.caddy-data.volumeConfig = {
         type = "bind";
-        device = config.myServices.caddy.containerConfig.volumes.caddy-data;
+        device = "/opt/caddy/data";
       };
 
       containers.caddy = {
@@ -141,6 +146,13 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/caddy/config"
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/caddy/data"
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -156,8 +168,8 @@ in
             "/etc/timezone:/etc/timezone:ro"
             "/etc/localtime:/etc/localtime:ro"
 
-            # config files
-            "${config.myServices.caddy.containerConfig.files."Caddyfile".fullPath}:/etc/caddy/Caddyfile:ro,U"
+            # config
+            "${config.home.homeDirectory}/containers/caddy/Caddyfile:/etc/caddy/Caddyfile:ro,U"
 
             # volumes
             "${volumes.caddy-certs.ref}:/certs:ro"
@@ -171,7 +183,6 @@ in
             "${toString ports.caddyHttps}:443/tcp"
             "${toString ports.caddyHttps}:443/udp"
 
-            # admin port
             "${toString ports.caddyAdmin}:2019/tcp"
           ];
         };

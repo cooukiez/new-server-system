@@ -133,7 +133,6 @@ let
     };
   };
 
-  # secret mappings
   secretMap = {
     auth-ldap-pw = "ldap/s_admin-pass";
 
@@ -184,17 +183,11 @@ in
 
       icon = "authelia";
     };
-
-    containerConfig = {
-      files."configuration.yml" = {
-        source = (pkgs.formats.yaml { }).generate "configuration.yml" autheliaSettings;
-      };
-
-      volumes = {
-        authelia-config = "/opt/authelia/config";
-      };
-    };
   };
+
+  home.file."containers/authelia/configuration.yml".source =
+    (pkgs.formats.yaml { }).generate "configuration.yml"
+      autheliaSettings;
 
   age.secrets = builtins.mapAttrs (_: name: {
     file = ../../secrets/${name}.age;
@@ -228,13 +221,19 @@ in
           Restart = "always";
           RestartSec = "10";
 
-          ExecStartPre = [
-            "${pkgs.coreutils}/bin/cp ${
-              config.myServices.authelia.containerConfig.files."configuration.yml".fullPath
-            } /opt/authelia/config/configuration.yml"
-            "${pkgs.yq-go}/bin/yq -i '.identity_providers.oidc.jwks[0].key = load_str(\"${config.age.secrets.auth-oidc-jwk.path}\")' /opt/authelia/config/configuration.yml"
-            "${pkgs.coreutils}/bin/chmod 644 /opt/authelia/config/configuration.yml"
-          ];
+          ExecStartPre =
+            let
+              jwkLocation = ".identity_providers.oidc.jwks[0].key";
+            in
+            [
+              "+${pkgs.writeShellScript "pre-start" ''
+                ${pkgs.coreutils}/bin/mkdir -p "/opt/authelia/config"
+
+                ${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/configuration.yml /opt/authelia/config/configuration.yml"
+                ${pkgs.yq-go}/bin/yq -i '${jwkLocation} = load_str(\"${config.age.secrets.auth-oidc-jwk.path}\")' /opt/authelia/config/configuration.yml
+                ${pkgs.coreutils}/bin/chmod 644 /opt/authelia/config/configuration.yml
+              ''}"
+            ];
         };
 
         containerConfig = {
@@ -251,7 +250,7 @@ in
               "/etc/localtime:/etc/localtime:ro"
 
               # certificates
-              # "/certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro"
+              "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
               "/certs/ca.crt:/certs/ca.crt:ro"
 
               "${volumes.authelia-config.ref}:/config:U"

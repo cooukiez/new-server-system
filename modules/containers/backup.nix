@@ -28,13 +28,6 @@ in
 
       icon = "https://avatars.githubusercontent.com/u/12418060?s=48&v=4";
     };
-
-    containerConfig = {
-      volumes = {
-        borg-data = "/opt/borg/data";
-        borg-cache = "/opt/borg/cache";
-      };
-    };
   };
 
   virtualisation.quadlet =
@@ -78,15 +71,14 @@ in
       # borg volumes
       volumes.borg-data.volumeConfig = {
         type = "bind";
-        device = config.myServices.borg-backup.containerConfig.volumes.borg-data;
+        device = "/opt/borg/data";
       };
 
       volumes.borg-cache.volumeConfig = {
         type = "bind";
-        device = config.myServices.borg-backup.containerConfig.volumes.borg-cache;
+        device = "/opt/borg/cache";
       };
 
-      # borg redis
       containers.borg-redis = {
         autoStart = true;
         serviceConfig = {
@@ -106,12 +98,18 @@ in
         };
       };
 
-      # borg server
       containers.borg = {
         autoStart = true;
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/borg/data"
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/borg/cache"
+            ''}"
+          ];
         };
 
         containerConfig = {

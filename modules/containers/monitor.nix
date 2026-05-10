@@ -13,8 +13,10 @@
 }:
 let
   grafanaVersion = "latest";
+
   prometheusVersion = "latest";
   prometheusPodmanExporterVersion = "latest";
+
   lokiVersion = "latest";
 
   prometheusDatasource = "PBFA97CFB590B2093";
@@ -23,31 +25,32 @@ let
   #
   # paths inside container
   #
-  grafanaPaths = rec {
+  grafanaPaths = {
     root = "/grafana";
 
-    config = "${root}/grafana.ini";
-    provisioning = "${root}/provisioning";
+    config = "/grafana/grafana.ini";
+    provisioning = "/grafana/provisioning";
+
     cert = "/certs/ca.crt";
 
-    data = "${root}/data";
-    plugins = "${root}/plugins";
-    log = "${root}/log";
+    data = "/grafana/data";
+    plugins = "/grafana/plugins";
+    log = "/grafana/log";
   };
 
-  prometheusPaths = rec {
+  prometheusPaths = {
     root = "/prometheus";
 
-    config = "${root}/prometheus.yml";
-    data = "${root}/data";
+    config = "/prometheus/prometheus.yml";
+    data = "/prometheus/data";
   };
 
-  lokiPaths = rec {
+  lokiPaths = {
     root = "/loki";
 
-    config = "${root}/local-config.yml";
-    chunks = "${root}/chunks";
-    rules = "${root}/rules";
+    config = "/loki/local-config.yml";
+    chunks = "/loki/chunks";
+    rules = "/loki/rules";
   };
 
   #
@@ -86,7 +89,33 @@ let
       oauth_allow_insecure_email_lookup = true;
     };
 
-    "auth.generic_oauth" = (import ./auth/oidc-client-configs.nix).grafana;
+    "auth.generic_oauth" = {
+      enabled = true;
+      name = "Authelia";
+      icon = "signin";
+
+      client_id = "grafana";
+      client_secret = "$__file{/run/secrets/GRAFANA_CLIENT_KEY}";
+
+      scopes = "openid profile email groups";
+      empty_scopes = false;
+
+      auth_url = "https://auth.home.lan/api/oidc/authorization";
+      token_url = "https://auth.home.lan/api/oidc/token";
+      api_url = "https://auth.home.lan/api/oidc/userinfo";
+
+      login_attribute_path = "preferred_username";
+      groups_attribute_path = "groups";
+      name_attribute_path = "name";
+      allow_assign_grafana_admin = true;
+
+      use_pkce = true;
+      auth_style = "InHeader";
+
+      tls_client_ca = "/certs/ca.crt";
+
+      role_attribute_path = "contains(groups, 'admins') && 'Admin' || contains(groups, 'editors') && 'Editor' || 'Viewer'";
+    };
   };
 
   grafanaDatasourceSettings = {
@@ -146,6 +175,7 @@ let
     common = {
       instance_addr = "127.0.0.1";
       path_prefix = lokiPaths.root;
+
       storage.filesystem = {
         chunks_directory = lokiPaths.chunks;
         rules_directory = lokiPaths.rules;
@@ -180,39 +210,26 @@ in
     grafanaPaths = grafanaPaths;
   };
 
+  # grafana
+  home.file."containers/grafana/grafana.ini".source =
+    (pkgs.formats.ini { }).generate "grafana.ini"
+      grafanaSettings;
+
+  home.file."containers/grafana/provisioning/datasources/datasources.yaml".source =
+    (pkgs.formats.yaml { }).generate "datasources.yaml"
+      grafanaDatasourceSettings;
+
+  # prometheus
+  home.file."containers/prometheus/prometheus.yml".source =
+    (pkgs.formats.yaml { }).generate "prometheus.yml"
+      prometheusSettings;
+
+  # loki
+  home.file."containers/loki/loki.yaml".source =
+    (pkgs.formats.yaml { }).generate "loki.yaml"
+      lokiSettings;
+
   myServices = {
-    grafana = {
-      serviceConfig = {
-        name = "Grafana";
-        description = "Container / Monitoring Dashboard";
-        serviceType = "Monitoring";
-
-        subdomain = "monitor";
-        port = ports.grafana;
-
-        policy = "bypass";
-
-        icon = "grafana";
-      };
-
-      containerConfig = {
-        files."grafana.ini" = {
-          source = (pkgs.formats.ini { }).generate "grafana.ini" grafanaSettings;
-        };
-
-        files."provisioning/datasources/datasources.yaml" = {
-          source = (pkgs.formats.yaml { }).generate "datasources.yaml" grafanaDatasourceSettings;
-        };
-
-        volumes = {
-          grafana-provisioning = "/opt/grafana/provisiong";
-          grafana-data = "/opt/grafana/data";
-          grafana-plugins = "/opt/grafana/plugins";
-          grafana-log = "/opt/grafana/log";
-        };
-      };
-    };
-
     glances = {
       serviceConfig = {
         name = "Glances";
@@ -226,6 +243,21 @@ in
         group = "admins";
 
         icon = "glances";
+      };
+    };
+
+    grafana = {
+      serviceConfig = {
+        name = "Grafana";
+        description = "Container / Monitoring Dashboard";
+        serviceType = "Monitoring";
+
+        subdomain = "monitor";
+        port = ports.grafana;
+
+        policy = "bypass";
+
+        icon = "grafana";
       };
     };
 
@@ -243,30 +275,10 @@ in
 
         icon = "prometheus";
       };
-
-      containerConfig = {
-        files."prometheus.yml" = {
-          source = (pkgs.formats.yaml { }).generate "prometheus.yml" prometheusSettings;
-        };
-
-        volumes.prometheus-data = "/opt/prometheus/data";
-      };
-    };
-
-    loki = {
-      containerConfig = {
-        files."loki.yaml" = {
-          source = (pkgs.formats.yaml { }).generate "loki.yaml" lokiSettings;
-        };
-
-        volumes.loki-data = "/opt/loki/data";
-      };
     };
   };
 
-  age.secrets = {
-    grafana-client-key.file = ../../secrets/auth/clients/s_grafana.age;
-  };
+  age.secrets.grafana-client-key.file = ../../secrets/auth/clients/s_grafana.age;
 
   virtualisation.quadlet =
     let
@@ -288,13 +300,13 @@ in
             };
           })
           {
-            grafana-provisioning = config.myServices.grafana.containerConfig.volumes.grafana-provisioning;
-            grafana-data = config.myServices.grafana.containerConfig.volumes.grafana-data;
-            grafana-plugins = config.myServices.grafana.containerConfig.volumes.grafana-plugins;
-            grafana-log = config.myServices.grafana.containerConfig.volumes.grafana-log;
+            grafana-provisioning = "/opt/grafana/provisioning";
+            grafana-data = "/opt/grafana/data";
+            grafana-plugins = "/opt/grafana/plugins";
+            grafana-log = "/opt/grafana/log";
 
-            prometheus-data = config.myServices.prometheus.containerConfig.volumes.prometheus-data;
-            loki-data = config.myServices.loki.containerConfig.volumes.loki-data;
+            prometheus-data = "/opt/prometheus/data";
+            loki-data = "/opt/loki/data";
           };
 
       containers.grafana = {
@@ -304,7 +316,14 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "${pkgs.coreutils}/bin/cp -rfL ${config.home.homeDirectory}/containers/grafana/provisioning/. /opt/grafana/provisioning/"
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/grafana/provisiong"
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/grafana/data"
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/grafana/plugins"
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/grafana/log"
+
+              ${pkgs.coreutils}/bin/cp -rfL ${config.home.homeDirectory}/containers/grafana/provisioning/. /opt/grafana/provisioning/
+            ''}"
           ];
         };
 
@@ -341,9 +360,7 @@ in
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # config
-            "${
-              config.myServices.grafana.containerConfig.files."grafana.ini".fullPath
-            }:${grafanaPaths.config}:ro,U"
+            "${config.home.homeDirectory}/containers/grafana/grafana.ini:${grafanaPaths.config}:ro,U"
 
             # secrets
             "${config.age.secrets.grafana-client-key.path}:/run/secrets/GRAFANA_CLIENT_KEY:ro"
@@ -367,6 +384,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/prometheus/data"
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -431,7 +454,7 @@ in
             "/etc/timezone:/etc/timezone:ro"
             "/etc/localtime:/etc/localtime:ro"
 
-            # mount squ podman socket
+            # podman socket
             "/run/user/10000/podman/podman.sock:/run/podman/podman.sock:ro,U"
           ];
 
@@ -450,6 +473,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/loki/data"
+            ''}"
+          ];
         };
 
         containerConfig = {

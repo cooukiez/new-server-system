@@ -22,11 +22,7 @@ let
 
     dns =
       let
-        ips = [
-          "9.9.9.10"
-          "149.112.112.10"
-        ]
-        ++ hostConfig.dnsServers;
+        ips = hostConfig.dnsServers;
       in
       {
         bind_hosts = [ "0.0.0.0" ];
@@ -101,18 +97,11 @@ in
 
       icon = "adguard-home";
     };
-
-    containerConfig = {
-      files."AdGuardHome.yaml" = {
-        source = (pkgs.formats.yaml { }).generate "AdGuardHome.yaml" adguardSettings;
-      };
-
-      volumes = {
-        adguard-conf = "/opt/adguardhome/conf";
-        adguard-work = "/opt/adguardhome/work";
-      };
-    };
   };
+
+  home.file."containers/adguard/AdGuardHome.yaml".source =
+    (pkgs.formats.yaml { }).generate "AdGuardHome.yaml"
+      adguardSettings;
 
   virtualisation.quadlet =
     let
@@ -121,12 +110,12 @@ in
     {
       volumes.adguard-conf.volumeConfig = {
         type = "bind";
-        device = config.myServices.adguard.containerConfig.volumes.adguard-conf;
+        device = "/opt/adguard/conf";
       };
 
       volumes.adguard-work.volumeConfig = {
         type = "bind";
-        device = config.myServices.adguard.containerConfig.volumes.adguard-work;
+        device = /opt/adguard/work;
       };
 
       containers.adguardhome = {
@@ -136,11 +125,13 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            # adguardhome requires read and write
-            "${pkgs.coreutils}/bin/cp ${
-              config.myServices.adguard.containerConfig.files."AdGuardHome.yaml".fullPath
-            } /opt/adguardhome/conf/AdGuardHome.yaml"
-            "${pkgs.coreutils}/bin/chmod 644 /opt/adguardhome/conf/AdGuardHome.yaml"
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/adgurad/conf"
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/adgurad/work"
+
+              ${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/adguard/AdGuardHome.yaml /opt/adguard/conf/AdGuardHome.yaml"
+              ${pkgs.coreutils}/bin/chmod 644 /opt/adguard/conf/AdGuardHome.yaml
+            ''}"
           ];
         };
 

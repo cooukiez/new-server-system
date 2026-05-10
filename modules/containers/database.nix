@@ -15,6 +15,7 @@ let
   postgresVersion = "alpine";
   pgadminVersion = "latest";
 
+  # todo: make passwords secret
   services = [
     {
       name = "authelia";
@@ -121,13 +122,6 @@ in
 
       icon = "postgresql";
     };
-
-    containerConfig = {
-      volumes = {
-        postgres-data = "/opt/postgres/data";
-        pgadmin-data = "/opt/postgres/pgadmin";
-      };
-    };
   };
 
   age.secrets =
@@ -142,8 +136,8 @@ in
       pgadmin-pw = mkSecret "s_pgadmin-pw";
     };
 
+  # todo: auto run startup scripts
   home.file."containers/postgres/init-all-db.sql".text = ''
-    -- Prevent script from crashing if a command fails
     \set ON_ERROR_STOP off
 
     ${builtins.concatStringsSep "\n" (map mkSql services)}
@@ -162,12 +156,12 @@ in
 
       volumes.postgres-data.volumeConfig = {
         type = "bind";
-        device = config.myServices.postgres.containerConfig.volumes.postgres-data;
+        device = "/opt/postgres/data";
       };
 
       volumes.pgadmin-data.volumeConfig = {
         type = "bind";
-        device = config.myServices.postgres.containerConfig.volumes.pgadmin-data;
+        device = "/opt/postgres/pgadmin";
       };
 
       containers.postgres = {
@@ -175,6 +169,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/postgres/data"
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -215,12 +215,17 @@ in
         };
       };
 
-      # https://www.pgadmin.org/docs/pgadmin4/latest/container_deployment.html
       containers.pgadmin = {
         autoStart = true;
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/postgres/pgadmin"
+            ''}"
+          ];
         };
 
         containerConfig = {

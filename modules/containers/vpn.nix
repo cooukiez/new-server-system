@@ -11,6 +11,7 @@
   ...
 }:
 let
+  # todo: gluetun key in agenix
   gluetunKey = "169qzBxFa0ET26rkTWa3akmVopysVilS";
 
   gluetunVersion = "latest";
@@ -30,17 +31,9 @@ in
 
       icon = "gluetun";
     };
-
-    containerConfig = {
-      volumes = {
-        gluetun-data = "/opt/gluetun/data";
-      };
-    };
   };
 
-  age.secrets = {
-    gluetun-key.file = ../../secrets/s_gluetun-key.age;
-  };
+  age.secrets.gluetun-key.file = ../../secrets/s_gluetun-key.age;
 
   virtualisation.quadlet =
     let
@@ -55,7 +48,7 @@ in
 
       volumes.gluetun-data.volumeConfig = {
         type = "bind";
-        device = config.myServices.gluetun.containerConfig.volumes.gluetun-data;
+        device = "/opt/gluetun/data";
       };
 
       containers.gluetun = {

@@ -75,7 +75,6 @@ in
       };
 
       systemd.user.services."podman-user-wait-network-online" = lib.mkForce {
-        Unit.Description = "Replacement podman-user-wait-network-online to prevent quadlet hang";
         Service = {
           Type = "oneshot";
           ExecStart = "${pkgs.coreutils}/bin/true";

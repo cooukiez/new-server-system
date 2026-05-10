@@ -28,12 +28,6 @@ in
 
       icon = "https://avatars.githubusercontent.com/u/129409591?s=48&v=4";
     };
-
-    containerConfig = {
-      volumes = {
-        lldap-data = "/opt/lldap/data";
-      };
-    };
   };
 
   age.secrets = {
@@ -51,7 +45,7 @@ in
     {
       volumes.lldap-data.volumeConfig = {
         type = "bind";
-        device = config.myServices.lldap.containerConfig.volumes.lldap-data;
+        device = "/opt/lldap/data";
       };
 
       containers.lldap = {
@@ -65,6 +59,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/lldap/data"
+            ''}"
+          ];
         };
 
         containerConfig = {
