@@ -17,9 +17,6 @@ RUN   apk --no-cache add \
 
 WORKDIR /crontab-ui
 
-LABEL maintainer="@alseambusher"
-LABEL description="Crontab-UI docker"
-
 COPY --from=build /crontab-ui/node_modules ./node_modules
 COPY . .
 

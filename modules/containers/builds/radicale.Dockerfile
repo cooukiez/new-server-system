@@ -1,5 +1,3 @@
-# https://github.com/Kozea/Radicale/blob/17e461cd828eea7013a41a727be90fbf030871d0/Dockerfile
-
 FROM python:3-alpine AS builder
 
 ARG VERSION=master

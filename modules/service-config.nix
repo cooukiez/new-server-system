@@ -96,66 +96,6 @@ in
 
               default = null;
             };
-
-            containerConfig = {
-              files = lib.mkOption {
-                type = lib.types.attrsOf (
-                  lib.types.submodule (
-                    { config, name, ... }:
-                    {
-                      options = {
-                        name = lib.mkOption {
-                          type = lib.types.str;
-                          default = name;
-                        };
-
-                        source = lib.mkOption {
-                          type = lib.types.either lib.types.path lib.types.package;
-                        };
-
-                        path = lib.mkOption {
-                          type = lib.types.str;
-                          default = "containers/${serviceName}/${config.name}";
-                          readOnly = true;
-                        };
-
-                        fullPath = lib.mkOption {
-                          type = lib.types.str;
-                          default = "${homeDir}/${config.path}";
-                          readOnly = true;
-                        };
-
-                        copyToVolume = lib.mkOption {
-                          type = lib.types.listOf (
-                            lib.types.submodule {
-                              options = {
-                                volume = lib.mkOption {
-                                  type = lib.types.str;
-                                };
-
-                                mode = lib.mkOption {
-                                  type = lib.types.str;
-                                  default = "0644";
-                                };
-                              };
-                            }
-                          );
-
-                          default = [ ];
-                        };
-                      };
-                    }
-                  )
-                );
-
-                default = { };
-              };
-
-              volumes = lib.mkOption {
-                type = lib.types.attrsOf lib.types.str;
-                default = { };
-              };
-            };
           };
         }
       )

@@ -80,8 +80,8 @@
           ;
       };
 
-      systemModules = import ./modules/system;
-      homeModules = import ./modules/home;
+      containerModules = import ./modules/containers;
+      serviceModules = import ./modules/services;
 
       nixosConfigurations = lib.genAttrs hostDirs (name: mkHost name);
     };
