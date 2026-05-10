@@ -316,7 +316,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-grafana" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/grafana/provisiong"
               ${pkgs.coreutils}/bin/mkdir -p "/opt/grafana/data"
               ${pkgs.coreutils}/bin/mkdir -p "/opt/grafana/plugins"
@@ -386,7 +386,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-prometheus" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/prometheus/data"
             ''}"
           ];
@@ -473,7 +473,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-loki" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/loki/data"
             ''}"
           ];

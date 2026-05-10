@@ -53,7 +53,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-gitea" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/gitea/data"
             ''}"
           ];

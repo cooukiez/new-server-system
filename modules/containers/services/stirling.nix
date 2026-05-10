@@ -63,7 +63,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-stirling" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/stirling/config"
               ${pkgs.coreutils}/bin/mkdir -p "/opt/stirling/tessdata"
               ${pkgs.coreutils}/bin/mkdir -p "/opt/stirling/pipeline"

@@ -731,11 +731,11 @@
         "zen-browser": "zen-browser"
       },
       "locked": {
-        "lastModified": 1778430904,
-        "narHash": "sha256-QHiA7v3I+tZnnGcqIgr/1+aa7KrjBjKYwy9FFflMmao=",
+        "lastModified": 1778452043,
+        "narHash": "sha256-jiA6XXRNALJvABjFq9VXMWDXd8X2kSgoDCQj+XgGGjA=",
         "owner": "cooukiez",
         "repo": "nixos-system",
-        "rev": "8a6e9421024dae35c1f97920a14e312eb5c31efa",
+        "rev": "0da6e16b1919f84fb28e0bc1d5d6e444e3d9ff5e",
         "type": "github"
       },
       "original": {

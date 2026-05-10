@@ -52,12 +52,6 @@ in
 
       icon = "papra";
     };
-
-    containerConfig = {
-      volumes = {
-        papra-data = "/opt/papra/data";
-      };
-    };
   };
 
   home.file."${papraAuthUnpatchedPath}" = {
@@ -104,7 +98,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-papra" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/papra/data"
 
               SECRET_VAL=$(${pkgs.coreutils}/bin/cat ${config.age.secrets.papra-client-secret.path})

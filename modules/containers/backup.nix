@@ -106,7 +106,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-borg" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/borg/data"
               ${pkgs.coreutils}/bin/mkdir -p "/opt/borg/cache"
             ''}"

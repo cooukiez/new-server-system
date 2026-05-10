@@ -61,7 +61,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-lldap" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/lldap/data"
             ''}"
           ];

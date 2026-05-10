@@ -64,7 +64,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-trek" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/trek/data"
               ${pkgs.coreutils}/bin/mkdir -p "/opt/trek/uploads"
             ''}"

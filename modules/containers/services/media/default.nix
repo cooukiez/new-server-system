@@ -92,7 +92,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-jellyfin" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/jellyfin/config"
               ${pkgs.coreutils}/bin/mkdir -p "/opt/jellyfin/data"
               ${pkgs.coreutils}/bin/mkdir -p "/opt/jellyfin/cache"

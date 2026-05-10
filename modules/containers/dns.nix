@@ -118,18 +118,18 @@ in
         device = "/opt/adguard/work";
       };
 
-      containers.adguardhome = {
+      containers.adguard = {
         autoStart = true;
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-adguard" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/adgurad/conf"
               ${pkgs.coreutils}/bin/mkdir -p "/opt/adgurad/work"
 
-              ${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/adguard/AdGuardHome.yaml /opt/adguard/conf/AdGuardHome.yaml"
+              ${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/adguard/AdGuardHome.yaml /opt/adguard/conf/AdGuardHome.yaml
               ${pkgs.coreutils}/bin/chmod 644 /opt/adguard/conf/AdGuardHome.yaml
             ''}"
           ];

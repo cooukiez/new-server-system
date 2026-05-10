@@ -216,11 +216,11 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-lidarr" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/lidarr/data"
               ${pkgs.coreutils}/bin/mkdir -p "/opt/lidarr/cache/spotify"
 
-              ${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/lidarr/config.xml /opt/lidarr/data/config.xml"
+              ${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/lidarr/config.xml /opt/lidarr/data/config.xml
               ${pkgs.coreutils}/bin/chmod 644 /opt/lidarr/data/config.xml
             ''}"
           ];
@@ -275,7 +275,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-slskd" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/slskd/data"
             ''}"
           ];

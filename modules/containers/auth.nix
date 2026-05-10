@@ -226,7 +226,7 @@ in
               jwkLocation = ".identity_providers.oidc.jwks[0].key";
             in
             [
-              "+${pkgs.writeShellScript "pre-start" ''
+              "+${pkgs.writeShellScript "pre-authelia" ''
                 ${pkgs.coreutils}/bin/mkdir -p "/opt/authelia/config"
 
                 ${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/configuration.yml /opt/authelia/config/configuration.yml"

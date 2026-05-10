@@ -53,7 +53,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-atuin" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/atuin/config"
             ''}"
           ];

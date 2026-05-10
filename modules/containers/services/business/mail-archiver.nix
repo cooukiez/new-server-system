@@ -66,7 +66,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-mail-archiver" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/mail-archiver/protection-keys"
             ''}"
           ];

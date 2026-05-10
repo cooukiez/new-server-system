@@ -171,7 +171,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-postgres" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/postgres/data"
             ''}"
           ];
@@ -222,7 +222,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-pgadmin" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/postgres/pgadmin"
             ''}"
           ];

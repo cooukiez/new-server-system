@@ -59,7 +59,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-node-red" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/node-red/data"
             ''}"
           ];

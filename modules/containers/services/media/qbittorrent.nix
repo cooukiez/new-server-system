@@ -58,7 +58,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-qbittorrent" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/qbittorrent/data"
             ''}"
           ];

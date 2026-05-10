@@ -122,7 +122,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-radicale" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/radicale/data"
             ''}"
           ];

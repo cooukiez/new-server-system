@@ -47,7 +47,9 @@
 
     config = {
       allowUnfree = true;
-      permittedInsecurePackages = [ ];
+      permittedInsecurePackages = [
+        "ventoy-1.1.10"
+      ];
     };
   };
 
@@ -106,7 +108,7 @@
   users.groups.squ.gid = hostConfig.squ.gid;
 
   systemd.tmpfiles.rules = [
-    "Z /etc/certs 0400 ${hostConfig.squ.uid} ${hostConfig.squ.gid} -"
+    "Z /etc/certs 0400 ${toString hostConfig.squ.uid} ${toString hostConfig.squ.gid} -"
   ]
   ++ lib.flatten (
     lib.mapAttrsToList (username: _: [
@@ -177,7 +179,9 @@
 
           config = {
             allowUnfree = true;
-            permittedInsecurePackages = [ ];
+            permittedInsecurePackages = [
+              "ventoy-1.1.10"
+            ];
           };
         };
 

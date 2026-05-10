@@ -148,7 +148,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-caddy" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/caddy/config"
               ${pkgs.coreutils}/bin/mkdir -p "/opt/caddy/data"
             ''}"

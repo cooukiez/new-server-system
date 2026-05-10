@@ -77,7 +77,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-immich-ml" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/immich/ml-cache"
             ''}"
           ];
@@ -108,7 +108,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-immich-redis" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/immich/redis"
             ''}"
           ];
@@ -135,7 +135,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-immich-postgres" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/immich/db"
             ''}"
           ];

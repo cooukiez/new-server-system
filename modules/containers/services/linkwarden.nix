@@ -76,7 +76,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-linkwarden-meili" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/linkwarden/meili"
             ''}"
           ];
@@ -124,7 +124,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-start" ''
+            "+${pkgs.writeShellScript "pre-linkwarden" ''
               ${pkgs.coreutils}/bin/mkdir -p "/opt/linkwarden/data"
             ''}"
           ];
