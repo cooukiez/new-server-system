@@ -6,21 +6,18 @@
 */
 
 {
-  inputs,
-  outputs,
-  config,
-  pkgs,
-  lib,
-  globalConfig,
+  hostConfig,
   ...
 }:
 let
-  uid = toString globalConfig.squ.uid;
-  gid = toString globalConfig.squ.gid;
+  uid = toString hostConfig.squ.uid;
+  gid = toString hostConfig.squ.gid;
 in
 {
   home-manager.users.squ =
     {
+      config,
+      pkgs,
       lib,
       hostConfig,
       ...

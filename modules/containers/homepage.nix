@@ -9,7 +9,7 @@
   config,
   pkgs,
   lib,
-  globalConfig,
+  hostConfig,
   ports,
   publicServices,
   ...
@@ -249,7 +249,7 @@ in
             HOMEPAGE_VAR_CONFIG_CHOWN = "false";
             HOMEPAGE_VAR_PUBLIC_CHOWN = "false";
 
-            HOMEPAGE_ALLOWED_HOSTS = "home.lan,${globalConfig.staticIP}";
+            HOMEPAGE_ALLOWED_HOSTS = "home.lan,${hostConfig.staticIP}";
             HOMEPAGE_FILE_TAILSCALE_KEY = "/run/secrets/HOMEPAGE_TAILSCALE_KEY";
           };
 

@@ -8,7 +8,7 @@
 {
   config,
   pkgs,
-  globalConfig,
+  hostConfig,
   ports,
   ...
 }:
@@ -26,7 +26,7 @@ let
           "9.9.9.10"
           "149.112.112.10"
         ]
-        ++ globalConfig.dnsServers;
+        ++ hostConfig.dnsServers;
       in
       {
         bind_hosts = [ "0.0.0.0" ];
@@ -69,17 +69,17 @@ let
         {
           enabled = true;
           domain = "home.lan";
-          answer = "${globalConfig.staticIP}";
+          answer = "${hostConfig.staticIP}";
         }
         {
           enabled = true;
           domain = "*.home.lan";
-          answer = "${globalConfig.staticIP}";
+          answer = "${hostConfig.staticIP}";
         }
         {
           enabled = true;
           domain = "*.home.lan.fritz.box";
-          answer = "${globalConfig.staticIP}";
+          answer = "${hostConfig.staticIP}";
         }
       ];
     };

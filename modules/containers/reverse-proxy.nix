@@ -9,7 +9,7 @@
   config,
   pkgs,
   lib,
-  globalConfig,
+  hostConfig,
   ports,
   publicServices,
   ...
@@ -60,12 +60,12 @@ in
               tls /certs/home.lan.crt /certs/home.lan.key
             }
 
-            https://${globalConfig.staticIP} {
+            https://${hostConfig.staticIP} {
               import my_tls
               redir http://{host}{uri}
             }
 
-            http://${globalConfig.staticIP} {
+            http://${hostConfig.staticIP} {
               handle /cert {
                 header Content-Disposition "attachment; filename=root-ca.crt"
                 header Content-Type "application/x-x509-ca-cert"

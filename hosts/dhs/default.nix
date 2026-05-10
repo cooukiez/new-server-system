@@ -29,6 +29,7 @@
 
     inputs.agenix.nixosModules.default
     inputs.home-manager.nixosModules.home-manager
+    inputs.quadlet-nix.nixosModules.quadlet
   ];
 
   nixpkgs = {
