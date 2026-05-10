@@ -197,25 +197,20 @@ let
   ];
 in
 {
-
-  myServices.homepage = {
-    containerConfig = {
-      files =
-        lib.mapAttrs'
-          (name: value: {
-            name = "${name}.yaml";
-            value = {
-              source = (pkgs.formats.yaml { }).generate "${name}.yaml" value;
-            };
-          })
-          {
-            settings = homepageSettings;
-            widgets = homepageWidgets;
-            services = homepageServices;
-            bookmarks = homepageBookmarks;
-          };
-    };
-  };
+  home.file =
+    lib.mapAttrs'
+      (name: value: {
+        name = "containers/homepage/${name}.yaml";
+        value = {
+          source = (pkgs.formats.yaml { }).generate "${name}.yaml" value;
+        };
+      })
+      {
+        settings = homepageSettings;
+        widgets = homepageWidgets;
+        services = homepageServices;
+        bookmarks = homepageBookmarks;
+      };
 
   age.secrets =
     let
@@ -265,21 +260,13 @@ in
             "/run/user/10000/podman/podman.sock:/run/podman/podman.sock:ro,U"
 
             # config
-            "${
-              config.myServices.homepage.containerConfig.files."settings.yaml".fullPath
-            }:/app/config/settings.yaml:ro,U"
-            "${
-              config.myServices.homepage.containerConfig.files."widgets.yaml".fullPath
-            }:/app/config/widgets.yaml:ro,U"
-            "${
-              config.myServices.homepage.containerConfig.files."services.yaml".fullPath
-            }:/app/config/services.yaml:ro,U"
-            "${
-              config.myServices.homepage.containerConfig.files."bookmarks.yaml".fullPath
-            }:/app/config/bookmarks.yaml:ro,U"
+            "${config.home.homeDirectory}/containers/homepage/settings.yaml:/app/config/settings.yaml:ro,U"
+            "${config.home.homeDirectory}/containers/homepage/widgets.yaml:/app/config/widgets.yaml:ro,U"
+            "${config.home.homeDirectory}/containers/homepage/services.yaml:/app/config/services.yaml:ro,U"
+            "${config.home.homeDirectory}/containers/homepage/bookmarks.yaml:/app/config/bookmarks.yaml:ro,U"
 
             # background
-            "${./assets/background-fullres-compressed.jpg}:/app/public/images/background.jpg:ro"
+            "${../../assets/background/fullres-compressed.jpg}:/app/public/images/background.jpg:ro"
 
             # secrets
             "${config.age.secrets.homepage-tailscale.path}:/run/secrets/HOMEPAGE_TAILSCALE_KEY:ro"

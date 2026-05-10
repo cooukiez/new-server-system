@@ -115,7 +115,7 @@ in
 
       volumes.adguard-work.volumeConfig = {
         type = "bind";
-        device = /opt/adguard/work;
+        device = "/opt/adguard/work";
       };
 
       containers.adguardhome = {

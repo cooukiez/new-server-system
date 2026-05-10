@@ -259,9 +259,9 @@ let
   };
 in
 {
-  home.file = dashboardFiles;
-
-  myServices.grafana.containerConfig.files."provisioning/dashboards/dashboards.yaml" = {
-    source = (pkgs.formats.yaml { }).generate "dashboards.yaml" grafanaDashboardSettings;
+  home.file = dashboardFiles // {
+    "containers/grafana/provisioning/dashboards/dashboards.yaml" = {
+      source = (pkgs.formats.yaml { }).generate "dashboards.yaml" grafanaDashboardSettings;
+    };
   };
 }

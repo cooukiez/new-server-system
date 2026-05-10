@@ -210,25 +210,6 @@ in
     grafanaPaths = grafanaPaths;
   };
 
-  # grafana
-  home.file."containers/grafana/grafana.ini".source =
-    (pkgs.formats.ini { }).generate "grafana.ini"
-      grafanaSettings;
-
-  home.file."containers/grafana/provisioning/datasources/datasources.yaml".source =
-    (pkgs.formats.yaml { }).generate "datasources.yaml"
-      grafanaDatasourceSettings;
-
-  # prometheus
-  home.file."containers/prometheus/prometheus.yml".source =
-    (pkgs.formats.yaml { }).generate "prometheus.yml"
-      prometheusSettings;
-
-  # loki
-  home.file."containers/loki/loki.yaml".source =
-    (pkgs.formats.yaml { }).generate "loki.yaml"
-      lokiSettings;
-
   myServices = {
     glances = {
       serviceConfig = {
@@ -277,6 +258,25 @@ in
       };
     };
   };
+
+  # grafana
+  home.file."containers/grafana/grafana.ini".source =
+    (pkgs.formats.ini { }).generate "grafana.ini"
+      grafanaSettings;
+
+  home.file."containers/grafana/provisioning/datasources/datasources.yaml".source =
+    (pkgs.formats.yaml { }).generate "datasources.yaml"
+      grafanaDatasourceSettings;
+
+  # prometheus
+  home.file."containers/prometheus/prometheus.yml".source =
+    (pkgs.formats.yaml { }).generate "prometheus.yml"
+      prometheusSettings;
+
+  # loki
+  home.file."containers/loki/loki.yaml".source =
+    (pkgs.formats.yaml { }).generate "loki.yaml"
+      lokiSettings;
 
   age.secrets.grafana-client-key.file = ../../secrets/auth/clients/s_grafana.age;
 
@@ -412,9 +412,7 @@ in
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # config
-            "${
-              config.myServices.prometheus.containerConfig.files."prometheus.yml".fullPath
-            }:${prometheusPaths.config}:ro,U"
+            "$${config.home.homeDirectory}/containers/prometheus/prometheus.yml:${prometheusPaths.config}:ro,U"
 
             # volumes
             "${volumes.prometheus-data.ref}:${prometheusPaths.data}:U"
@@ -495,7 +493,7 @@ in
             "/etc/localtime:/etc/localtime:ro"
 
             # config
-            "${config.myServices.loki.containerConfig.files."loki.yaml".fullPath}:${lokiPaths.config}:ro,U"
+            "${config.home.homeDirectory}/containers/loki/loki.yaml:${lokiPaths.config}:ro,U"
 
             # volumes
             "${volumes.loki-data.ref}:/loki:U"

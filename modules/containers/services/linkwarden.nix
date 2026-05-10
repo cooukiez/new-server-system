@@ -7,6 +7,7 @@
 
 {
   config,
+  pkgs,
   ports,
   envSecretsPrefix,
   ...

@@ -7,6 +7,7 @@
 
 {
   config,
+  pkgs,
   ports,
   ...
 }:
@@ -27,12 +28,6 @@ in
 
       icon = "qbittorrent";
     };
-
-    containerConfig = {
-      volumes = {
-        qbittorrent-config = "/opt/qbittorrent/data";
-      };
-    };
   };
 
   virtualisation.quadlet =
@@ -47,14 +42,13 @@ in
 
       volumes.qbittorrent-config.volumeConfig = {
         type = "bind";
-        device = config.myServices.qbittorrent.containerConfig.volumes.qbittorrent-config;
+        device = "/opt/qbittorrent/data";
       };
 
       containers.qbittorrent = {
         autoStart = true;
 
         unitConfig = {
-          # required for networking
           Requires = [ "gluetun.service" ];
           After = [ "gluetun.service" ];
         };
@@ -62,6 +56,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/qbittorrent/data"
+            ''}"
+          ];
         };
 
         containerConfig = {
