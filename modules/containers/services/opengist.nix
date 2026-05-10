@@ -29,12 +29,6 @@ in
 
       icon = "opengist";
     };
-
-    containerConfig = {
-      volumes = {
-        opengist-data = "/opt/opengist/data";
-      };
-    };
   };
 
   age.secrets =
@@ -55,7 +49,7 @@ in
     {
       volumes.opengist-data.volumeConfig = {
         type = "bind";
-        device = config.myServices.opengist.containerConfig.volumes.opengist-data;
+        device = "/opt/opengist/data";
       };
 
       containers.opengist = {
@@ -69,6 +63,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/opengist/data"
+            ''}"
+          ];
         };
 
         containerConfig = {

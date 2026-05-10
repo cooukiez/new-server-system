@@ -27,12 +27,6 @@ in
 
       icon = "https://avatars.githubusercontent.com/u/5444419?s=48&v=4";
     };
-
-    containerConfig = {
-      volumes = {
-        transfer-sh-data = "/opt/transfer-sh/data";
-      };
-    };
   };
 
   virtualisation.quadlet =
@@ -42,7 +36,7 @@ in
     {
       volumes.transfer-sh-data.volumeConfig = {
         type = "bind";
-        device = config.myServices.transfer-sh.containerConfig.volumes.transfer-sh-data;
+        device = "/opt/transfer-sh/data";
       };
 
       containers.transfer-sh = {
@@ -51,6 +45,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/transfer-sh/data"
+            ''}"
+          ];
         };
 
         containerConfig = {

@@ -28,15 +28,6 @@ in
 
       icon = "stirling-pdf";
     };
-
-    containerConfig = {
-      volumes = {
-        stirling-config = "/opt/stirling/config";
-        stirling-tessdata = "/opt/stirling/tessdata";
-        stirling-pipeline = "/opt/stirling/pipeline";
-        stirling-log = "/opt/stirling/log";
-      };
-    };
   };
 
   virtualisation.quadlet =
@@ -46,22 +37,22 @@ in
     {
       volumes.stirling-config.volumeConfig = {
         type = "bind";
-        device = config.myServices.stirling.containerConfig.volumes.stirling-config;
+        device = "/opt/stirling/config";
       };
 
       volumes.stirling-tessdata.volumeConfig = {
         type = "bind";
-        device = config.myServices.stirling.containerConfig.volumes.stirling-tessdata;
+        device = "/opt/stirling/tessdata";
       };
 
       volumes.stirling-pipeline.volumeConfig = {
         type = "bind";
-        device = config.myServices.stirling.containerConfig.volumes.stirling-pipeline;
+        device = "/opt/stirling/pipeline";
       };
 
       volumes.stirling-log.volumeConfig = {
         type = "bind";
-        device = config.myServices.stirling.containerConfig.volumes.stirling-log;
+        device = "/opt/stirling/log";
       };
 
       containers.stirling = {
@@ -69,6 +60,15 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/stirling/config"
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/stirling/tessdata"
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/stirling/pipeline"
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/stirling/log"
+            ''}"
+          ];
         };
 
         containerConfig = {

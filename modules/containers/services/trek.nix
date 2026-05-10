@@ -28,13 +28,6 @@ in
       policy = "bypass";
       icon = "https://raw.githubusercontent.com/mauriceboe/TREK/6df5edfbdb387d4dfb9c9260c0f99569a71dcd8a/server/public/icons/icon.svg";
     };
-
-    containerConfig = {
-      volumes = {
-        trek-data = "/opt/trek/data";
-        trek-uploads = "/opt/trek/uploads";
-      };
-    };
   };
 
   age.secrets =
@@ -55,12 +48,12 @@ in
     {
       volumes.trek-data.volumeConfig = {
         type = "bind";
-        device = config.myServices.trek.containerConfig.volumes.trek-data;
+        device = "/opt/trek/data";
       };
 
       volumes.trek-uploads.volumeConfig = {
         type = "bind";
-        device = config.myServices.trek.containerConfig.volumes.trek-uploads;
+        device = "/opt/trek/uploads";
       };
 
       containers.trek = {
@@ -69,6 +62,13 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/trek/data"
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/trek/uploads"
+            ''}"
+          ];
         };
 
         containerConfig = {

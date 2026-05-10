@@ -206,7 +206,7 @@ in
 
       volumes.authelia-config.volumeConfig = {
         type = "bind";
-        device = config.myServices.authelia.containerConfig.volumes.authelia-config;
+        device = "/opt/authelia/config";
       };
 
       containers.authelia = {

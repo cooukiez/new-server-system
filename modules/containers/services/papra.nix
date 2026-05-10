@@ -16,7 +16,23 @@
 let
   papraVersion = "latest";
 
-  papraAuthSettings = (import ../auth/oidc-client-configs.nix).papra;
+  papraAuthSettings = {
+    providerId = "authelia";
+    providerName = "Authelia";
+    providerIconUrl = "https://www.authelia.com/images/branding/logo-cropped.png";
+
+    clientId = "papra";
+    clientSecret = "PLACEHOLDER_CLIENT_SECRET";
+
+    type = "oidc";
+    discoveryUrl = "https://auth.home.lan/.well-known/openid-configuration";
+    scopes = [
+      "openid"
+      "profile"
+      "email"
+    ];
+  };
+
   papraAuthJson = builtins.toJSON [ papraAuthSettings ];
 
   papraAuthUnpatchedPath = "${envSecretsSuffix}/papra/auth-client-config";
@@ -77,7 +93,7 @@ in
 
       volumes.papra-data.volumeConfig = {
         type = "bind";
-        device = config.myServices.papra.containerConfig.volumes.papra-data;
+        device = "/opt/papra/data";
       };
 
       containers.papra = {
@@ -88,13 +104,16 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            (pkgs.writeShellScript "patch-papra-auth" ''
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/papra/data"
+
               SECRET_VAL=$(${pkgs.coreutils}/bin/cat ${config.age.secrets.papra-client-secret.path})
 
               ${pkgs.gnused}/bin/sed "s|PLACEHOLDER_CLIENT_SECRET|$SECRET_VAL|g" \
                 ${papraAuthUnpatchedPath} > ${papraAuthPatchedPath}
+
               ${pkgs.coreutils}/bin/chmod 644 ${papraAuthPatchedPath}
-            '')
+            ''}"
           ];
         };
 

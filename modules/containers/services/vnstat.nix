@@ -35,7 +35,7 @@ in
       inherit (config.virtualisation.quadlet) volumes networks pods;
     in
     {
-      # vnstat database volume
+      # vnstat database
       volumes.vnstat-db.volumeConfig = {
         type = "bind";
         device = "/var/lib/vnstat";

@@ -49,21 +49,4 @@
     group-claim-name = "groups";
     admin-group = "admins";
   };
-
-  papra = {
-    providerId = "authelia";
-    providerName = "Authelia";
-    providerIconUrl = "https://www.authelia.com/images/branding/logo-cropped.png";
-
-    clientId = "papra";
-    clientSecret = "PLACEHOLDER_CLIENT_SECRET";
-
-    type = "oidc";
-    discoveryUrl = "https://auth.home.lan/.well-known/openid-configuration";
-    scopes = [
-      "openid"
-      "profile"
-      "email"
-    ];
-  };
 }
