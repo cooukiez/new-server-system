@@ -14,8 +14,6 @@
   ...
 }:
 let
-  slskdSettingsFormat = pkgs.formats.yaml { };
-
   mkLidarrXml = attrs: ''
     <Config>
       ${builtins.concatStringsSep "\n  " (
@@ -51,6 +49,8 @@ let
     Branch = "nightly";
     UpdateMechanism = "Docker";
 
+    # todo: private db password
+
     # postgres configuration
     PostgresUser = "lidarr";
     PostgresPassword = "lidarr";
@@ -66,6 +66,8 @@ let
   };
 
   # slskd settings
+
+  # todo: private api key
   slskdLidarrKey = "C2h1M5wh5iNUWNLYexHuTKj5s2mu29Xk";
 
   slskdSettings = {
@@ -136,16 +138,6 @@ in
 
         icon = "lidarr";
       };
-
-      containerConfig = {
-        files."config.xml" = {
-          source = pkgs.writeText "config.xml" (mkLidarrXml lidarrSettings);
-        };
-
-        volumes = {
-          lidarr-data = "/opt/lidarr/data";
-        };
-      };
     };
 
     slskd = {
@@ -161,19 +153,16 @@ in
 
         icon = "slskd";
       };
-
-      containerConfig = {
-        files."slskd.yml" = {
-          source = (pkgs.formats.yaml { }).generate "slskd.yml" slskdSettings;
-        };
-
-        volumes = {
-          slskd-data = "/opt/slskd/data";
-          slskd-download = "/media/download/slskd";
-        };
-      };
     };
   };
+
+  home.file."containers/lidarr/config.xml".source = pkgs.writeText "config.xml" (
+    mkLidarrXml lidarrSettings
+  );
+
+  home.file."containers/slskd/slskd.yml".source =
+    (pkgs.formats.yaml { }).generate "slskd.yml"
+      slskdSettings;
 
   age.secrets =
     let
@@ -195,7 +184,12 @@ in
     {
       volumes.lidarr-data.volumeConfig = {
         type = "bind";
-        device = config.myServices.lidarr.containerConfig.volumes.lidarr-data;
+        device = "/opt/lidarr/data";
+      };
+
+      volumes.lidarr-cache.volumeConfig = {
+        type = "bind";
+        device = "/opt/lidarr/cache";
       };
 
       volumes.slskd-download.volumeConfig = {
@@ -205,9 +199,10 @@ in
 
       volumes.slskd-data.volumeConfig = {
         type = "bind";
-        device = config.myServices.slskd.containerConfig.volumes.slskd-data;
+        device = "/opt/slskd/data";
       };
 
+      # todo: bring deemix back
       containers.lidarr = {
         autoStart = true;
 
@@ -219,11 +214,15 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
           ExecStartPre = [
-            "${pkgs.coreutils}/bin/cp ${
-              config.myServices.lidarr.containerConfig.files."config.xml".fullPath
-            } /opt/lidarr/data/config.xml"
-            "${pkgs.coreutils}/bin/chmod 644 /opt/lidarr/data/config.xml"
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/lidarr/data"
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/lidarr/cache/spotify"
+
+              ${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/lidarr/config.xml /opt/lidarr/data/config.xml"
+              ${pkgs.coreutils}/bin/chmod 644 /opt/lidarr/data/config.xml
+            ''}"
           ];
         };
 
@@ -248,8 +247,9 @@ in
             "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
 
-            # config
+            # volumes
             "${volumes.lidarr-data.ref}:/config:U"
+            "${volumes.lidarr-cache.ref}:/cache:U"
 
             # media volumes
             "${volumes.media-download.ref}:/download"
@@ -273,6 +273,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/slskd/data"
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -311,7 +317,7 @@ in
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # config
-            "${config.myServices.slskd.containerConfig.files."slskd.yml".fullPath}:/app/slskd.yml:ro"
+            "${config.home.homeDirectory}/containers/slskd/slskd.yml:/app/slskd.yml:ro"
 
             # volumes
             "${volumes.slskd-data.ref}:/app"

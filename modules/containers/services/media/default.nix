@@ -39,15 +39,6 @@ in
 
       icon = "jellyfin";
     };
-
-    containerConfig = {
-      volumes = {
-        jellyfin-config = "/opt/jellyfin/config";
-        jellyfin-data = "/opt/jellyfin/data";
-        jellyfin-cache = "/opt/jellyfin/cache";
-        jellyfin-log = "/opt/jellyfin/log";
-      };
-    };
   };
 
   virtualisation.quadlet =
@@ -75,22 +66,22 @@ in
       # jellyfin volumes
       volumes.jellyfin-config.volumeConfig = {
         type = "bind";
-        device = config.myServices.jellyfin.containerConfig.volumes.jellyfin-config;
+        device = "/opt/jellyfin/config";
       };
 
       volumes.jellyfin-data.volumeConfig = {
         type = "bind";
-        device = config.myServices.jellyfin.containerConfig.volumes.jellyfin-data;
+        device = "/opt/jellyfin/data";
       };
 
       volumes.jellyfin-cache.volumeConfig = {
         type = "bind";
-        device = config.myServices.jellyfin.containerConfig.volumes.jellyfin-cache;
+        device = "/opt/jellyfin/cache";
       };
 
       volumes.jellyfin-log.volumeConfig = {
         type = "bind";
-        device = config.myServices.jellyfin.containerConfig.volumes.jellyfin-log;
+        device = "/opt/jellyfin/log";
       };
 
       containers.jellyfin = {
@@ -98,6 +89,15 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-start" ''
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/jellyfin/config"
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/jellyfin/data"
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/jellyfin/cache"
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/jellyfin/log"
+            ''}"
+          ];
         };
 
         containerConfig = {

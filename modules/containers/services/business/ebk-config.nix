@@ -128,7 +128,33 @@
       max_failures_per_user_per_minute = 5;
     };
 
-    auth = (import ../../auth/oidc-client-configs.nix).ebk;
+    auth = {
+      enable_internal_auth = false;
+      enable_oauth2_auth = true;
+      # enable_two_factor = true;
+
+      enable_forget_password = false;
+      forget_password_require_email_verify = false;
+
+      oauth2_provider = "oidc";
+      oauth2_client_id = "ezbookkeeping";
+
+      oauth2_user_identifier = "email";
+      oauth2_use_pkce = true;
+      oauth2_auto_register = true;
+
+      oauth2_state_expired_time = 300;
+      oauth2_request_timeout = 10000;
+
+      oauth2_proxy = "system";
+      oauth2_skip_tls_verify = false;
+
+      oidc_provider_base_url = "https://auth.home.lan";
+      oidc_provider_check_issuer_url = true;
+
+      enable_oidc_display_name = true;
+      oidc_custom_display_name = "Authelia";
+    };
 
     user = {
       enable_register = true;
