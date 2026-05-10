@@ -22,8 +22,9 @@
       ll = "ls -la";
       gs = "git status";
 
-      us = "sudo nixos-rebuild switch --upgrade-all --impure";
-      sw-nix = "sudo nixos-rebuild switch --impure";
+      us = "sudo nixos-rebuild switch --impure";
+      uus = "sudo nixos-rebuild switch --upgrade-all --impure";
+      uso = "sudo nixos-rebuild switch --offline --impure";
 
       nus = "nh os switch /etc/nixos";
       nuus = "nh os switch /etc/nixos --update";

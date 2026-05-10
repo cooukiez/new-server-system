@@ -9,8 +9,6 @@
   #
   # core
   #
-
-  # auth
   authelia = 9091;
   lldap = 3890;
   lldapWeb = 17170;
@@ -46,8 +44,6 @@
   #
   # services
   #
-
-  # automization
   nodeRed = 1880;
   crontab = 8030;
 

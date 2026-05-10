@@ -35,7 +35,7 @@ while IFS= read -r -d '' file; do
     header="/*
   $rel_path
 
-  part of der-home-server
+  part of server system
   created $created_date
 */"
 
@@ -83,5 +83,3 @@ while IFS= read -r -d '' file; do
     rm "$tmp"
 
 done < <(find "$base_dir" -type f -name "*.nix" -print0)
-
-echo "headers processed."

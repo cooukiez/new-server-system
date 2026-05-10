@@ -12,6 +12,8 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
+    nixos-system.url = "github:cooukiez/nixos-system";
+
     home-manager = {
       url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -31,141 +33,56 @@
       inherit (self) outputs;
       lib = nixpkgs.lib;
 
-      globalConfig = {
-        dnsServers = [
-          "1.1.1.1"
-          "8.8.8.8"
-          "9.9.9.9"
-        ];
+      hostDirs = lib.attrNames (
+        lib.filterAttrs (name: type: type == "directory") (builtins.readDir ./hosts)
+      );
 
-        hostname = "dhs";
-        hostSystem = "x86_64-linux";
-        staticIP = "192.168.178.3";
-
-        squ = {
-          uid = 10000;
-          gid = 10000;
-        };
-
-        ports = import ./port-configuration.nix;
-        users = import ./user-configuration.nix;
-      };
-
-      systems = [ globalConfig.hostSystem ];
-      forAllSystems = lib.genAttrs systems;
-
-      mkUsers =
-        pkgs:
-        (lib.mapAttrs (_: user: {
-          description = user.fullName;
-          password = "CHANGE-ME";
-
-          isNormalUser = true;
-          createHome = true;
-
-          extraGroups = [
-            "wheel"
-            "networkmanager"
-          ];
-          shell = pkgs.zsh;
-        }) globalConfig.users)
-        // {
-          squ = {
-            description = "quadlet-user";
-            uid = globalConfig.squ.uid;
-            group = "squ";
-
-            isNormalUser = true;
-            createHome = true;
-
-            linger = true;
-            autoSubUidGidRange = true;
-          };
-        };
-
-      mkNixos =
-        hostname:
+      mkHost =
+        hostName:
+        let
+          hostPath = ./hosts/${hostName};
+          hostConfig = import "${hostPath}/host.nix";
+          userList = import ./users.nix;
+        in
         lib.nixosSystem {
+          system = hostConfig.hostSystem;
           specialArgs = {
-            inherit inputs outputs globalConfig;
-            nixosModules = "${self}/modules/nixos";
+            inherit
+              inputs
+              outputs
+              hostConfig
+              userList
+              ;
+            inherit (hostConfig) hostname;
           };
 
           modules = [
-            outputs.nixosModules.common
-            outputs.nixosModules.core
-            outputs.nixosModules.services
-            outputs.containerModules
+            hostPath
 
-            inputs.home-manager.nixosModules.home-manager
-            inputs.quadlet-nix.nixosModules.quadlet
-            inputs.agenix.nixosModules.default
-
-            outputs.homeConfigurations.admin
-
-            (
-              { pkgs, ... }:
-              {
-                nixpkgs = {
-                  overlays = [
-                    inputs.self.overlays.additions
-                    inputs.self.overlays.modifications
-                    inputs.self.overlays.unstable-packages
-                  ];
-
-                  config.allowUnfree = true;
-                  config.permittedInsecurePackages = [ ];
-                };
-
-                nix =
-                  let
-                    flakeInputs = lib.filterAttrs (_: lib.isType "flake") inputs;
-                    myNixPath = lib.mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
-                  in
-                  {
-                    settings = {
-                      experimental-features = "nix-command flakes";
-                      flake-registry = "";
-                      nix-path = myNixPath;
-                    };
-
-                    registry = lib.mapAttrs (_: flake: { inherit flake; }) flakeInputs;
-                    nixPath = myNixPath;
-
-                    channel.enable = false;
-                    optimise.automatic = true;
-                    optimise.dates = [ "03:45" ];
-                  };
-
-                users.users = mkUsers pkgs;
-                users.groups.squ.gid = globalConfig.squ.gid;
-
-                system.stateVersion = "25.11";
-              }
-            )
+            ({ system.stateVersion = "25.11"; })
           ];
         };
+
+      system = "x86_64-linux";
+      supportedSystems = [ system ];
+
+      forAllSystems = lib.genAttrs supportedSystems;
     in
     {
       packages = forAllSystems (system: import ./pkgs nixpkgs.legacyPackages.${system});
+      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
+
       overlays = {
-        inherit (import ./overlays { inherit inputs; })
+        inherit (import ./overlays { inherit inputs system; })
           additions
           modifications
           unstable-packages
           ;
       };
 
-      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
+      systemModules = import ./modules/system;
+      homeModules = import ./modules/home;
 
-      nixosModules = import ./modules/nixos;
-      homeManagerModules = import ./modules/home;
-      containerModules = import ./modules/containers;
-
-      homeConfigurations = import ./home;
-
-      nixosConfigurations = {
-        dhs = mkNixos "dhs";
-      };
+      nixosConfigurations = lib.genAttrs hostDirs (name: mkHost name);
     };
 }
