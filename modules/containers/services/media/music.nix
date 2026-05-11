@@ -300,9 +300,9 @@ in
           };
 
           environmentFiles = [
-            "containers/secrets/slskd/e_user"
-            "containers/secrets/slskd/e_pass"
-            "containers/secrets/slskd/e_webui-pw"
+            "secrets/containers/slskd/e_user"
+            "secrets/containers/slskd/e_pass"
+            "secrets/containers/slskd/e_webui-pw"
           ];
 
           volumes = [
