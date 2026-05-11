@@ -39,7 +39,7 @@ in
       };
     in
     {
-      grafana-client-key = mkSecret "s_gluetun-key";
+      proton-key = mkSecret "proton-key";
     };
 
   virtualisation.quadlet =
@@ -103,7 +103,7 @@ in
             "/etc/localtime:/etc/localtime:ro"
 
             # secrets
-            "${config.age.secrets.gluetun-key.path}:/run/secrets/WIREGUARD_KEY:ro"
+            "${config.age.secrets.proton-key.path}:/run/secrets/WIREGUARD_KEY:ro"
 
             # volumes
             "${volumes.gluetun-data.ref}:/gluetun:U"
