@@ -311,11 +311,6 @@ in
 
           ExecStartPre = [
             "+${pkgs.writeShellScript "pre-grafana" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/grafana/provisiong"
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/grafana/data"
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/grafana/plugins"
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/grafana/log"
-
               ${pkgs.coreutils}/bin/cp -rfL ${config.home.homeDirectory}/containers/grafana/provisioning/. /opt/grafana/provisioning/
             ''}"
           ];
@@ -378,12 +373,6 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-prometheus" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/prometheus/data"
-            ''}"
-          ];
         };
 
         containerConfig = {
@@ -465,12 +454,6 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-loki" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/loki/data"
-            ''}"
-          ];
         };
 
         containerConfig = {

@@ -62,12 +62,6 @@
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-mail-archiver" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/mail-archiver/protection-keys"
-            ''}"
-          ];
         };
 
         containerConfig = {

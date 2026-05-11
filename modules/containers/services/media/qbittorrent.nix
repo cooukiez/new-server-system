@@ -10,6 +10,7 @@
   pkgs,
   images,
   ports,
+  downloadPath,
   ...
 }:
 {
@@ -35,7 +36,7 @@
     {
       volumes.qbittorrent-download.volumeConfig = {
         type = "bind";
-        device = "/media/download/qbittorrent";
+        device = "${downloadPath}/qbittorrent";
       };
 
       volumes.qbittorrent-config.volumeConfig = {
@@ -54,12 +55,6 @@
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-qbittorrent" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/qbittorrent/data"
-            ''}"
-          ];
         };
 
         containerConfig = {

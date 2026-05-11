@@ -71,12 +71,6 @@
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-linkwarden-meili" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/linkwarden/meili"
-            ''}"
-          ];
         };
 
         containerConfig = {
@@ -119,12 +113,6 @@
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-linkwarden" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/linkwarden/data"
-            ''}"
-          ];
         };
 
         containerConfig = {

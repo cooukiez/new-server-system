@@ -49,12 +49,6 @@
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-atuin" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/atuin/config"
-            ''}"
-          ];
         };
 
         containerConfig = {

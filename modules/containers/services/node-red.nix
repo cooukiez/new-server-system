@@ -55,12 +55,6 @@
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-node-red" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/node-red/data"
-            ''}"
-          ];
         };
 
         containerConfig = {

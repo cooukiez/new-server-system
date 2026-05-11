@@ -10,21 +10,15 @@
   pkgs,
   images,
   ports,
+  musicPath,
+  downloadPath,
   ...
 }:
-let
-  downloadPath = "/media/download";
-  musicPath = "/media/music";
-in
 {
   imports = [
     ./music.nix
     ./qbittorrent.nix
   ];
-
-  _module.args = {
-    musicPath = musicPath;
-  };
 
   myServices.jellyfin = {
     serviceConfig = {
@@ -53,14 +47,14 @@ in
       };
 
       # general volumes
-      volumes.media-download.volumeConfig = {
-        type = "bind";
-        device = downloadPath;
-      };
-
       volumes.media-music.volumeConfig = {
         type = "bind";
         device = musicPath;
+      };
+
+      volumes.media-download.volumeConfig = {
+        type = "bind";
+        device = downloadPath;
       };
 
       # jellyfin volumes

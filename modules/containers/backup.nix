@@ -10,6 +10,7 @@
   pkgs,
   images,
   ports,
+  documentsPath,
   ...
 }:
 {
@@ -42,7 +43,7 @@
       # source
       volumes.data-documents.volumeConfig = {
         type = "bind";
-        device = "/data/documents";
+        device = documentsPath;
       };
 
       volumes.data-opt.volumeConfig = {
@@ -101,13 +102,6 @@
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-borg" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/borg/data"
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/borg/cache"
-            ''}"
-          ];
         };
 
         containerConfig = {

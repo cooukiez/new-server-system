@@ -76,13 +76,6 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-ebk" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/ebk/data"
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/ebk/log"
-            ''}"
-          ];
         };
 
         containerConfig = {

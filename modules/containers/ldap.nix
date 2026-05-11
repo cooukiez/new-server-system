@@ -57,12 +57,6 @@
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-lldap" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/lldap/data"
-            ''}"
-          ];
         };
 
         containerConfig = {

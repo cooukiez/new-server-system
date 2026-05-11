@@ -49,12 +49,6 @@
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-gitea" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/gitea/data"
-            ''}"
-          ];
         };
 
         containerConfig = {

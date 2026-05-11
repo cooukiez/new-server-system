@@ -12,6 +12,7 @@
   ports,
   envSecretsPrefix,
   musicPath,
+  downloadPath,
   ...
 }:
 let
@@ -114,6 +115,8 @@ let
           version = 1;
           url = "http://gluetun:8888";
           auth = "apikey";
+
+          # todo: private api key
           apiKey = "169qzBxFa0ET26rkTWa3akmVopysVilS";
         };
       };
@@ -191,7 +194,7 @@ in
 
       volumes.slskd-download.volumeConfig = {
         type = "bind";
-        device = "/media/download/slskd";
+        device = "${downloadPath}/slskd";
       };
 
       volumes.slskd-data.volumeConfig = {
@@ -214,7 +217,7 @@ in
 
           ExecStartPre = [
             "+${pkgs.writeShellScript "pre-lidarr" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/lidarr/data"
+              ${pkgs.coreutils}/bin/mkdir -p "${downloadPath}/deezer"
               ${pkgs.coreutils}/bin/mkdir -p "/opt/lidarr/cache/spotify"
 
               ${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/lidarr/config.xml /opt/lidarr/data/config.xml
@@ -273,7 +276,8 @@ in
 
           ExecStartPre = [
             "+${pkgs.writeShellScript "pre-slskd" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/slskd/data"
+              ${pkgs.coreutils}/bin/mkdir -p "${downloadPath}/slskd/finished"
+              ${pkgs.coreutils}/bin/mkdir -p "${downloadPath}/slskd/incomplete"
             ''}"
           ];
         };

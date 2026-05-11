@@ -12,6 +12,7 @@
   ports,
   envSecretsSuffix,
   envSecretsPrefix,
+  documentsPath,
   ...
 }:
 let
@@ -81,7 +82,7 @@ in
     {
       volumes.data-documents.volumeConfig = {
         type = "bind";
-        device = "/data/documents";
+        device = documentsPath;
       };
 
       volumes.papra-data.volumeConfig = {
@@ -98,8 +99,6 @@ in
 
           ExecStartPre = [
             "+${pkgs.writeShellScript "pre-papra" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/papra/data"
-
               SECRET_VAL=$(${pkgs.coreutils}/bin/cat ${config.age.secrets.papra-client-secret.path})
 
               ${pkgs.gnused}/bin/sed "s|PLACEHOLDER_CLIENT_SECRET|$SECRET_VAL|g" \

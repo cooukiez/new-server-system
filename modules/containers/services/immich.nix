@@ -10,11 +10,9 @@
   pkgs,
   images,
   ports,
+  photosPath,
   ...
 }:
-let
-  photosPath = "/media/photos";
-in
 {
   myServices.immich = {
     serviceConfig = {
@@ -72,12 +70,6 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-immich-ml" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/immich/ml-cache"
-            ''}"
-          ];
         };
 
         containerConfig = {
@@ -103,12 +95,6 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-immich-redis" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/immich/redis"
-            ''}"
-          ];
         };
 
         containerConfig = {
@@ -130,12 +116,6 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-immich-postgres" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/immich/db"
-            ''}"
-          ];
         };
 
         containerConfig = {

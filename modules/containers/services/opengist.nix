@@ -61,12 +61,6 @@
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-opengist" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/opengist/data"
-            ''}"
-          ];
         };
 
         containerConfig = {

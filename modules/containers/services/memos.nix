@@ -60,12 +60,6 @@
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-memos" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/memos/data"
-            ''}"
-          ];
         };
 
         containerConfig = {

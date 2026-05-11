@@ -145,13 +145,6 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-caddy" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/caddy/config"
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/caddy/data"
-            ''}"
-          ];
         };
 
         containerConfig = {

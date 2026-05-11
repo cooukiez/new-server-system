@@ -125,9 +125,6 @@ in
 
           ExecStartPre = [
             "+${pkgs.writeShellScript "pre-adguard" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/adguard/conf"
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/adguard/work"
-
               ${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/adguard/AdGuardHome.yaml /opt/adguard/conf/AdGuardHome.yaml
               ${pkgs.coreutils}/bin/chmod 644 /opt/adguard/conf/AdGuardHome.yaml
             ''}"
