@@ -32,7 +32,7 @@
     };
 
     auth = {
-      type = "remote_user";
+      type = "http_x_remote_user";
 
       # cache_logins = false;
       # cache_successful_logins_expiry = 15;

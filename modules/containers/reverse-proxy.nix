@@ -117,7 +117,7 @@ in
           handle @dav {
             import auth_verify
             reverse_proxy host.containers.internal:${toString ports.radicale} {
-              header_up X-Remote-User {http.auth.user.id}
+              header_up X-Remote-User {header.Remote-User}
             }
           }
 
