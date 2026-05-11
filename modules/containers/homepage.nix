@@ -218,7 +218,7 @@ in
       };
     in
     {
-      homepage-tailscale = mkSecret "s_tailscale-api";
+      homepage-tailscale = mkSecret "tailscale-api";
     };
 
   virtualisation.quadlet =

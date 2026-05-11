@@ -33,11 +33,12 @@
   age.secrets =
     let
       mkSecret = name: {
-        file = ../../../secrets/${name}.age;
-        path = "${envSecretsPrefix}/${name}";
+        file = ../../../secrets/containers/memos/${name}.age;
       };
     in
-    { };
+    {
+      memos-db-pass = mkSecret "s_db-pass";
+    };
 
   virtualisation.quadlet =
     let

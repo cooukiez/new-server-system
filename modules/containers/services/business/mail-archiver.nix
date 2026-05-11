@@ -32,13 +32,14 @@
   age.secrets =
     let
       mkSecret = name: {
-        file = ../../../../secrets/${name}.age;
-        path = "${envSecretsPrefix}/${name}";
+        file = ../../../../secrets/containers/archiver/${name}.age;
+        path = "${envSecretsPrefix}/containers/archiver/${name}";
         mode = "444";
       };
     in
     {
-      archiver-client-key = mkSecret "auth/clients/e_mail-archiver";
+      archiver-admin-pass = mkSecret "e_admin-pass";
+      archiver-client-key = mkSecret "e_auth-client";
     };
 
   virtualisation.quadlet =
@@ -80,7 +81,6 @@
 
             # fallback credentials first login
             Authentication__Username = "admin";
-            Authentication__Password = "admin";
             Authentication__SessionTimeoutMinutes = "60";
 
             BandwidthTracking__Enabled = "false";
@@ -119,7 +119,8 @@
           };
 
           environmentFiles = [
-            "secrets/auth/clients/e_mail-archiver"
+            "secrets/containers/archiver/e_admin-pass"
+            "secrets/containers/archiver/e_auth-client"
           ];
 
           volumes = [

@@ -32,17 +32,18 @@
   age.secrets =
     let
       mkSecret = name: {
-        file = ../../../secrets/${name}.age;
-        path = "${envSecretsPrefix}/${name}";
+        file = ../../../secrets/containers/link/${name}.age;
+        path = "${envSecretsPrefix}/containers/link/${name}";
         mode = "444";
       };
     in
     {
-      link-meili-key = mkSecret "link/e_link-meili-key";
+      link-client-key = mkSecret "e_auth-client";
+      link-meili-key = mkSecret "e_link-meili-key";
+      link-input-meili = mkSecret "e_meili-key";
+      link-next-auth = mkSecret "e_next-auth";
 
-      link-client-key = mkSecret "auth/clients/e_link";
-      link-input-meili = mkSecret "link/e_meili-key";
-      link-next-auth = mkSecret "link/e_next-auth";
+      link-db-pass.file = ../../../secrets/containers/link/s_db-pass.age;
     };
 
   virtualisation.quadlet =
@@ -83,7 +84,7 @@
           };
 
           environmentFiles = [
-            "secrets/link/e_meili-key"
+            "secrets/containers/link/e_meili-key"
           ];
 
           volumes = [
@@ -142,9 +143,9 @@
           };
 
           environmentFiles = [
-            "secrets/auth/clients/e_link"
-            "secrets/link/e_link-meili-key"
-            "secrets/link/e_next-auth"
+            "secrets/containers/link/e_auth-client"
+            "secrets/containers/link/e_link-meili-key"
+            "secrets/containers/link/e_next-auth"
           ];
 
           volumes = [

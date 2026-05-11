@@ -133,12 +133,12 @@ let
   };
 
   secretMap = {
-    auth-ldap-pw = "ldap/s_admin-pass";
+    auth-ldap-pw = "auth/ldap/s_admin-pass";
 
     auth-jwt = "auth/s_jwt-secret";
     auth-session = "auth/s_session";
 
-    auth-postgres-pw = "s_postgres-pw";
+    auth-postgres-pw = "db/s_postgres-pw";
     auth-storage-key = "auth/s_storage-key";
 
     auth-oidc-hmac = "auth/s_oidc-hmac";

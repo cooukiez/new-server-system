@@ -275,11 +275,11 @@ in
   age.secrets =
     let
       mkSecret = name: {
-        file = ../../secrets/${name}.age;
+        file = ../../secrets/containers/grafana/${name}.age;
       };
     in
     {
-      grafana-client-key = mkSecret "auth/clients/s_grafana";
+      grafana-client-key = mkSecret "s_auth-client";
     };
 
   virtualisation.quadlet =

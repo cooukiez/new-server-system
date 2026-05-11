@@ -31,12 +31,12 @@
   age.secrets =
     let
       mkSecret = name: {
-        file = ../../../secrets/${name}.age;
-        path = "${envSecretsPrefix}/${name}";
+        file = ../../../secrets/containers/trek/${name}.age;
+        path = "${envSecretsPrefix}/containers/trek/${name}";
       };
     in
     {
-      trek-admin-password = mkSecret "auth/clients/e_trek";
+      trek-client-key = mkSecret "e_auth-client";
     };
 
   virtualisation.quadlet =
@@ -97,7 +97,7 @@
           };
 
           environmentFiles = [
-            "secrets/auth/clients/e_trek"
+            "secrets/containers/trek/e_auth-client"
           ];
 
           volumes = [

@@ -32,12 +32,13 @@
   age.secrets =
     let
       mkSecret = name: {
-        file = ../../../secrets/${name}.age;
-        path = "${envSecretsPrefix}/${name}";
+        file = ../../../secrets/containers/opengist/${name}.age;
+        path = "${envSecretsPrefix}/containers/opengist/${name}";
       };
     in
     {
-      opengist-client-key = mkSecret "auth/clients/e_opengist";
+      opengist-client-key = mkSecret "e_auth-client";
+      opengist-db-pass.file = ../../../secrets/containers/opengist/s_db-pass.age;
     };
 
   virtualisation.quadlet =
@@ -93,7 +94,7 @@
           };
 
           environmentFiles = [
-            "secrets/auth/clients/e_opengist"
+            "secrets/containers/opengist/e_auth-client"
           ];
 
           volumes = [

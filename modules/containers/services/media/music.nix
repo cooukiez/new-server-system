@@ -172,9 +172,9 @@ in
       };
     in
     {
-      slskd-user = mkSecret "slskd/e_user";
-      slskd-pass = mkSecret "slskd/e_pass";
-      slskd-webui = mkSecret "slskd/e_webui-pw";
+      slskd-user = mkSecret "containers/slskd/e_user";
+      slskd-pass = mkSecret "containers/slskd/e_pass";
+      slskd-webui = mkSecret "containers/slskd/e_webui-pw";
     };
 
   virtualisation.quadlet =
@@ -300,9 +300,9 @@ in
           };
 
           environmentFiles = [
-            "secrets/slskd/e_user"
-            "secrets/slskd/e_pass"
-            "secrets/slskd/e_webui-pw"
+            "containers/secrets/slskd/e_user"
+            "containers/secrets/slskd/e_pass"
+            "containers/secrets/slskd/e_webui-pw"
           ];
 
           volumes = [

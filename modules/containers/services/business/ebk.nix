@@ -40,13 +40,13 @@ in
   age.secrets =
     let
       mkSecret = name: {
-        file = ../../../../secrets/${name}.age;
+        file = ../../../../secrets/containers/ebk/${name}.age;
         mode = "444";
       };
     in
     {
-      ebk-client-key = mkSecret "auth/clients/s_ebk";
-      ebk-secret-key = mkSecret "ebk/s_secret-key";
+      ebk-client-key = mkSecret "s_auth-client";
+      ebk-secret-key = mkSecret "s_secret-key";
     };
 
   virtualisation.quadlet =

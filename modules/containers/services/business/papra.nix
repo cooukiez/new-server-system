@@ -35,8 +35,8 @@ let
 
   papraAuthJson = builtins.toJSON [ papraAuthSettings ];
 
-  papraAuthUnpatchedPath = "${envSecretsSuffix}/papra/auth-client-config";
-  papraAuthPatchedPath = "${envSecretsSuffix}/papra/auth-client-config-patched";
+  papraAuthUnpatchedPath = "${envSecretsSuffix}/containers/papra/auth-client-config";
+  papraAuthPatchedPath = "${envSecretsSuffix}/containers/papra/auth-client-config-patched";
 in
 {
   myServices.papra = {
@@ -63,16 +63,16 @@ in
   age.secrets =
     let
       mkSecret = name: {
-        file = ../../../../secrets/${name}.age;
-        path = "${envSecretsPrefix}/${name}";
+        file = ../../../../secrets/containers/papra/${name}.age;
+        path = "${envSecretsPrefix}/containers/papra/${name}";
       };
     in
     {
-      papra-auth-secret = mkSecret "papra/e_auth-secret";
-      papra-storage-key = mkSecret "papra/e_storage-key";
-      papra-webhook-secret = mkSecret "papra/e_webhook-secret";
+      papra-auth-secret = mkSecret "e_auth-secret";
+      papra-storage-key = mkSecret "e_storage-key";
+      papra-webhook-secret = mkSecret "e_webhook-secret";
 
-      papra-client-secret.file = ../../../../secrets/auth/clients/s_papra.age;
+      papra-client-key = mkSecret "s_auth-client";
     };
 
   virtualisation.quadlet =
@@ -100,7 +100,7 @@ in
           ExecStartPre = [
             # todo: write universal secrets patcher
             "+${pkgs.writeShellScript "pre-papra" ''
-              SECRET_VAL=$(${pkgs.coreutils}/bin/cat ${config.age.secrets.papra-client-secret.path})
+              SECRET_VAL=$(${pkgs.coreutils}/bin/cat ${config.age.secrets.papra-client-key.path})
 
               ${pkgs.gnused}/bin/sed "s|PLACEHOLDER_CLIENT_SECRET|$SECRET_VAL|g" \
                 ${papraAuthUnpatchedPath} > ${papraAuthPatchedPath}
@@ -141,10 +141,10 @@ in
           };
 
           environmentFiles = [
-            "secrets/papra/e_auth-secret"
-            "secrets/papra/e_webhook-secret"
+            "secrets/containers/papra/e_auth-secret"
+            "secrets/containers/papra/e_webhook-secret"
 
-            "secrets/papra/auth-client-config-patched"
+            "secrets/containers/papra/auth-client-config-patched"
           ];
 
           volumes = [

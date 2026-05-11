@@ -33,11 +33,11 @@
   age.secrets =
     let
       mkSecret = name: {
-        file = ../../secrets/${name}.age;
+        file = ../../../secrets/containers/immich/${name}.age;
       };
     in
     {
-      immich-db-pw = mkSecret "s_postgres-pw";
+      immich-db-pass = mkSecret "s_db-pass";
     };
 
   virtualisation.quadlet =
@@ -131,7 +131,7 @@
 
           environments = {
             POSTGRES_USER = "admin";
-            POSTGRES_PASSWORD_FILE = "/run/secrets/IMMICH_DB_PW";
+            POSTGRES_PASSWORD_FILE = "/run/secrets/IMMICH_DB_PASS";
 
             POSTGRES_DB = "immich";
             POSTGRES_INITDB_ARGS = "--data-checksums";
@@ -142,7 +142,7 @@
             "/etc/localtime:/etc/localtime:ro"
 
             "${volumes.immich-db.ref}:/var/lib/postgresql/data:U"
-            "${config.age.secrets.immich-db-pw.path}:/run/secrets/IMMICH_DB_PW:ro"
+            "${config.age.secrets.immich-db-pass.path}:/run/secrets/IMMICH_DB_PASS:ro"
           ];
         };
       };
@@ -186,7 +186,7 @@
             DB_PORT = "5432";
 
             DB_USERNAME = "admin";
-            DB_PASSWORD_FILE = "/run/secrets/IMMICH_DB_PW";
+            DB_PASSWORD_FILE = "/run/secrets/IMMICH_DB_PASS";
 
             IMMICH_MACHINE_LEARNING_URL = "http://immich-ml:3003";
             REDIS_HOSTNAME = "immich-redis";
@@ -203,7 +203,7 @@
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # secrets
-            "${config.age.secrets.immich-db-pw.path}:/run/secrets/IMMICH_DB_PW:ro"
+            "${config.age.secrets.immich-db-pass.path}:/run/secrets/IMMICH_DB_PASS:ro"
 
             # volumes
             "${volumes.immich-media.ref}:/data:U"
