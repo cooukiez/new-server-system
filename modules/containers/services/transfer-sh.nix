@@ -8,12 +8,10 @@
 {
   config,
   pkgs,
+  images,
   ports,
   ...
 }:
-let
-  transferSHVersion = "latest-noroot";
-in
 {
   myServices.transfer-sh = {
     serviceConfig = {
@@ -55,7 +53,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/dutchcoders/transfer.sh:${transferSHVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.transfer-sh}";
           name = "transfer-sh";
 
           exec = [

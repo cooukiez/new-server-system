@@ -9,12 +9,11 @@
   config,
   pkgs,
   hostConfig,
+  images,
   ports,
   ...
 }:
 let
-  adguardVersion = "latest";
-
   adguardSettings = {
     http = {
       address = "0.0.0.0:3000";
@@ -136,7 +135,7 @@ in
         };
 
         containerConfig = {
-          image = "adguard/adguardhome:${adguardVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.adguard}";
           name = "adguardhome";
           addCapabilities = [ "NET_BIND_SERVICE" ];
 

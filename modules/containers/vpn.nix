@@ -8,15 +8,13 @@
 {
   config,
   pkgs,
+  images,
   ports,
   ...
 }:
 let
   # todo: gluetun key in agenix
   gluetunKey = "169qzBxFa0ET26rkTWa3akmVopysVilS";
-
-  gluetunVersion = "latest";
-  gluetunWebUIVersion = "latest";
 in
 {
   myServices.gluetun = {
@@ -60,7 +58,7 @@ in
         };
 
         containerConfig = {
-          image = "ghcr.io/qdm12/gluetun:${gluetunVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.gluetun}";
           name = "gluetun";
           networks = [ "vpn-service-net" ];
 
@@ -125,7 +123,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/scuzza/gluetun-webui:${gluetunWebUIVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.gluetun-webui}";
           name = "gluetun-webui";
           networks = [ "vpn-service-net" ];
 

@@ -8,12 +8,10 @@
 {
   config,
   pkgs,
+  images,
   ports,
   ...
 }:
-let
-  stirlingVersion = "latest";
-in
 {
   myServices.stirling = {
     serviceConfig = {
@@ -73,7 +71,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/stirlingtools/stirling-pdf:${stirlingVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.stirling}";
           name = "stirling";
 
           environments = {

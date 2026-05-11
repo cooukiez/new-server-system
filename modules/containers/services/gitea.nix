@@ -8,12 +8,10 @@
 {
   config,
   pkgs,
+  images,
   ports,
   ...
 }:
-let
-  giteaVersion = "1.25.5";
-in
 {
   myServices.gitea = {
     serviceConfig = {
@@ -60,7 +58,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.gitea.com/gitea:${giteaVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.gitea}";
           name = "gitea";
 
           addHosts = [

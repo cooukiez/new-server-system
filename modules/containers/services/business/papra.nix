@@ -8,14 +8,13 @@
 {
   config,
   pkgs,
+  images,
   ports,
   envSecretsSuffix,
   envSecretsPrefix,
   ...
 }:
 let
-  papraVersion = "latest";
-
   papraAuthSettings = {
     providerId = "authelia";
     providerName = "Authelia";
@@ -112,7 +111,7 @@ in
         };
 
         containerConfig = {
-          image = "ghcr.io/papra-hq/papra:${papraVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.papra}";
           name = "papra";
 
           addHosts = [

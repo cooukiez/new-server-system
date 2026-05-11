@@ -8,13 +8,11 @@
 {
   config,
   pkgs,
+  images,
   ports,
   envSecretsPrefix,
   ...
 }:
-let
-  mailArchiverVersion = "latest";
-in
 {
   myServices.mailArchiver = {
     serviceConfig = {
@@ -73,7 +71,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/s1t5/mailarchiver:${mailArchiverVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.mail-archiver}";
           name = "mail-archiver";
 
           addHosts = [

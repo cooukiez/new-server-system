@@ -8,17 +8,11 @@
 {
   config,
   pkgs,
+  images,
   ports,
   ...
 }:
 let
-  grafanaVersion = "latest";
-
-  prometheusVersion = "latest";
-  prometheusPodmanExporterVersion = "latest";
-
-  lokiVersion = "latest";
-
   prometheusDatasource = "PBFA97CFB590B2093";
   lokiDatasource = "P8E80F9AEF21F6940";
 
@@ -328,7 +322,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/grafana/grafana-enterprise:${grafanaVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.grafana}";
           name = "grafana";
           networks = [ "monitoring.network" ];
 
@@ -393,7 +387,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/prom/prometheus:${prometheusVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.prometheus}";
           name = "prometheus";
           networks = [ "monitoring.network" ];
 
@@ -440,7 +434,7 @@ in
         };
 
         containerConfig = {
-          image = "quay.io/navidys/prometheus-podman-exporter:${prometheusPodmanExporterVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.prometheus-podman-exporter}";
           name = "podman-exporter";
           networks = [ "monitoring.network" ];
 
@@ -480,7 +474,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/grafana/loki:${lokiVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.loki}";
           name = "loki";
           networks = [ "monitoring.network" ];
 

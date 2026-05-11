@@ -8,12 +8,10 @@
 {
   config,
   pkgs,
+  images,
   ports,
   ...
 }:
-let
-  atuinVersion = "latest";
-in
 {
   myServices.atuin = {
     serviceConfig = {
@@ -60,7 +58,7 @@ in
         };
 
         containerConfig = {
-          image = "ghcr.io/atuinsh/atuin:${atuinVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.atuin}";
           name = "atuin";
 
           exec = [ "start" ];

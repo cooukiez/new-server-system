@@ -8,14 +8,11 @@
 {
   config,
   pkgs,
+  images,
   ports,
   envSecretsPrefix,
   ...
 }:
-let
-  meiliVersion = "latest";
-  linkwardenVersion = "latest";
-in
 {
   myServices.linkwarden = {
     serviceConfig = {
@@ -83,7 +80,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/getmeili/meilisearch:${meiliVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.meili}";
           name = "linkwarden-meili";
           networks = [ "linkwarden-net" ];
 
@@ -131,7 +128,7 @@ in
         };
 
         containerConfig = {
-          image = "ghcr.io/linkwarden/linkwarden:${linkwardenVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.linkwarden}";
           name = "linkwarden";
           networks = [ "linkwarden-net" ];
 

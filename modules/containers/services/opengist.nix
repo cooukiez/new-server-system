@@ -8,13 +8,11 @@
 {
   config,
   pkgs,
+  images,
   ports,
   envSecretsPrefix,
   ...
 }:
-let
-  opengistVersion = "latest";
-in
 {
   myServices.opengist = {
     serviceConfig = {
@@ -72,7 +70,7 @@ in
         };
 
         containerConfig = {
-          image = "ghcr.io/thomiceli/opengist:${opengistVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.opengist}";
           name = "opengist";
           user = "0:0";
 

@@ -8,13 +8,11 @@
 {
   config,
   pkgs,
+  images,
   ports,
   envSecretsPrefix,
   ...
 }:
-let
-  nodeRedVersion = "latest";
-in
 {
   myServices.nodeRed = {
     serviceConfig = {
@@ -66,7 +64,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/nodered/node-red:${nodeRedVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.node-red}";
           name = "node-red";
 
           addHosts = [

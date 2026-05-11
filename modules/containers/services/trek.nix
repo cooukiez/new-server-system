@@ -8,13 +8,11 @@
 {
   config,
   pkgs,
+  images,
   ports,
   envSecretsPrefix,
   ...
 }:
-let
-  trekVersion = "latest";
-in
 {
   myServices.trek = {
     serviceConfig = {
@@ -72,7 +70,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/mauriceboe/trek:${trekVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.trek}";
           name = "trek";
 
           addHosts = [

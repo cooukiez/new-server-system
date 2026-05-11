@@ -8,13 +8,11 @@
 {
   config,
   pkgs,
+  images,
   ports,
   ...
 }:
 let
-  postgresVersion = "alpine";
-  pgadminVersion = "latest";
-
   # todo: make passwords secret
   services = [
     {
@@ -178,7 +176,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/library/postgres:${postgresVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.postgres}";
           name = "postgres";
           networks = [ "postgres-net" ];
 
@@ -229,7 +227,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/dpage/pgadmin4:${pgadminVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.pgadmin}";
           name = "pgadmin";
           networks = [ "postgres-net" ];
 

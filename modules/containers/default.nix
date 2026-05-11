@@ -62,6 +62,8 @@ in
       ];
 
       _module.args = {
+        images = import ../../generated-images.nix;
+
         ports = hostConfig.ports;
 
         envSuffix = "${baseDir}/env";

@@ -8,13 +8,10 @@
 {
   config,
   pkgs,
+  images,
   ports,
   ...
 }:
-let
-  borgUIVersion = "latest";
-  redisVersion = "alpine";
-in
 {
   myServices.borg-backup = {
     serviceConfig = {
@@ -88,7 +85,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/library/redis:${redisVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.redis}";
           name = "borg-redis";
           networks = [ "borg-net" ];
 
@@ -114,7 +111,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/ainullcode/borg-ui:${borgUIVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.borg-ui}";
           name = "borg";
           networks = [ "borg-net" ];
 

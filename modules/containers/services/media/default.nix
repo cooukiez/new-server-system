@@ -8,14 +8,13 @@
 {
   config,
   pkgs,
+  images,
   ports,
   ...
 }:
 let
   downloadPath = "/media/download";
   musicPath = "/media/music";
-
-  jellyfinVersion = "latest";
 in
 {
   imports = [
@@ -102,7 +101,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/jellyfin/jellyfin:${jellyfinVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.jellyfin}";
           name = "jellyfin";
           networks = [ "media-net" ];
 

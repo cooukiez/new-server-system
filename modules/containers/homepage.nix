@@ -10,13 +10,12 @@
   pkgs,
   lib,
   hostConfig,
+  images,
   ports,
   publicServices,
   ...
 }:
 let
-  homepageVersion = "latest";
-
   hostInt = "http://host.containers.internal";
 
   groupedData = lib.groupBy (s: s.serviceConfig.serviceType) (lib.attrValues publicServices);
@@ -235,7 +234,7 @@ in
         };
 
         containerConfig = {
-          image = "ghcr.io/gethomepage/homepage:${homepageVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.homepage}";
           name = "homepage";
 
           environments = {

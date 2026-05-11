@@ -9,19 +9,12 @@
   config,
   pkgs,
   lib,
+  images,
   ports,
   publicServices,
   ...
 }:
 let
-  autheliaVersion = "latest";
-
-  autheliaImage = pkgs.dockerTools.pullImage {
-    imageName = "ghcr.io/authelia/authelia";
-    imageDigest = "sha256:0c824dcab1ae97c56bf673c5e77fe8cc6bcd400564555140cc8002a12c6b6463";
-    sha256 = "sha256-roffp3zYeW21Wy9WDXnLWHhpBBjouww6K+0PRWUbnLA=";
-  };
-
   sortedServiceList = lib.sort (a: b: a.serviceConfig.subdomain < b.serviceConfig.subdomain) (
     lib.attrValues publicServices
   );
@@ -245,7 +238,7 @@ in
         };
 
         containerConfig = {
-          image = "docker-archive:${autheliaImage}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.authelia}";
           name = "authelia";
           networks = [ "auth-net" ];
 

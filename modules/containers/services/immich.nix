@@ -8,15 +8,12 @@
 {
   config,
   pkgs,
+  images,
   ports,
   ...
 }:
 let
   photosPath = "/media/photos";
-
-  redisVersion = "alpine";
-  immichDbVersion = "14-vectorchord0.5.3";
-  immichVersion = "release";
 in
 {
   myServices.immich = {
@@ -84,7 +81,7 @@ in
         };
 
         containerConfig = {
-          image = "ghcr.io/immich-app/immich-machine-learning:${immichVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.immich-ml}";
           name = "immich-ml";
           networks = [ "immich-net" ];
 
@@ -115,7 +112,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/valkey/valkey:${redisVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.valkey}";
           name = "immich-redis";
           networks = [ "immich-net" ];
 
@@ -142,7 +139,7 @@ in
         };
 
         containerConfig = {
-          image = "ghcr.io/immich-app/postgres:${immichDbVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.immich-db}";
           name = "immich-postgres";
           networks = [ "immich-net" ];
 
@@ -187,7 +184,7 @@ in
         };
 
         containerConfig = {
-          image = "ghcr.io/immich-app/immich-server:${immichVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.immich-server}";
           name = "immich-server";
           networks = [ "immich-net" ];
 

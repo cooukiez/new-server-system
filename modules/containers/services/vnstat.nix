@@ -8,12 +8,10 @@
 {
   config,
   pkgs,
+  images,
   ports,
   ...
 }:
-let
-  vnstatDashboardVersion = "latest";
-in
 {
   myServices.vnstat = {
     serviceConfig = {
@@ -50,7 +48,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/kshitizb/vnstat-dashboard:${vnstatDashboardVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.vnstat-dashboard}";
           name = "vnstat-dashboard";
 
           environments = {

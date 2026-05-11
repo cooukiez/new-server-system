@@ -8,6 +8,7 @@
 {
   config,
   pkgs,
+  images,
   ports,
   envSecretsPrefix,
   musicPath,
@@ -21,9 +22,6 @@ let
       )}
     </Config>
   '';
-
-  lidarrVersion = "nightly";
-  slskdVersion = "latest";
 
   # lidarr settings
   lidarrSettings = {
@@ -226,7 +224,7 @@ in
         };
 
         containerConfig = {
-          image = "lscr.io/linuxserver/lidarr:${lidarrVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.lidarr}";
           name = "lidarr";
           userns = "keep-id:uid=10000,gid=10000";
           networks = [ "media-net" ];
@@ -281,7 +279,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/slskd/slskd:${slskdVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.slskd}";
           name = "slskd";
           userns = "keep-id:uid=10000,gid=10000";
           user = "10000:10000";

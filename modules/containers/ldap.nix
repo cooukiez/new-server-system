@@ -8,12 +8,10 @@
 {
   config,
   pkgs,
+  images,
   ports,
   ...
 }:
-let
-  lldapVersion = "stable";
-in
 {
   myServices.lldap = {
     serviceConfig = {
@@ -68,7 +66,7 @@ in
         };
 
         containerConfig = {
-          image = "ghcr.io/lldap/lldap:${lldapVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.lldap}";
           name = "lldap";
           networks = [ "auth-net" ];
 

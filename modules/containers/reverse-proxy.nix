@@ -10,13 +10,12 @@
   pkgs,
   lib,
   hostConfig,
+  images,
   ports,
   publicServices,
   ...
 }:
 let
-  caddyVersion = "latest";
-
   sortedServiceList = lib.sort (a: b: a.serviceConfig.subdomain < b.serviceConfig.subdomain) (
     lib.attrValues publicServices
   );
@@ -156,7 +155,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/library/caddy:${caddyVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.caddy}";
           name = "caddy";
           addCapabilities = [ "NET_BIND_SERVICE" ];
 

@@ -8,12 +8,10 @@
 {
   config,
   pkgs,
+  images,
   ports,
   ...
 }:
-let
-  qBittorrentVersion = "latest";
-in
 {
   myServices.qbittorrent = {
     serviceConfig = {
@@ -65,7 +63,7 @@ in
         };
 
         containerConfig = {
-          image = "lscr.io/linuxserver/qbittorrent:${qBittorrentVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.qbittorrent}";
           name = "qbittorrent";
 
           # networking through gluetun

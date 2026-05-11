@@ -8,14 +8,12 @@
 {
   config,
   pkgs,
+  images,
   ports,
   envSecretsPrefix,
   ...
 }:
-let
-  # todo: disable non oidc login
-  memosVersion = "stable";
-in
+# todo: disable non oidc login
 {
   myServices.memos = {
     serviceConfig = {
@@ -71,7 +69,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/neosmemo/memos:${memosVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.memos}";
           name = "memos";
 
           addHosts = [

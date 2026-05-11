@@ -8,13 +8,12 @@
 {
   config,
   pkgs,
+  images,
   ports,
   envSecretsPrefix,
   ...
 }:
 let
-  ebkVersion = "latest";
-
   # todo: switch to environment variables
   # todo: switch to private db password
   ebkSettings = (import ./ebk-config.nix { inherit config ports; }).ebkSettings;
@@ -87,7 +86,7 @@ in
         };
 
         containerConfig = {
-          image = "docker.io/mayswind/ezbookkeeping:${ebkVersion}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.ebk}";
           name = "ebk";
 
           addHosts = [
