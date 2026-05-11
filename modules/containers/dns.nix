@@ -79,6 +79,14 @@ let
       ];
     };
 
+    querylog = {
+      interval = "2160h";
+    };
+
+    statistics = {
+      interval = "2160h";
+    };
+
     schema_version = 33;
   };
 in
@@ -145,8 +153,8 @@ in
             "/etc/localtime:/etc/localtime:ro"
 
             # volumes
-            "${volumes.adguard-conf.ref}:/opt/adguard/conf:U"
-            "${volumes.adguard-work.ref}:/opt/adguard/work:U"
+            "${volumes.adguard-conf.ref}:/opt/adguardhome/conf:U"
+            "${volumes.adguard-work.ref}:/opt/adguardhome/work:U"
           ];
 
           publishPorts = [

@@ -17,7 +17,9 @@
 }:
 let
   sortedServiceList = lib.sort (a: b: a.serviceConfig.subdomain < b.serviceConfig.subdomain) (
-    lib.filter (s: !(s.serviceConfig.disableProxy or false)) (lib.attrValues publicServices)
+    lib.filter (s: s.serviceConfig != null && s.serviceConfig.disableProxy == false) (
+      lib.attrValues publicServices
+    )
   );
 
   serviceHandlers = lib.trim (
