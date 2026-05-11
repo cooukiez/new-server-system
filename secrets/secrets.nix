@@ -99,6 +99,12 @@ in
   # unsorted
   #
 
+  # certs
+  "certs/ca.key.age".publicKeys = allKeys;
+  "certs/ca.srl.age".publicKeys = allKeys;
+  "certs/home.lan.csr.age".publicKeys = allKeys;
+  "certs/home.lan.key.age".publicKeys = allKeys;
+
   # general
   "s_global-agenix.age".publicKeys = allKeys;
   "s_gluetun-key.age".publicKeys = allKeys;

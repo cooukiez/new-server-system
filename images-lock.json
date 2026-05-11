@@ -19,6 +19,11 @@
     "imageDigest": "sha256:355cb506b07422707bb66ceefd3bd7e228755b5d7e2642065f18b049292c423f",
     "sha256": "sha256-l5xdfXtlJKA6OEp4r7U4G83HI4F+lKePBiLflZ+RNBI="
   },
+  "radicale-original": {
+    "imageName": "ghcr.io/kozea/radicale",
+    "imageDigest": "sha256:aaf46c96e87c37fe10b51723b61d06c10d4bc597ebbe19c2cf7877084616fec9",
+    "sha256": "sha256-+txNBdKo6cU/Vdjm/0kbQcDbfUusv0sWeQLmjbkFWXQ="
+  },
   "jellyfin": {
     "imageName": "docker.io/jellyfin/jellyfin",
     "imageDigest": "sha256:1694ff069f0c9dafb283c36765175606866769f5d72f2ed56b6a0f1be922fc37",

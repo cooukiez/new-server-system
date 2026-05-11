@@ -5,11 +5,14 @@ import re
 import sys
 import argparse
 
+# nix shell nixpkgs#skopeo nixpkgs#nix-prefetch-docker nixpkgs#python3 -c python3 fetch-images.py
+
 IMAGES = [
     {"name": "ebk", "repo": "docker.io/mayswind/ezbookkeeping", "tag": "latest"},
     {"name": "mail-archiver", "repo": "docker.io/s1t5/mailarchiver", "tag": "latest"},
     {"name": "papra", "repo": "ghcr.io/papra-hq/papra", "tag": "latest"},
     {"name": "radicale", "repo": "docker.io/tomsquest/docker-radicale", "tag": "latest"},
+    {"name": "radicale-original", "repo": "ghcr.io/kozea/radicale", "tag": "latest"},
     
     {"name": "jellyfin", "repo": "docker.io/jellyfin/jellyfin", "tag": "latest"},
     {"name": "lidarr", "repo": "lscr.io/linuxserver/lidarr", "tag": "nightly"},

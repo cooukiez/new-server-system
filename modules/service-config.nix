@@ -83,6 +83,11 @@ in
                         default = "one_factor";
                       };
 
+                      disableProxy = lib.mkOption {
+                        type = lib.types.bool;
+                        default = true;
+                      };
+
                       group = lib.mkOption {
                         type = lib.types.nullOr lib.types.str;
                         default = null;

@@ -32,17 +32,18 @@
     };
 
     auth = {
-      type = "ldap";
+      type = "remote_user";
 
       # cache_logins = false;
       # cache_successful_logins_expiry = 15;
       # cache_failed_logins_expiry = 90;
 
+      # ldap setup
       ldap_uri = "ldap://ldap.home.lan:${toString ports.lldap}";
       ldap_base = "ou=people,dc=ldap,dc=home,dc=lan";
 
       ldap_reader_dn = "uid=admin,ou=people,dc=ldap,dc=home,dc=lan";
-      ldap_secret_file = "/run/secrets/LDAP_PASSWORD";
+      # ldap_secret_file = "/run/secrets/LDAP_PASSWORD";
 
       ldap_filter = "(&(objectClass=person)(memberOf=cn=users,ou=groups,dc=ldap,dc=home,dc=lan)(uid={0}))";
 

@@ -17,7 +17,7 @@
 }:
 let
   sortedServiceList = lib.sort (a: b: a.serviceConfig.subdomain < b.serviceConfig.subdomain) (
-    lib.attrValues publicServices
+    lib.filter (s: !(s.serviceConfig.disableProxy or false)) (lib.attrValues publicServices)
   );
 
   serviceHandlers = lib.trim (
@@ -112,6 +112,14 @@ in
           }
 
       ${serviceHandlers}
+
+          @radicale host radicale.home.lan
+          handle @radicale {
+            import auth_verify
+            reverse_proxy host.containers.internal:${toString ports.radicale} {
+              header_up X-Remote-User {http.auth.user.id}
+            }
+          }
 
           handle {
             abort

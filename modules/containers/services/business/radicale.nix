@@ -26,7 +26,9 @@ in
       subdomain = "dav";
       port = ports.radicale;
 
-      policy = "bypass";
+      disableProxy = true;
+      policy = "two_factor";
+      group = "users";
 
       icon = "radicale";
     };
@@ -70,7 +72,7 @@ in
         };
 
         containerConfig = {
-          image = "docker-archive:${pkgs.dockerTools.pullImage images.radicale}";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.radicale-original}";
           name = "radicale";
 
           addHosts = [
@@ -80,6 +82,8 @@ in
 
           environments = {
             TZ = "Europe/Berlin";
+
+            RADICALE_CONFIG = "/config";
           };
 
           volumes = [

@@ -185,6 +185,8 @@
           };
         };
 
+        programs.zsh.enable = true;
+
         age.identityPaths = [ squConfigKeyPath ];
 
         systemd.user.startServices = "sd-switch";
