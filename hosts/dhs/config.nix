@@ -86,7 +86,7 @@
 
   networkConfig.tailscaleServer = true;
   networkConfig.tailscaleOperator = "admin";
-  age.secrets.tailscale-key.file = ../../secrets/s_tailscale-key.age;
+  age.secrets.tailscale-key.file = ../../secrets/tailscale-key.age;
   services.tailscale.authKeyFile = config.age.secrets.tailscale-key.path;
 
   networkConfig.glances = true;

@@ -35,11 +35,11 @@
       };
     in
     {
-      lldap-admin = mkSecret "auth/ldap/s_admin-pass.age";
+      lldap-admin = mkSecret "auth/ldap/s_admin-pass";
       lldap-jwt = mkSecret "auth/ldap/s_jwt-secret";
-      lldap-seed = mkSecret "auth/ldap/s_key-seed.age";
+      lldap-seed = mkSecret "auth/ldap/s_key-seed";
 
-      ldap-postgres-pw = mkSecret "db/s_postgres-pw.age";
+      ldap-postgres-pw = mkSecret "db/s_postgres-pw";
     };
 
   virtualisation.quadlet =

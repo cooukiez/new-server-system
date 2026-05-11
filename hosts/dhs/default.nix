@@ -131,7 +131,7 @@
 
   age.secrets = {
     squ-config-key = {
-      file = ../../secrets/s_global-agenix.age;
+      file = ../../secrets/global-agenix.age;
       owner = "squ";
       group = "squ";
     };
