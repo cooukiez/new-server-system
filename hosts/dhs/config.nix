@@ -133,7 +133,7 @@
   # security configuration
   security.sudo.wheelNeedsPassword = false;
   security.pki.certificateFiles = [
-    ../../ca.crt
+    ../../certs/ca.crt
   ];
 
   services.haveged.enable = true;

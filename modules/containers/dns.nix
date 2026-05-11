@@ -133,7 +133,7 @@ in
 
         containerConfig = {
           image = "docker-archive:${pkgs.dockerTools.pullImage images.adguard}";
-          name = "adguardhome";
+          name = "adguard";
           addCapabilities = [ "NET_BIND_SERVICE" ];
 
           environments = {

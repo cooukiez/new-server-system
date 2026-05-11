@@ -15,9 +15,9 @@
       timeout = 30;
 
       ssl = false;
-      certificate = "";
-      key = "";
-      certificate_authority = "";
+      certificate = "/certs/home.lan.crt";
+      key = "/run/secrets/HOME_LAN_KEY";
+      certificate_authority = "/certs/ca.crt";
 
       protocol = "";
       ciphersuite = "";

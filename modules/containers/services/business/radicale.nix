@@ -42,12 +42,10 @@ in
     let
       mkSecret = name: {
         file = ../../../../secrets/${name}.age;
-        path = "${envSecretsPrefix}/${name}";
-        mode = "444";
       };
     in
     {
-      radicale-ldap-pw = mkSecret "ldap/s_admin-pass";
+      home-lan-key = mkSecret "certs/home.lan.key";
     };
 
   virtualisation.quadlet =
@@ -93,12 +91,13 @@ in
             # certificates
             "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
+            "/certs/home.lan.crt:/certs/home.lan.crt:ro"
 
             # config
             "${config.home.homeDirectory}/containers/radicale/config:/config:ro,U"
 
             # secrets
-            "${config.age.secrets.radicale-ldap-pw.path}:/run/secrets/LDAP_PASSWORD:ro"
+            "${config.age.secrets.home-lan-key.path}:/run/secrets/HOME_LAN_KEY:ro"
 
             # volumes
             "${volumes.radicale-data.ref}:/data:U"
