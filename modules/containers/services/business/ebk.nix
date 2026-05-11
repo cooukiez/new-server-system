@@ -14,7 +14,6 @@
   ...
 }:
 let
-  # todo: switch to environment variables
   # todo: switch to private db password
   ebkSettings = (import ./ebk-config.nix { inherit config ports; }).ebkSettings;
 in

@@ -8,44 +8,13 @@
 {
   config,
   pkgs,
+  images,
   ports,
   envSecretsPrefix,
   ...
 }:
 let
-  radicaleImageVersion = "master";
-
-  radicaleSettings = {
-    server = {
-      hosts = "0.0.0.0:5232";
-    };
-
-    auth = {
-      type = "ldap";
-
-      ldap_uri = "ldap://ldap.home.lan:${toString ports.lldap}";
-      ldap_base = "ou=people,dc=ldap,dc=home,dc=lan";
-
-      ldap_reader_dn = "uid=admin,ou=people,dc=ldap,dc=home,dc=lan";
-      ldap_secret_file = "/run/secrets/LDAP_PASSWORD";
-
-      ldap_filter = "(&(objectClass=person)(memberOf=cn=users,ou=groups,dc=ldap,dc=home,dc=lan)(uid={0}))";
-
-      ldap_user_attribute = "uid";
-      ldap_groups_attribute = "memberOf";
-
-      ldap_security = "tls";
-      ldap_ssl_ca_file = "/certs/ca.crt";
-    };
-
-    storage = {
-      filesystem_folder = "/radicale/data";
-    };
-
-    logging = {
-      level = "info";
-    };
-  };
+  radicaleSettings = (import ./radicale-config.nix { inherit ports; }).radicaleSettings;
 in
 {
   myServices.radicale = {
@@ -85,25 +54,9 @@ in
         volumes
         networks
         pods
-        builds
         ;
     in
     {
-      builds.radicale-image = {
-        buildConfig = {
-          file = "${pkgs.writeText "radicale.Dockerfile" (
-            builtins.readFile ../../builds/radicale.Dockerfile
-          )}";
-
-          tag = "localhost/radicale-ldap:internal";
-
-          buildArgs = {
-            VERSION = radicaleImageVersion;
-            DEPENDENCIES = "ldap";
-          };
-        };
-      };
-
       volumes.radicale-data.volumeConfig = {
         type = "bind";
         device = "/opt/radicale/data";
@@ -111,19 +64,13 @@ in
 
       containers.radicale = {
         autoStart = true;
-
-        unitConfig = {
-          Requires = [ "radicale-image-build.service" ];
-          After = [ "radicale-image-build.service" ];
-        };
-
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
         };
 
         containerConfig = {
-          image = "localhost/radicale-ldap:internal";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.radicale}";
           name = "radicale";
 
           addHosts = [
@@ -133,9 +80,6 @@ in
 
           environments = {
             TZ = "Europe/Berlin";
-
-            RADICALE_CONFIG = "/radicale/config";
-            GIT_SSL_CAINFO = "/certs/ca.crt";
           };
 
           volumes = [
@@ -147,13 +91,13 @@ in
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # config
-            "${config.home.homeDirectory}/containers/radicale/config:/radicale/config:ro,U"
+            "${config.home.homeDirectory}/containers/radicale/config:/config:ro,U"
 
             # secrets
             "${config.age.secrets.radicale-ldap-pw.path}:/run/secrets/LDAP_PASSWORD:ro"
 
             # volumes
-            "${volumes.radicale-data.ref}:/radicale/data:U"
+            "${volumes.radicale-data.ref}:/data:U"
           ];
 
           publishPorts = [

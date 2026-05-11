@@ -56,7 +56,7 @@
             TZ = "Europe/Berlin";
             PORT = "8000";
 
-            CRON_DB_PATH = "/crontab-ui";
+            CRON_DB_PATH = "/data";
             CRON_PATH = "/etc/crontabs";
 
             ENABLE_AUTOSAVE = "true";
@@ -66,7 +66,7 @@
             "/etc/timezone:/etc/timezone:ro"
             "/etc/localtime:/etc/localtime:ro"
 
-            "${volumes.crontab-data.ref}:/crontab-ui:U"
+            "${volumes.crontab-data.ref}:/data:U"
           ];
 
           publishPorts = [

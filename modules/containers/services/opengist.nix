@@ -77,7 +77,7 @@
             UID = "0";
             GID = "0";
 
-            OG_OPENGIST_HOME = "/opengist";
+            OG_OPENGIST_HOME = "/data";
             # todo: private db password
             OG_DB_URI = "postgres://opengist:opengist@host.containers.internal:${toString ports.postgres}/opengist";
             OG_EXTERNAL_URL = config.myServices.opengist.serviceConfig.href;
@@ -103,7 +103,7 @@
             "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
 
-            "${volumes.opengist-data.ref}:/opengist:U"
+            "${volumes.opengist-data.ref}:/data:U"
           ];
 
           publishPorts = [

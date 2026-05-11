@@ -11,15 +11,18 @@
   ...
 }:
 {
+  # https://github.com/mayswind/ezbookkeeping/blob/e6c6d021124566325cdbafeb70616378dc9654f7/conf/ezbookkeeping.ini#L4
   ebkSettings = {
-    global.mode = "production";
+    global = {
+      mode = "production";
+    };
 
     server = {
       protocol = "http";
       http_addr = "0.0.0.0";
       http_port = 8080;
 
-      domain = "finance.home.lan";
+      domain = config.myServices.ebk.serviceConfig.domain;
       root_url = config.myServices.ebk.serviceConfig.href;
       static_root_path = "public";
 
@@ -43,6 +46,7 @@
       host = "host.containers.internal:${toString ports.postgres}";
       ssl_mode = "disable";
 
+      # todo: private db password
       name = "ebk";
       user = "ebk";
       passwd = "ebk";
@@ -70,11 +74,6 @@
       from_address = "";
     };
 
-    storage = {
-      type = "local_filesystem";
-      local_filesystem_path = "storage/";
-    };
-
     log = {
       mode = "console file";
       level = "info";
@@ -88,6 +87,12 @@
       log_file_max_days = 7;
     };
 
+    storage = {
+      type = "local_filesystem";
+      local_filesystem_path = "storage/";
+      # ignore minio and webdav
+    };
+
     llm = {
       transaction_from_ai_image_recognition = false;
       max_ai_recognition_picture_size = 10485760;
@@ -95,6 +100,7 @@
 
     llm_image_recognition = {
       llm_provider = "";
+      # ignore llm options
     };
 
     uuid = {
@@ -154,6 +160,10 @@
 
       enable_oidc_display_name = true;
       oidc_custom_display_name = "Authelia";
+
+      # unused
+      nextcloud_base_url = "";
+      gitea_base_url = "";
     };
 
     user = {

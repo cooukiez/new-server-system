@@ -98,6 +98,7 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
+            # todo: write universal secrets patcher
             "+${pkgs.writeShellScript "pre-papra" ''
               SECRET_VAL=$(${pkgs.coreutils}/bin/cat ${config.age.secrets.papra-client-secret.path})
 

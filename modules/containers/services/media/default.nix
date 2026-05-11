@@ -106,10 +106,10 @@
           environments = {
             TZ = "Europe/Berlin";
 
-            JELLYFIN_CONFIG_DIR = "/jellyfin/config";
-            JELLYFIN_DATA_DIR = "/jellyfin/data";
-            JELLYFIN_CACHE_DIR = "/jellyfin/cache";
-            JELLYFIN_LOG_DIR = "/jellyfin/log";
+            JELLYFIN_CONFIG_DIR = "/config";
+            JELLYFIN_DATA_DIR = "/data";
+            JELLYFIN_CACHE_DIR = "/cache";
+            JELLYFIN_LOG_DIR = "/log";
           };
 
           volumes = [
@@ -121,10 +121,10 @@
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # volumes
-            "${volumes.jellyfin-config.ref}:/jellyfin/config:U"
-            "${volumes.jellyfin-data.ref}:/jellyfin/data:U"
-            "${volumes.jellyfin-cache.ref}:/jellyfin/cache:U"
-            "${volumes.jellyfin-log.ref}:/jellyfin/log:U"
+            "${volumes.jellyfin-config.ref}:/config:U"
+            "${volumes.jellyfin-data.ref}:/data:U"
+            "${volumes.jellyfin-cache.ref}:/cache:U"
+            "${volumes.jellyfin-log.ref}:/log:U"
 
             "${volumes.media-music.ref}:/media/music:ro"
           ];
