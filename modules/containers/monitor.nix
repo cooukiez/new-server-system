@@ -272,7 +272,15 @@ in
     (pkgs.formats.yaml { }).generate "loki.yaml"
       lokiSettings;
 
-  age.secrets.grafana-client-key.file = ../../secrets/auth/clients/s_grafana.age;
+  age.secrets =
+    let
+      mkSecret = name: {
+        file = ../../secrets/${name}.age;
+      };
+    in
+    {
+      grafana-client-key = mkSecret "auth/clients/s_grafana";
+    };
 
   virtualisation.quadlet =
     let

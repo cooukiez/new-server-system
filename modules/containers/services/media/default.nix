@@ -83,15 +83,6 @@
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-jellyfin" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/jellyfin/config"
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/jellyfin/data"
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/jellyfin/cache"
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/jellyfin/log"
-            ''}"
-          ];
         };
 
         containerConfig = {

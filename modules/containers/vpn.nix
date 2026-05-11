@@ -32,7 +32,15 @@ in
     };
   };
 
-  age.secrets.gluetun-key.file = ../../secrets/s_gluetun-key.age;
+  age.secrets =
+    let
+      mkSecret = name: {
+        file = ../../secrets/${name}.age;
+      };
+    in
+    {
+      grafana-client-key = mkSecret "s_gluetun-key";
+    };
 
   virtualisation.quadlet =
     let

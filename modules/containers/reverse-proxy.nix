@@ -69,18 +69,6 @@ in
             file_server
           }
 
-          handle /papra* {
-            reverse_proxy http://host.containers.internal:${toString ports.papra}
-          }
-
-          handle /immich* {
-            reverse_proxy http://host.containers.internal:${toString ports.immich}
-          }
-
-          handle /jellyfin* {
-            reverse_proxy http://host.containers.internal:${toString ports.jellyfin}
-          }
-
           handle {
             redir https://home.lan
           }

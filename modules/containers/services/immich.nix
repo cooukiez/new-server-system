@@ -30,9 +30,15 @@
   };
 
   # todo: change immich database password to something different
-  age.secrets = {
-    immich-db-pw.file = ../../../secrets/s_postgres-pw.age;
-  };
+  age.secrets =
+    let
+      mkSecret = name: {
+        file = ../../secrets/${name}.age;
+      };
+    in
+    {
+      immich-db-pw = mkSecret "s_postgres-pw";
+    };
 
   virtualisation.quadlet =
     let

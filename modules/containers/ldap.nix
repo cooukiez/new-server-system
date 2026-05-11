@@ -28,13 +28,19 @@
     };
   };
 
-  age.secrets = {
-    lldap-jwt.file = ../../secrets/ldap/s_jwt-secret.age;
-    lldap-seed.file = ../../secrets/ldap/s_key-seed.age;
-    lldap-admin.file = ../../secrets/ldap/s_admin-pass.age;
+  age.secrets =
+    let
+      mkSecret = name: {
+        file = ../../secrets/${name}.age;
+      };
+    in
+    {
+      lldap-jwt = mkSecret "ldap/s_jwt-secret";
+      lldap-seed = mkSecret "ldap/s_key-seed.age";
+      lldap-admin = mkSecret "ldap/s_admin-pass.age";
 
-    postgres-pw.file = ../../secrets/s_postgres-pw.age;
-  };
+      postgres-pw = mkSecret "s_postgres-pw.age";
+    };
 
   virtualisation.quadlet =
     let

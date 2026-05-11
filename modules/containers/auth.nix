@@ -225,6 +225,7 @@ in
               jwkLocation = ".identity_providers.oidc.jwks[0].key";
             in
             [
+              # todo: better way of patching secrets
               "+${pkgs.writeShellScript "pre-authelia" ''
                 export JWT_SECRET=$(${pkgs.coreutils}/bin/cat ${config.age.secrets.auth-oidc-jwk.path})
 
