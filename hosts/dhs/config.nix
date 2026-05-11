@@ -8,7 +8,7 @@
 {
   # boot configuration
   boot = {
-    kernelPackages = pkgs.linuxPackages_6_19;
+    kernelPackages = pkgs.linuxPackages_6_18;
     consoleLogLevel = 0;
 
     initrd.verbose = false;
