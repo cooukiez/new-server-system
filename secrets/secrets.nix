@@ -70,7 +70,7 @@ in
   "containers/archiver/s_db-pass.age".publicKeys = allKeys;
 
   # atuin
-  "containers/atuin/s_db-pass".publicKeys = allKeys;
+  "containers/atuin/s_db-pass.age".publicKeys = allKeys;
 
   # ebk
   "containers/ebk/s_auth-client.age".publicKeys = allKeys;
@@ -78,18 +78,18 @@ in
   "containers/ebk/s_secret-key.age".publicKeys = allKeys;
 
   # gitea
-  "containers/gitea/s_auth-client".publicKeys = allKeys;
-  "containers/gitea/s_db-pass".publicKeys = allKeys;
+  "containers/gitea/s_auth-client.age".publicKeys = allKeys;
+  "containers/gitea/s_db-pass.age".publicKeys = allKeys;
 
   # grafana
   "containers/grafana/s_auth-client.age".publicKeys = allKeys;
 
   # immich
-  "containers/immich/s_auth-client".publicKeys = allKeys;
-  "containers/immich/s_db-pass".publicKeys = allKeys;
+  "containers/immich/s_auth-client.age".publicKeys = allKeys;
+  "containers/immich/s_db-pass.age".publicKeys = allKeys;
 
   # lidarr
-  "containers/lidarr/s_db-pass".publicKeys = allKeys;
+  "containers/lidarr/s_db-pass.age".publicKeys = allKeys;
 
   # linkwarden
   "containers/link/e_auth-client.age".publicKeys = allKeys;
@@ -99,8 +99,8 @@ in
   "containers/link/e_next-auth.age".publicKeys = allKeys;
 
   # memos
-  "containers/memos/s_auth-client".publicKeys = allKeys;
-  "containers/memos/s_db-pass".publicKeys = allKeys;
+  "containers/memos/s_auth-client.age".publicKeys = allKeys;
+  "containers/memos/s_db-pass.age".publicKeys = allKeys;
 
   # opengist
   "containers/opengist/e_auth-client.age".publicKeys = allKeys;
