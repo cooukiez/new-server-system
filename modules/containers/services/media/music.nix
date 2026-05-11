@@ -289,10 +289,6 @@ in
             "vpn-service-net"
           ];
 
-          labels = {
-            "io.containers.autoupdate" = "registry";
-          };
-
           environments = {
             TZ = "Europe/Berlin";
 

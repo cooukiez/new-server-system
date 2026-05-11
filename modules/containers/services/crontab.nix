@@ -8,13 +8,10 @@
 {
   config,
   pkgs,
+  images,
   ports,
   ...
 }:
-let
-  gitRepo = "https://github.com/alseambusher/crontab-ui.git";
-  buildDir = "${config.home.homeDirectory}/containers/crontab/build";
-in
 {
   myServices.crontab = {
     serviceConfig = {
@@ -42,35 +39,8 @@ in
         device = "/opt/crontab/data";
       };
 
-      # todo: check if github issue is resolved
-      builds.crontab-image = {
-        serviceConfig = {
-          ExecStartPre = [
-            "${pkgs.writeShellScript "build" ''
-              -${pkgs.coreutils}/bin/rm -rf ${buildDir}
-
-              ${pkgs.git}/bin/git clone ${gitRepo} ${buildDir}
-              ${pkgs.coreutils}/bin/cp ${../builds/crontab.Dockerfile} ${buildDir}/crontab.Dockerfile
-              ${pkgs.coreutils}/bin/chmod -R u+rw ${buildDir}
-            ''}"
-          ];
-        };
-
-        buildConfig = {
-          file = "${pkgs.writeText "crontab.Dockerfile" (builtins.readFile ../builds/crontab.Dockerfile)}";
-
-          workdir = "${buildDir}";
-          tag = "localhost/crontab:internal";
-        };
-      };
-
       containers.crontab = {
         autoStart = true;
-
-        unitConfig = {
-          Requires = [ "crontab-image-build.service" ];
-          After = [ "crontab-image-build.service" ];
-        };
 
         serviceConfig = {
           Restart = "always";
@@ -84,7 +54,7 @@ in
         };
 
         containerConfig = {
-          image = "localhost/crontab:internal";
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.crontab}";
           name = "crontab";
           user = "0:0";
 

@@ -9,6 +9,7 @@ IMAGES = [
     {"name": "ebk", "repo": "docker.io/mayswind/ezbookkeeping", "tag": "latest"},
     {"name": "mail-archiver", "repo": "docker.io/s1t5/mailarchiver", "tag": "latest"},
     {"name": "papra", "repo": "ghcr.io/papra-hq/papra", "tag": "latest"},
+    {"name": "radicale", "repo": "docker.io/tomsquest/docker-radicale", "tag": "latest"},
     
     {"name": "jellyfin", "repo": "docker.io/jellyfin/jellyfin", "tag": "latest"},
     {"name": "lidarr", "repo": "lscr.io/linuxserver/lidarr", "tag": "nightly"},
@@ -16,6 +17,7 @@ IMAGES = [
     {"name": "qbittorrent", "repo": "lscr.io/linuxserver/qbittorrent", "tag": "latest"},
 
     {"name": "atuin", "repo": "ghcr.io/atuinsh/atuin", "tag": "latest"},
+    {"name": "crontab", "repo": "docker.io/alseambusher/crontab-ui", "tag": "latest"},
     {"name": "gitea", "repo": "docker.gitea.com/gitea", "tag": "latest"},
 
     {"name": "immich-ml", "repo": "ghcr.io/immich-app/immich-machine-learning", "tag": "release"},

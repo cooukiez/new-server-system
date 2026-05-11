@@ -15,6 +15,11 @@
     imageDigest = "sha256:1de52370c82d0eb9aad101f5f06b92272cbae850f0ca3dc623fc96835f57ad68";
     sha256 = "sha256-HkMS8xbTNoaaIE6AT9Wo2XOucTnsFSXxw3KMOgaZeL8=";
   };
+  radicale = {
+    imageName = "docker.io/tomsquest/docker-radicale";
+    imageDigest = "sha256:355cb506b07422707bb66ceefd3bd7e228755b5d7e2642065f18b049292c423f";
+    sha256 = "sha256-l5xdfXtlJKA6OEp4r7U4G83HI4F+lKePBiLflZ+RNBI=";
+  };
   jellyfin = {
     imageName = "docker.io/jellyfin/jellyfin";
     imageDigest = "sha256:1694ff069f0c9dafb283c36765175606866769f5d72f2ed56b6a0f1be922fc37";
@@ -39,6 +44,11 @@
     imageName = "ghcr.io/atuinsh/atuin";
     imageDigest = "sha256:9a3bf220acd36873004fe18a9abb2bcd2d74a8c3522e52d309ba7c53d971c01f";
     sha256 = "sha256-MElrfN9cE+d66IQYnJrBNzXZp6Gv7VYl1SMVdTBQEKY=";
+  };
+  crontab = {
+    imageName = "docker.io/alseambusher/crontab-ui";
+    imageDigest = "sha256:09e47ec32dec6300174f2d4e5cff6c189ba6ad75f31dbfe69704ec574ee58a04";
+    sha256 = "sha256-qvYYECS0LMl3lvhaR5xCTHR8YJzyUtuokk5rjOp+ouQ=";
   };
   gitea = {
     imageName = "docker.gitea.com/gitea";
