@@ -153,7 +153,7 @@ in
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # config
-            "${config.home.homeDirectory}:/radicale/config:ro,U"
+            "${config.home.homeDirectory}/containers/radicale/config:/radicale/config:ro,U"
 
             # secrets
             "${config.age.secrets.radicale-ldap-pw.path}:/run/secrets/LDAP_PASSWORD:ro"

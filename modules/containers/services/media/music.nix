@@ -23,7 +23,6 @@ let
   '';
 
   lidarrVersion = "nightly";
-  lidarrListsNginxVersion = "alpine";
   slskdVersion = "latest";
 
   # lidarr settings

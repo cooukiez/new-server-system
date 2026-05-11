@@ -229,8 +229,10 @@ in
               "+${pkgs.writeShellScript "pre-authelia" ''
                 ${pkgs.coreutils}/bin/mkdir -p "/opt/authelia/config"
 
-                ${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/configuration.yml /opt/authelia/config/configuration.yml"
-                ${pkgs.yq-go}/bin/yq -i '${jwkLocation} = load_str(\"${config.age.secrets.auth-oidc-jwk.path}\")' /opt/authelia/config/configuration.yml
+                export JWT_SECRET=$(${pkgs.coreutils}/bin/cat ${config.age.secrets.auth-oidc-jwk.path})
+
+                ${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/configuration.yml /opt/authelia/config/configuration.yml
+                ${pkgs.yq-go}/bin/yq -i ".identity_providers.oidc.jwks[0].key = load_str(\"${config.age.secrets.auth-oidc-jwk.path}\")" /opt/authelia/config/configuration.yml
                 ${pkgs.coreutils}/bin/chmod 644 /opt/authelia/config/configuration.yml
               ''}"
             ];

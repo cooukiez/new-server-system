@@ -126,8 +126,8 @@ in
 
           ExecStartPre = [
             "+${pkgs.writeShellScript "pre-adguard" ''
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/adgurad/conf"
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/adgurad/work"
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/adguard/conf"
+              ${pkgs.coreutils}/bin/mkdir -p "/opt/adguard/work"
 
               ${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/adguard/AdGuardHome.yaml /opt/adguard/conf/AdGuardHome.yaml
               ${pkgs.coreutils}/bin/chmod 644 /opt/adguard/conf/AdGuardHome.yaml
@@ -149,8 +149,8 @@ in
             "/etc/localtime:/etc/localtime:ro"
 
             # volumes
-            "${volumes.adguard-conf.ref}:/opt/adguardhome/conf:U"
-            "${volumes.adguard-work.ref}:/opt/adguardhome/work:U"
+            "${volumes.adguard-conf.ref}:/opt/adguard/conf:U"
+            "${volumes.adguard-work.ref}:/opt/adguard/work:U"
           ];
 
           publishPorts = [

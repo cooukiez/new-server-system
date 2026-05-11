@@ -412,7 +412,7 @@ in
             "/certs/ca.crt:/certs/ca.crt:ro"
 
             # config
-            "$${config.home.homeDirectory}/containers/prometheus/prometheus.yml:${prometheusPaths.config}:ro,U"
+            "${config.home.homeDirectory}/containers/prometheus/prometheus.yml:${prometheusPaths.config}:ro,U"
 
             # volumes
             "${volumes.prometheus-data.ref}:${prometheusPaths.data}:U"
