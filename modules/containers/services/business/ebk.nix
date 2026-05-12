@@ -40,8 +40,7 @@ in
     let
       mkSecret = name: {
         file = ../../../../secrets/containers/ebk/${name}.age;
-        # todo: test if mode 444 required
-        # mode = "444";
+        mode = "444";
       };
     in
     {
