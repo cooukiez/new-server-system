@@ -12,6 +12,37 @@
   ports,
   ...
 }:
+
+let
+  createEnv = mkEnv {
+    path = "containers/lldap/env";
+    vars = {
+      LLDAP_LDAP_BASE_DN = "dc=ldap,dc=home,dc=lan";
+
+      LLDAP_JWT_SECRET_FILE = "/run/secrets/LLDAP_JWT_SECRET";
+      LLDAP_KEY_SEED_FILE = "/run/secrets/LLDAP_KEY_SEED";
+      LLDAP_LDAP_USER_PASS_FILE = "/run/secrets/LLDAP_ADMIN_PASS";
+
+      LLDAP_KEY_FILE = "";
+
+      LLDAP_DATABASE_URL =
+        let
+          name = "lldap";
+          user = "lldap";
+          pass = "@PLACEHOLDER_DB_PASS@";
+
+          host = "host.containers.internal";
+          port = toString ports.postgres;
+        in
+        "postgres://${user}:${pass}@${host}:${port}/${name}";
+    };
+
+    secrets = {
+      # "PLACEHOLDER_DB_PASS" = config.age.secrets.lldap-db-pass.path;
+      "PLACEHOLDER_DB_PASS" = pkgs.writeText "db-pass" "lldap";
+    };
+  };
+in
 {
   myServices.lldap = {
     serviceConfig = {
@@ -36,6 +67,7 @@
     in
     {
       lldap-admin = mkSecret "auth/ldap/s_admin-pass";
+      lldap-db-pass = mkSecret "auth/ldap/s_db-pass";
       lldap-jwt = mkSecret "auth/ldap/s_jwt-secret";
       lldap-seed = mkSecret "auth/ldap/s_key-seed";
 
@@ -63,6 +95,12 @@
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-lldap" ''
+              ${createEnv}
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -75,19 +113,11 @@
 
             UID = "0";
             GID = "0";
-
-            # settings
-            LLDAP_LDAP_BASE_DN = "dc=ldap,dc=home,dc=lan";
-
-            LLDAP_JWT_SECRET_FILE = "/run/secrets/LLDAP_JWT_SECRET";
-            LLDAP_KEY_SEED_FILE = "/run/secrets/LLDAP_KEY_SEED";
-            LLDAP_LDAP_USER_PASS_FILE = "/run/secrets/LLDAP_ADMIN_PASS";
-
-            LLDAP_KEY_FILE = "";
-
-            # todo: priavte db password
-            LLDAP_DATABASE_URL = "postgres://lldap:lldap@host.containers.internal:${toString ports.postgres}/lldap";
           };
+
+          environmentFiles = [
+            "env/containers/lldap/env"
+          ];
 
           volumes = [
             "/etc/timezone:/etc/timezone:ro"

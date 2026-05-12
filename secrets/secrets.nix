@@ -48,7 +48,7 @@ in
 
   # ldap
   "auth/ldap/s_admin-pass.age".publicKeys = allKeys;
-  "auth/ldap/s_db-pass".publicKeys = allKeys;
+  "auth/ldap/s_db-pass.age".publicKeys = allKeys;
   "auth/ldap/s_jwt-secret.age".publicKeys = allKeys;
   "auth/ldap/s_key-seed.age".publicKeys = allKeys;
 
