@@ -10,8 +10,40 @@
   pkgs,
   images,
   ports,
+  mkEnv,
   ...
 }:
+let
+  createEnv = mkEnv {
+    path = "containers/atuin/env";
+    vars = {
+      TZ = "Europe/Berlin";
+
+      ATUIN_HOST = "0.0.0.0";
+      ATUIN_PORT = "8888";
+
+      ATUIN_OPEN_REGISTRATION = "true";
+
+      ATUIN_DB_URI =
+        let
+          name = "atuin";
+          user = "atuin";
+          pass = "@PLACEHOLDER_DB_PASS@";
+
+          host = "host.containers.internal";
+          port = toString ports.postgres;
+        in
+        "postgres://${user}:${pass}@${host}:${port}/${name}";
+
+      RUST_LOG = "info,atuin_server=debug";
+    };
+
+    secrets = {
+      # "PLACEHOLDER_DB_PASS" = config.age.secrets.atuin-db-pass.path;
+      "PLACEHOLDER_DB_PASS" = pkgs.writeText "db-pass" "atuin";
+    };
+  };
+in
 {
   myServices.atuin = {
     serviceConfig = {
@@ -27,6 +59,16 @@
       icon = "atuin";
     };
   };
+
+  age.secrets =
+    let
+      mkSecret = name: {
+        file = ../../../secrets/containers/atuin/${name}.age;
+      };
+    in
+    {
+      atuin-db-pass = mkSecret "s_db-pass";
+    };
 
   virtualisation.quadlet =
     let
@@ -49,6 +91,12 @@
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-atuin" ''
+              ${createEnv}
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -57,19 +105,9 @@
 
           exec = [ "start" ];
 
-          environments = {
-            TZ = "Europe/Berlin";
-
-            ATUIN_HOST = "0.0.0.0";
-            ATUIN_PORT = "8888";
-
-            ATUIN_OPEN_REGISTRATION = "true";
-
-            # todo: private db password
-            ATUIN_DB_URI = "postgres://atuin:atuin@host.containers.internal:${toString ports.postgres}/atuin";
-
-            RUST_LOG = "info,atuin_server=debug";
-          };
+          environmentFiles = [
+            "env/containers/atuin/env"
+          ];
 
           volumes = [
             "/etc/timezone:/etc/timezone:ro"

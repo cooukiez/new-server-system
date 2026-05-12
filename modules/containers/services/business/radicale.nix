@@ -35,7 +35,7 @@ in
   };
 
   home.file."containers/radicale/config".source =
-    (pkgs.formats.ini { }).generate "config"
+    (pkgs.formats.ini { }).generate "radicale-settings"
       radicaleSettings;
 
   age.secrets =

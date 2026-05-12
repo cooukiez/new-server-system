@@ -46,10 +46,8 @@
       host = "host.containers.internal:${toString ports.postgres}";
       ssl_mode = "disable";
 
-      # todo: private db password
       name = "ebk";
       user = "ebk";
-      passwd = "ebk";
 
       auto_update_database = true;
 

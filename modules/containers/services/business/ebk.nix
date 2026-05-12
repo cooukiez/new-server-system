@@ -14,7 +14,6 @@
   ...
 }:
 let
-  # todo: switch to private db password
   ebkSettings = (import ./ebk-config.nix { inherit config ports; }).ebkSettings;
 in
 {
@@ -41,11 +40,13 @@ in
     let
       mkSecret = name: {
         file = ../../../../secrets/containers/ebk/${name}.age;
+        # todo: test if mode 444 required
         mode = "444";
       };
     in
     {
       ebk-client-key = mkSecret "s_auth-client";
+      ebk-db-pass = mkSecret "s_db-pass";
       ebk-secret-key = mkSecret "s_secret-key";
     };
 
@@ -88,8 +89,9 @@ in
           environments = {
             TZ = "Europe/Berlin";
 
-            EBKCFP_SECURITY_SECRET_KEY = "/run/secrets/EBK_SECRET_KEY";
             EBKCFP_AUTH_OAUTH2_CLIENT_SECRET = "/run/secrets/EBK_CLIENT_KEY";
+            EBKCFP_DATABASE_PASSWD = "/run/secrets/EBK_DB_PASS";
+            EBKCFP_SECURITY_SECRET_KEY = "/run/secrets/EBK_SECRET_KEY";
           };
 
           volumes = [
@@ -105,6 +107,10 @@ in
 
             # secrets
             "${config.age.secrets.ebk-client-key.path}:/run/secrets/EBK_CLIENT_KEY:ro"
+
+            # todo: replace this with actual password
+            "${pkgs.writeText "db-pass" "ebk"}:/run/secrets/EBK_DB_PASS:ro"
+
             "${config.age.secrets.ebk-secret-key.path}:/run/secrets/EBK_SECRET_KEY:ro"
 
             # volumes

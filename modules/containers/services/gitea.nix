@@ -10,8 +10,30 @@
   pkgs,
   images,
   ports,
+  mkEnv,
   ...
 }:
+let
+  createEnv = mkEnv {
+    path = "containers/gitea/env";
+    vars = {
+      TZ = "Europe/Berlin";
+
+      GITEA__database__DB_TYPE = "postgres";
+      GITEA__database__HOST = "host.containers.internal:${toString ports.postgres}";
+      GITEA__database__NAME = "gitea";
+      GITEA__database__USER = "gitea";
+      GITEA__database__PASSWD = "@PLACEHOLDER_DB_PASS@";
+    };
+
+    secrets = {
+      # "PLACEHOLDER_DB_PASS" = config.age.secrets.gitea-db-pass.path;
+      "PLACEHOLDER_DB_PASS" = pkgs.writeText "db-pass" "gitea";
+    };
+
+    mode = "644";
+  };
+in
 {
   myServices.gitea = {
     serviceConfig = {
@@ -27,6 +49,16 @@
       icon = "gitea";
     };
   };
+
+  age.secrets =
+    let
+      mkSecret = name: {
+        file = ../../../secrets/containers/gitea/${name}.age;
+      };
+    in
+    {
+      gitea-db-pass = mkSecret "s_db-pass";
+    };
 
   virtualisation.quadlet =
     let
@@ -49,6 +81,12 @@
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-gitea" ''
+              ${createEnv}
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -59,17 +97,9 @@
             "auth.home.lan:host-gateway"
           ];
 
-          environments = {
-            TZ = "Europe/Berlin";
-
-            GITEA__database__DB_TYPE = "postgres";
-            GITEA__database__HOST = "host.containers.internal:${toString ports.postgres}";
-            GITEA__database__NAME = "gitea";
-            GITEA__database__USER = "gitea";
-
-            # todo: private db password
-            GITEA__database__PASSWD = "gitea";
-          };
+          environmentFiles = [
+            "env/containers/gitea/env"
+          ];
 
           volumes = [
             "/etc/timezone:/etc/timezone:ro"

@@ -237,7 +237,7 @@ in
 
               # deezer download
               ${pkgs.coreutils}/bin/mkdir -p "${downloadPath}/deezer"
-              # spotify playlist cache
+              # spotify cache
               ${pkgs.coreutils}/bin/mkdir -p "/opt/lidarr/cache/spotify"
 
               ${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/lidarr/config.xml /opt/lidarr/data/config.xml

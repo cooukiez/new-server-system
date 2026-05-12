@@ -96,11 +96,10 @@ in
   "containers/lidarr/s_db-pass.age".publicKeys = allKeys;
 
   # linkwarden
-  "containers/link/e_auth-client.age".publicKeys = allKeys;
+  "containers/link/s_auth-client.age".publicKeys = allKeys;
   "containers/link/s_db-pass.age".publicKeys = allKeys;
-  "containers/link/e_meili-key.age".publicKeys = allKeys;
-  "containers/link/e_link-meili-key.age".publicKeys = allKeys;
-  "containers/link/e_next-auth.age".publicKeys = allKeys;
+  "containers/link/s_meili-key.age".publicKeys = allKeys;
+  "containers/link/s_next-auth.age".publicKeys = allKeys;
 
   # memos
   "containers/memos/s_auth-client.age".publicKeys = allKeys;

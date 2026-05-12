@@ -29,7 +29,6 @@
     };
   };
 
-  # todo: change immich database password to something different
   age.secrets =
     let
       mkSecret = name: {

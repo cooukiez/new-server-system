@@ -13,6 +13,60 @@
   envSecretsPrefix,
   ...
 }:
+let
+  createLinkwardenMeili = mkEnv {
+    path = "containers/link/meili/env";
+    vars = {
+      MEILI_MASTER_KEY = "@PLACEHOLDER_MEILI_KEY@";
+      MEILI_NO_ANALYTICS = "true";
+    };
+
+    secrets = {
+      PLACEHOLDER_MEILI_KEY = config.age.secrets.link-meili-key.path;
+    };
+  };
+
+  createLinkwardenEnv = mkEnv {
+    path = "containers/link/link/env";
+    vars = {
+      DATABASE_URL =
+        let
+          name = "linkwarden";
+          user = "linkwarden";
+          pass = "@PLACEHOLDER_DB_PASS@";
+
+          host = "host.containers.internal";
+          port = toString ports.postgres;
+        in
+        "postgresql://${user}:${pass}@${host}:${port}/${name}";
+
+      MEILISEARCH_ENDPOINT = "http://linkwarden-meili:7700";
+      MEILISEARCH_MASTER_KEY = "@PLACEHOLDER_MEILI_KEY@";
+
+      NEXT_PUBLIC_AUTHELIA_ENABLED = "true";
+      AUTHELIA_WELLKNOWN_URL = "https://auth.home.lan/.well-known/openid-configuration";
+      AUTHELIA_CLIENT_ID = "linkwarden";
+      AUTHELIA_CLIENT_SECRET = "@PLACEHOLDER_CLIENT_KEY@";
+
+      NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
+
+      NEXTAUTH_URL = "https://links.home.lan/api/v1/auth";
+      NEXTAUTH_SECRET = "@PLACEHOLDER_NEXT_AUTH@";
+      NEXT_PUBLIC_CREDENTIALS_ENABLED = "false";
+      NEXT_PUBLIC_DISABLE_REGISTRATION = "true";
+    };
+
+    secrets = {
+      PLACEHOLDER_CLIENT_KEY = config.age.secrets.link-client-key.path;
+
+      # PLACEHOLDER_DB_PASS = config.age.secrets.link-db-pass.path;
+      PLACEHOLDER_DB_PASS = pkgs.writeText "db-pass" "linkwarden";
+
+      PLACEHOLDER_MEILI_KEY = config.age.secrets.link-meili-key.path;
+      PLACEHOLDER_NEXT_AUTH = config.age.secrets.link-next-auth.path;
+    };
+  };
+in
 {
   myServices.linkwarden = {
     serviceConfig = {
@@ -33,17 +87,13 @@
     let
       mkSecret = name: {
         file = ../../../secrets/containers/link/${name}.age;
-        path = "${envSecretsPrefix}/containers/link/${name}";
-        mode = "444";
       };
     in
     {
-      link-client-key = mkSecret "e_auth-client";
-      link-meili-key = mkSecret "e_link-meili-key";
-      link-input-meili = mkSecret "e_meili-key";
-      link-next-auth = mkSecret "e_next-auth";
-
-      link-db-pass.file = ../../../secrets/containers/link/s_db-pass.age;
+      link-client-key = mkSecret "s_auth-client";
+      link-db-pass = mkSecret "s_db-pass";
+      link-meili-key = mkSecret "s_meili-key";
+      link-next-auth = mkSecret "s_next-auth";
     };
 
   virtualisation.quadlet =
@@ -79,12 +129,8 @@
           name = "linkwarden-meili";
           networks = [ "linkwarden-net" ];
 
-          environments = {
-            MEILI_NO_ANALYTICS = "true";
-          };
-
           environmentFiles = [
-            "secrets/containers/link/e_meili-key"
+            "env/containers/link/meili/env"
           ];
 
           volumes = [
@@ -125,27 +171,8 @@
             "auth.home.lan:host-gateway"
           ];
 
-          environments = {
-            # todo: private db password
-            DATABASE_URL = "postgresql://linkwarden:linkwarden@host.containers.internal:${toString ports.postgres}/linkwarden";
-
-            MEILISEARCH_ENDPOINT = "http://linkwarden-meili:7700";
-
-            NEXT_PUBLIC_AUTHELIA_ENABLED = "true";
-            AUTHELIA_WELLKNOWN_URL = "https://auth.home.lan/.well-known/openid-configuration";
-            AUTHELIA_CLIENT_ID = "linkwarden";
-
-            NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
-
-            NEXTAUTH_URL = "https://links.home.lan/api/v1/auth";
-            NEXT_PUBLIC_CREDENTIALS_ENABLED = "false";
-            NEXT_PUBLIC_DISABLE_REGISTRATION = "true";
-          };
-
           environmentFiles = [
-            "secrets/containers/link/e_auth-client"
-            "secrets/containers/link/e_link-meili-key"
-            "secrets/containers/link/e_next-auth"
+            "env/containers/link/link/env"
           ];
 
           volumes = [
