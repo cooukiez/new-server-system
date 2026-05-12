@@ -123,6 +123,7 @@ in
 
   # trek
   "containers/trek/e_auth-client.age".publicKeys = allKeys;
+  "containers/trek/s_auth-client.age".publicKeys = allKeys;
 
   #
   # database

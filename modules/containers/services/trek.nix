@@ -10,9 +10,42 @@
   pkgs,
   images,
   ports,
-  envSecretsPrefix,
+  mkEnv,
   ...
 }:
+let
+  createEnv = mkEnv {
+    path = "containers/opengist/env";
+    vars = {
+      NODE_ENV = "production";
+      PORT = "3000";
+      APP_URL = config.myServices.trek.serviceConfig.href;
+
+      NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
+
+      # temporary for first run
+      ADMIN_EMAIL = "trek@local";
+
+      # authelia oidc configuration
+      OIDC_ISSUER = "https://auth.home.lan";
+      OIDC_CLIENT_ID = "trek";
+      OIDC_CLIENT_SECRET = "@PLACEHOLDER_CLIENT_KEY@";
+
+      OIDC_DISPLAY_NAME = "Authelia";
+      OIDC_ONLY = "true";
+
+      OIDC_ADMIN_CLAIM = "groups";
+      OIDC_ADMIN_VALUE = "admins";
+
+      OIDC_SCOPE = "openid email profile groups";
+      OIDC_DISCOVERY_URL = "https://auth.home.lan/.well-known/openid-configuration";
+    };
+
+    secrets = {
+      "PLACEHOLDER_CLIENT_KEY" = config.age.secrets.trek-client-key.path;
+    };
+  };
+in
 {
   myServices.trek = {
     serviceConfig = {
@@ -32,11 +65,10 @@
     let
       mkSecret = name: {
         file = ../../../secrets/containers/trek/${name}.age;
-        path = "${envSecretsPrefix}/containers/trek/${name}";
       };
     in
     {
-      trek-client-key = mkSecret "e_auth-client";
+      trek-client-key = mkSecret "s_auth-client";
     };
 
   virtualisation.quadlet =
@@ -60,6 +92,12 @@
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-trek" ''
+              ${createEnv}
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -72,32 +110,10 @@
 
           environments = {
             TZ = "Europe/Berlin";
-
-            NODE_ENV = "production";
-            PORT = "3000";
-            APP_URL = config.myServices.trek.serviceConfig.href;
-
-            NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
-
-            # temporary on startup
-            ADMIN_EMAIL = "trek@local";
-
-            # authelia oidc configuration
-            OIDC_ISSUER = "https://auth.home.lan";
-            OIDC_CLIENT_ID = "trek";
-
-            OIDC_DISPLAY_NAME = "Authelia";
-            OIDC_ONLY = "true";
-
-            OIDC_ADMIN_CLAIM = "groups";
-            OIDC_ADMIN_VALUE = "admins";
-
-            OIDC_SCOPE = "openid email profile groups";
-            OIDC_DISCOVERY_URL = "https://auth.home.lan/.well-known/openid-configuration";
           };
 
           environmentFiles = [
-            "secrets/containers/trek/e_auth-client"
+            "env/containers/trek/env"
           ];
 
           volumes = [

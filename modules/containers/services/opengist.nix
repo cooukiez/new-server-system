@@ -19,8 +19,17 @@ let
     vars = {
       OG_OPENGIST_HOME = "/opengist";
 
-      # todo: private db password
-      OG_DB_URI = "postgres://opengist:opengist@host.containers.internal:${toString ports.postgres}/opengist";
+      OG_DB_URI =
+        let
+          name = "opengist";
+          user = "opengist";
+          pass = "@PLACEHOLDER_DB_PASS@";
+
+          host = "host.containers.internal";
+          port = toString ports.postgres;
+        in
+        "postgres://${user}:${pass}@${host}:${port}/${name}";
+
       OG_EXTERNAL_URL = config.myServices.opengist.serviceConfig.href;
 
       # authelia oidc configuration
@@ -34,7 +43,9 @@ let
     };
 
     secrets = {
-      "PLACEHOLDER_AUTH_SECRET" = config.age.secrets.papra-auth-secret.path;
+      "PLACEHOLDER_CLIENT_KEY" = config.age.secrets.opengist-client-key.path;
+      # "PLACEHOLDER_DB_PASS" = config.age.secrets.opengist-db-pass.path;
+      "PLACEHOLDER_DB_PASS" = pkgs.writeText "db-pass" "opengist";
     };
   };
 in
@@ -58,12 +69,11 @@ in
     let
       mkSecret = name: {
         file = ../../../secrets/containers/opengist/${name}.age;
-        path = "${envSecretsPrefix}/containers/opengist/${name}";
       };
     in
     {
-      opengist-client-key = mkSecret "e_auth-client";
-      opengist-db-pass.file = ../../../secrets/containers/opengist/s_db-pass.age;
+      opengist-client-key = mkSecret "s_auth-client";
+      opengist-db-pass = mkSecret "s_db-pass";
     };
 
   virtualisation.quadlet =
@@ -87,6 +97,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-opengist" ''
+              ${createEnv}
+            ''}"
+          ];
         };
 
         containerConfig = {
