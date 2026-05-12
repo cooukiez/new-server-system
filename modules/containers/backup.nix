@@ -10,9 +10,43 @@
   pkgs,
   images,
   ports,
+  mkEnv,
   documentsPath,
   ...
 }:
+let
+  createEnv = mkEnv {
+    path = "containers/borg/env";
+    vars = {
+      ENVIRONMENT = "production";
+      PORT = "8081";
+
+      PUID = "0";
+      PGID = "0";
+
+      SECRET_KEY = "@PLACEHOLDER_SECRET_KEY@";
+      INITIAL_ADMIN_PASSWORD = "@PLACEHOLDER_ADMIN_PASS@";
+
+      REDIS_HOST = "borg-redis";
+      REDIS_PORT = "6379";
+
+      DATA_DIR = "/data";
+      LOCAL_MOUNT_POINTS = "/local";
+
+      # authelia proxy auth
+      DISABLE_AUTHENTICATION = "true";
+      PROXY_AUTH_HEADER = "X-Remote-User";
+      PROXY_AUTH_ROLE_HEADER = "X-Remote-Role";
+
+      LOG_LEVEL = "info";
+    };
+
+    secrets = {
+      PLACEHOLDER_ADMIN_PASS = config.age.secrets.borg-admin-pass.path;
+      PLACEHOLDER_SECRET_KEY = config.age.secrets.borg-secret-key.path;
+    };
+  };
+in
 {
   myServices.borg-backup = {
     serviceConfig = {
@@ -30,6 +64,17 @@
       icon = "https://avatars.githubusercontent.com/u/12418060?s=48&v=4";
     };
   };
+
+  age.secrets =
+    let
+      mkSecret = name: {
+        file = ../../secrets/containers/borg/${name}.age;
+      };
+    in
+    {
+      borg-admin-pass = mkSecret "s_admin-pass";
+      borg-secret-key = mkSecret "s_secret-key";
+    };
 
   virtualisation.quadlet =
     let
@@ -101,9 +146,21 @@
 
       containers.borg = {
         autoStart = true;
+
+        unitConfig = {
+          Requires = [ "borg-redis.service" ];
+          After = [ "borg-redis.service" ];
+        };
+
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-borg" ''
+              ${createEnv}
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -113,27 +170,12 @@
 
           environments = {
             TZ = "Europe/Berlin";
-
-            ENVIRONMENT = "production";
-            PORT = "8081";
-
-            PUID = "0";
-            PGID = "0";
-
-            REDIS_HOST = "borg-redis";
-            REDIS_PORT = "6379";
-
-            DATA_DIR = "/data";
-            LOCAL_MOUNT_POINTS = "/local";
-
-            # authelia proxy auth
-            DISABLE_AUTHENTICATION = "true";
-            PROXY_AUTH_HEADER = "X-Remote-User";
-            PROXY_AUTH_ROLE_HEADER = "X-Remote-Role";
-
-            LOG_LEVEL = "info";
           };
-LOCAL_MOUNT_POINTS
+
+          environmentFiles = [
+            "env/containers/borg/env"
+          ];
+
           volumes = [
             "/etc/timezone:/etc/timezone:ro"
             "/etc/localtime:/etc/localtime:ro"
