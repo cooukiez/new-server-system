@@ -145,7 +145,7 @@ def main():
         json.dump(updated_data, f, indent=2)
 
     with open(NIX_FILE, "w") as f:
-        f.write("# this file is generated automatically\n{\n")
+        f.write("{\n")
         for name, data in updated_data.items():
             f.write(f"  {name} = {{\n")
             f.write(f"    imageName = \"{data['imageName']}\";\n")
