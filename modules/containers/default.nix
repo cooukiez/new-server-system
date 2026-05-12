@@ -63,11 +63,17 @@ in
           ${builtins.concatStringsSep "\n" sedCommands}
         '';
 
-      mkSecretEnv =
-        relativePath: mode: template: mapping:
+      mkConf =
+        {
+          path,
+          source,
+          secrets,
+          mode ? "600",
+        }:
         let
-          prefixDir = "${config.home.homeDirectory}/.config/containers/systemd/secrets";
-          target = "${prefixDir}/${relativePath}";
+          prefixDir = "${config.home.homeDirectory}";
+
+          target = "${prefixDir}/${path}";
           targetDir = builtins.dirOf target;
 
           sed = "${pkgs.gnused}/bin/sed";
@@ -75,12 +81,12 @@ in
 
           sedCommands = lib.mapAttrsToList (
             placeholder: path: "${sed} -i \"s|@${placeholder}@|$(${cat} ${path})|g\" \"${target}\""
-          ) mapping;
+          ) secrets;
         in
-        pkgs.writeShellScript "patch-secrets" ''
+        pkgs.writeShellScript "init-config-file" ''
           set -euo pipefail
-          ${pkgs.coreutils}/bin/mkdir -p "${targetDir}"
-          ${pkgs.coreutils}/bin/cp ${template} ${target}
+          ${pkgs.coreutils}/bin/mkdir -p ${targetDir}
+          ${pkgs.coreutils}/bin/cp ${source} ${target}
           ${pkgs.coreutils}/bin/chmod ${mode} ${target}
 
           ${builtins.concatStringsSep "\n" sedCommands}
@@ -137,8 +143,8 @@ in
           envPrefix = mkPath "env";
           envSecretsPrefix = mkPath "secrets";
 
+          mkConf = mkConf;
           mkEnv = mkEnv;
-          mkSecretEnv = mkSecretEnv;
 
           allServices = config.myServices;
           publicServices = lib.filterAttrs (name: value: value.serviceConfig != null) config.myServices;

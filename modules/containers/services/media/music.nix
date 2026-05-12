@@ -10,7 +10,9 @@
   pkgs,
   images,
   ports,
+  mkConf,
   envSecretsPrefix,
+  mkEnv,
   musicPath,
   downloadPath,
   ...
@@ -25,103 +27,119 @@ let
   '';
 
   # lidarr settings
-  lidarrSettings = {
-    InstanceName = "Lidarr";
+  createLidarrConf = mkConf {
+    path = "containers/lidarr/config.xml";
+    source = pkgs.writeText "lidarr-settings" (mkLidarrXml {
+      InstanceName = "Lidarr";
 
-    BindAddress = "*";
-    Port = "8686";
-    SslPort = "6868";
+      BindAddress = "*";
+      Port = "8686";
+      SslPort = "6868";
 
-    UrlBase = "";
+      UrlBase = "";
 
-    EnableSsl = "False";
-    SslCertPath = "";
-    SslCertPassword = "";
+      EnableSsl = "False";
+      SslCertPath = "";
+      SslCertPassword = "";
 
-    LaunchBrowser = "True";
-    ApiKey = "d854c071ad1b4b47ba6afca9a10e5049";
+      LaunchBrowser = "True";
+      ApiKey = "@PLACEHOLDER_API_KEY@";
 
-    AuthenticationMethod = "Forms";
-    AuthenticationRequired = "Enabled";
+      AuthenticationMethod = "Forms";
+      AuthenticationRequired = "Enabled";
 
-    Branch = "nightly";
-    UpdateMechanism = "Docker";
+      Branch = "nightly";
+      UpdateMechanism = "Docker";
 
-    # todo: private db password
+      # postgres configuration
+      PostgresUser = "lidarr";
+      PostgresPassword = "@PLACEHOLDER_DB_PASS@";
 
-    # postgres configuration
-    PostgresUser = "lidarr";
-    PostgresPassword = "lidarr";
+      PostgresHost = "host.containers.internal";
+      PostgresPort = "${toString ports.postgres}";
 
-    PostgresHost = "host.containers.internal";
-    PostgresPort = "${toString ports.postgres}";
+      PostgresMainDb = "lidarr-main";
+      PostgresLogDb = "lidarr-log";
 
-    PostgresMainDb = "lidarr-main";
-    PostgresLogDb = "lidarr-log";
+      LogLevel = "debug";
+      AnalyticsEnabled = "False";
+    });
 
-    LogLevel = "debug";
-    AnalyticsEnabled = "False";
+    secrets = {
+      "PLACEHOLDER_API_KEY" = config.age.secrets.lidarr-api-key.path;
+
+      # "PLACEHOLDER_DB_PASS" = config.age.secrets.lidarr-db-pass.path;
+      "PLACEHOLDER_DB_PASS" = pkgs.writeText "db-pass" "lidarr";
+    };
   };
 
   # slskd settings
-
-  # todo: private api key
-  slskdLidarrKey = "C2h1M5wh5iNUWNLYexHuTKj5s2mu29Xk";
-
-  slskdSettings = {
-    directories = {
-      downloads = "/download/finished";
-      incomplete = "/download/incomplete";
-    };
-
-    shares = {
-      directories = [ "/music" ];
-    };
-
-    web = {
-      port = 5030;
-      https = {
-        disabled = false;
-        port = 5031;
+  createSlskdConf = {
+    path = "containers/slskd/slskd.yml";
+    source = (pkgs.formats.yaml { }).generate "slskd-settings" {
+      directories = {
+        downloads = "/download/finished";
+        incomplete = "/download/incomplete";
       };
 
-      authentication = {
-        disabled = false;
-        username = "admin";
-        apiKeys = {
-          lidarr = {
-            key = slskdLidarrKey;
-            cidr = "0.0.0.0/0,::/0";
+      shares = {
+        directories = [ "/music" ];
+      };
+
+      web = {
+        port = 5030;
+        https = {
+          disabled = false;
+          port = 5031;
+        };
+
+        authentication = {
+          disabled = false;
+          username = "admin";
+          password = "@PLACEHOLDER_WEBUI_PASS@";
+
+          apiKeys = {
+            lidarr = {
+              key = "@PLACEHOLDER_LIDARR_API_KEY@";
+              cidr = "0.0.0.0/0,::/0";
+            };
+          };
+        };
+      };
+
+      soulseek = {
+        address = "vps.slsknet.org";
+        port = 2271;
+      };
+
+      flags = {
+        no_remote_configuration = true;
+      };
+
+      integrations = {
+        vpn = {
+          enabled = true;
+          portForwarding = false;
+          pollingInterval = 2500;
+          gluetun = {
+            version = 1;
+            url = "http://gluetun:8888";
+            auth = "apikey";
+            apiKey = "@PLACEHOLDER_GLUETUN_API_KEY@";
           };
         };
       };
     };
 
-    soulseek = {
-      address = "vps.slsknet.org";
-      port = 2271;
-    };
-
-    flags = {
-      no_remote_configuration = true;
-    };
-
-    integrations = {
-      vpn = {
-        enabled = true;
-        portForwarding = false;
-        pollingInterval = 2500;
-        gluetun = {
-          version = 1;
-          url = "http://gluetun:8888";
-          auth = "apikey";
-
-          # todo: private api key
-          apiKey = "169qzBxFa0ET26rkTWa3akmVopysVilS";
-        };
-      };
+    secrets = {
+      "PLACEHOLDER_WEBUI_PASS" = config.age.secrets.slskd-webui-pass.path;
+      "PLACEHOLDER_LIDARR_API_KEY" = config.age.secrets.slskd-lidarr-api-key.path;
+      "PLACEHOLDER_GLUETUN_API_KEY" = config.age.secrets.slskd-gluetun-api-key.path;
     };
   };
+
+  # todo: private api key
+  slskdLidarrKey = "C2h1M5wh5iNUWNLYexHuTKj5s2mu29Xk";
 in
 {
   myServices = {
@@ -156,25 +174,19 @@ in
     };
   };
 
-  home.file."containers/lidarr/config.xml".source = pkgs.writeText "config.xml" (
-    mkLidarrXml lidarrSettings
-  );
-
-  home.file."containers/slskd/slskd.yml".source =
-    (pkgs.formats.yaml { }).generate "slskd.yml"
-      slskdSettings;
-
   age.secrets =
     let
       mkSecret = name: {
         file = ../../../../secrets/${name}.age;
-        path = "${envSecretsPrefix}/${name}";
       };
     in
     {
-      slskd-user = mkSecret "containers/slskd/e_user";
-      slskd-pass = mkSecret "containers/slskd/e_pass";
-      slskd-webui = mkSecret "containers/slskd/e_webui-pw";
+      lidarr-api-key = mkSecret "containers/lidarr/api-key";
+      lidarr-db-pass = mkSecret "containers/lidarr/db-pass";
+
+      slskd-user = mkSecret "containers/slskd/s_user";
+      slskd-pass = mkSecret "containers/slskd/s_pass";
+      slskd-webui = mkSecret "containers/slskd/s_webui-pw";
     };
 
   virtualisation.quadlet =

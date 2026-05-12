@@ -63,9 +63,7 @@ let
     secrets = {
       "PLACEHOLDER_AUTH_SECRET" = config.age.secrets.papra-auth-secret.path;
       "PLACEHOLDER_CLIENT_KEY" = config.age.secrets.papra-client-key.path;
-
-      # todo: make this private and update in node-red
-      "PLACEHOLDER_WEBHOOK_SECRET" = pkgs.writeText "papra-secret" "JmNtFvWILKGALzaSTcebXtwFmOgbXiYO";
+      "PLACEHOLDER_WEBHOOK_SECRET" = config.age.secrets.papra-webhook-secret.path;
     };
   };
 in

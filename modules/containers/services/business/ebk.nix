@@ -34,7 +34,7 @@ in
   };
 
   home.file."containers/ebk/ezbookkeeping.ini".source =
-    (pkgs.formats.ini { }).generate "ezbookkeeping.ini"
+    (pkgs.formats.ini { }).generate "ebk-settings"
       ebkSettings;
 
   age.secrets =

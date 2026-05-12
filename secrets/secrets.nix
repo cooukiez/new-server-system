@@ -77,6 +77,9 @@ in
   "containers/ebk/s_db-pass.age".publicKeys = allKeys;
   "containers/ebk/s_secret-key.age".publicKeys = allKeys;
 
+  # gluetun
+  "containers/gluetun/s_api-key.age".publicKeys = allKeys;
+
   # gitea
   "containers/gitea/s_auth-client.age".publicKeys = allKeys;
   "containers/gitea/s_db-pass.age".publicKeys = allKeys;
@@ -89,6 +92,7 @@ in
   "containers/immich/s_db-pass.age".publicKeys = allKeys;
 
   # lidarr
+  "containers/lidarr/s_api-key.age".publicKeys = allKeys;
   "containers/lidarr/s_db-pass.age".publicKeys = allKeys;
 
   # linkwarden
@@ -116,6 +120,11 @@ in
   "containers/slskd/e_pass.age".publicKeys = allKeys;
   "containers/slskd/e_user.age".publicKeys = allKeys;
   "containers/slskd/e_webui-pw.age".publicKeys = allKeys;
+
+  "containers/slskd/s_lidarr-api.age".publicKeys = allKeys;
+  "containers/slskd/s_pass.age".publicKeys = allKeys;
+  "containers/slskd/s_user.age".publicKeys = allKeys;
+  "containers/slskd/s_webui-pass.age".publicKeys = allKeys;
 
   # trek
   "containers/trek/e_auth-client.age".publicKeys = allKeys;
