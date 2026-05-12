@@ -74,7 +74,7 @@ let
   };
 
   # slskd settings
-  createSlskdConf = {
+  createSlskdConf = mkConf {
     path = "containers/slskd/slskd.yml";
     source = (pkgs.formats.yaml { }).generate "slskd-settings" {
       directories = {
@@ -110,6 +110,9 @@ let
       soulseek = {
         address = "vps.slsknet.org";
         port = 2271;
+
+        username = "@PLACEHOLDER_USER@";
+        password = "@PLACEHOLDER_PASS@";
       };
 
       flags = {
@@ -132,14 +135,13 @@ let
     };
 
     secrets = {
-      "PLACEHOLDER_WEBUI_PASS" = config.age.secrets.slskd-webui-pass.path;
-      "PLACEHOLDER_LIDARR_API_KEY" = config.age.secrets.slskd-lidarr-api-key.path;
       "PLACEHOLDER_GLUETUN_API_KEY" = config.age.secrets.slskd-gluetun-api-key.path;
+      "PLACEHOLDER_LIDARR_API_KEY" = config.age.secrets.slskd-lidarr-api-key.path;
+      "PLACEHOLDER_USER" = config.age.secrets.slskd-user.path;
+      "PLACEHOLDER_PASS" = config.age.secrets.slskd-pass.path;
+      "PLACEHOLDER_WEBUI_PASS" = config.age.secrets.slskd-webui-pass.path;
     };
   };
-
-  # todo: private api key
-  slskdLidarrKey = "C2h1M5wh5iNUWNLYexHuTKj5s2mu29Xk";
 in
 {
   myServices = {
@@ -181,12 +183,14 @@ in
       };
     in
     {
-      lidarr-api-key = mkSecret "containers/lidarr/api-key";
-      lidarr-db-pass = mkSecret "containers/lidarr/db-pass";
+      lidarr-api-key = mkSecret "containers/lidarr/s_api-key";
+      lidarr-db-pass = mkSecret "containers/lidarr/s_db-pass";
 
+      slskd-gluetun-api-key = mkSecret "containers/gluetun/s_api-key";
+      slskd-lidarr-api-key = mkSecret "containers/slskd/s_lidarr-api-key";
       slskd-user = mkSecret "containers/slskd/s_user";
       slskd-pass = mkSecret "containers/slskd/s_pass";
-      slskd-webui = mkSecret "containers/slskd/s_webui-pw";
+      slskd-webui-pass = mkSecret "containers/slskd/s_webui-pass";
     };
 
   virtualisation.quadlet =
@@ -229,7 +233,11 @@ in
 
           ExecStartPre = [
             "+${pkgs.writeShellScript "pre-lidarr" ''
+              ${createLidarrConf}
+
+              # deezer download
               ${pkgs.coreutils}/bin/mkdir -p "${downloadPath}/deezer"
+              # spotify playlist cache
               ${pkgs.coreutils}/bin/mkdir -p "/opt/lidarr/cache/spotify"
 
               ${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/lidarr/config.xml /opt/lidarr/data/config.xml
@@ -288,6 +296,8 @@ in
 
           ExecStartPre = [
             "+${pkgs.writeShellScript "pre-slskd" ''
+              ${createSlskdConf}
+
               ${pkgs.coreutils}/bin/mkdir -p "${downloadPath}/slskd/finished"
               ${pkgs.coreutils}/bin/mkdir -p "${downloadPath}/slskd/incomplete"
             ''}"
@@ -310,12 +320,6 @@ in
 
             SLSKD_REMOTE_CONFIGURATION = "false";
           };
-
-          environmentFiles = [
-            "secrets/containers/slskd/e_user"
-            "secrets/containers/slskd/e_pass"
-            "secrets/containers/slskd/e_webui-pw"
-          ];
 
           volumes = [
             "/etc/timezone:/etc/timezone:ro"

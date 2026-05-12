@@ -117,11 +117,7 @@ in
   "containers/papra/s_webhook-secret.age".publicKeys = allKeys;
 
   # slskd
-  "containers/slskd/e_pass.age".publicKeys = allKeys;
-  "containers/slskd/e_user.age".publicKeys = allKeys;
-  "containers/slskd/e_webui-pw.age".publicKeys = allKeys;
-
-  "containers/slskd/s_lidarr-api.age".publicKeys = allKeys;
+  "containers/slskd/s_lidarr-api-key.age".publicKeys = allKeys;
   "containers/slskd/s_pass.age".publicKeys = allKeys;
   "containers/slskd/s_user.age".publicKeys = allKeys;
   "containers/slskd/s_webui-pass.age".publicKeys = allKeys;
