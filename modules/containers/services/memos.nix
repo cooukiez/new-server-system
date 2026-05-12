@@ -21,7 +21,17 @@ let
       TZ = "Europe/Berlin";
 
       MEMOS_DRIVER = "postgres";
-      MEMOS_DSN = "postgres://memos:@PLACEHOLDER_DB_PASS@@host.containers.internal:${toString ports.postgres}/memos?sslmode=disable";
+
+      MEMOS_DSN =
+        let
+          name = "memos";
+          user = "memos";
+          pass = "@PLACEHOLDER_DB_PASS@";
+
+          host = "host.containers.internal";
+          port = toString ports.postgres;
+        in
+        "postgres://${user}:${pass}@${host}:${port}/${name}?sslmode=disable";
 
       MEMOS_ADDR = "0.0.0.0";
       MEMOS_PORT = "5230";

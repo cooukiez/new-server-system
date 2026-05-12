@@ -10,11 +10,11 @@
   pkgs,
   images,
   ports,
-  envSecretsPrefix,
+  mkEnv,
   ...
 }:
 let
-  createLinkwardenMeili = mkEnv {
+  createLinkwardenMeiliEnv = mkEnv {
     path = "containers/link/meili/env";
     vars = {
       MEILI_MASTER_KEY = "@PLACEHOLDER_MEILI_KEY@";
@@ -122,6 +122,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-linkwarden-meili" ''
+              ${createLinkwardenMeiliEnv}
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -160,6 +166,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-linkwarden" ''
+              ${createLinkwardenEnv}
+            ''}"
+          ];
         };
 
         containerConfig = {
