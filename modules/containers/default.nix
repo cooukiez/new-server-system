@@ -127,34 +127,22 @@ in
         ./vpn.nix
       ];
 
-      _module.args =
-        let
-          baseDir = ".config/containers/systemd";
-          mkPath = sub: "${config.home.homeDirectory}/${baseDir}/${sub}";
-        in
-        {
-          images = import ../../generated-images.nix;
+      _module.args = {
+        images = import ../../generated-images.nix;
+        ports = hostConfig.ports;
 
-          ports = hostConfig.ports;
+        mkConf = mkConf;
+        mkEnv = mkEnv;
 
-          envSuffix = "${baseDir}/env";
-          envSecretsSuffix = "${baseDir}/secrets";
+        allServices = config.myServices;
+        publicServices = lib.filterAttrs (name: value: value.serviceConfig != null) config.myServices;
 
-          envPrefix = mkPath "env";
-          envSecretsPrefix = mkPath "secrets";
+        documentsPath = "/data/documents";
+        photosPath = "/media/photos";
 
-          mkConf = mkConf;
-          mkEnv = mkEnv;
-
-          allServices = config.myServices;
-          publicServices = lib.filterAttrs (name: value: value.serviceConfig != null) config.myServices;
-
-          documentsPath = "/data/documents";
-          photosPath = "/media/photos";
-
-          musicPath = "/media/music";
-          downloadPath = "/media/download";
-        };
+        musicPath = "/media/music";
+        downloadPath = "/media/download";
+      };
 
       systemd.user.services."podman-volume-provisioning" = {
         Unit = {
