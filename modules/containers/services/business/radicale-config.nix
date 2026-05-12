@@ -1,3 +1,10 @@
+/*
+  modules/containers/services/business/radicale-config.nix
+
+  part of server system
+  created 2026-05-11
+*/
+
 {
   ports,
   ...

@@ -1,8 +1,8 @@
 /*
-  modules/containers/services/org/radicale.nix
+  modules/containers/services/business/radicale.nix
 
-  part of der-home-server
-  created 2026-04-16
+  part of server system
+  created 2026-04-21
 */
 
 {

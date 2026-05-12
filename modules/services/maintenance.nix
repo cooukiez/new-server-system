@@ -1,7 +1,7 @@
 /*
-  modules/nixos/services/maintenance.nix
+  modules/services/maintenance.nix
 
-  part of der-home-server
+  part of server system
   created 2026-04-20
 */
 

@@ -4,6 +4,8 @@ import subprocess
 from datetime import datetime
 from pathlib import Path
 
+# nix run nixpkgs#python3 -- ./refresh-headers.py
+
 def get_birthtime(file_path):
     try:
         cmd = ['stat', '-c', '%W', str(file_path)]

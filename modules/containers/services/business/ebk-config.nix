@@ -1,8 +1,8 @@
 /*
-  modules/containers/services/org/ebk-config.nix
+  modules/containers/services/business/ebk-config.nix
 
-  part of der-home-server
-  created 2026-04-20
+  part of server system
+  created 2026-04-21
 */
 
 {

@@ -1,7 +1,7 @@
 /*
   modules/containers/dns.nix
 
-  part of der-home-server
+  part of server system
   created 2026-04-19
 */
 

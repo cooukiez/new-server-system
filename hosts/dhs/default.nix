@@ -1,8 +1,8 @@
 /*
-  hosts/lvl/default.nix
+  hosts/dhs/default.nix
 
-  created by ludw
-  on 2026-04-22
+  part of server system
+  created 2026-05-10
 */
 
 {

@@ -1,7 +1,7 @@
 /*
-  modules/nixos/services/metrics.nix
+  modules/services/metrics.nix
 
-  part of der-home-server
+  part of server system
   created 2026-04-17
 */
 
