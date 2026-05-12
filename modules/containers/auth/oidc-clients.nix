@@ -183,7 +183,7 @@
   {
     client_id = "memos";
     client_name = "Memos";
-    client_secret = "$pbkdf2-sha512$310000$uFbkn5MGHwfzwbAA27iV7Q$b78L0MN.V/9vTtuNkXagYRsaOUkicZJ2AFWtPqIPMbHcIUWgMKkg04fJhPqzTlSDi0XgV1Kr9.rpOzEWh1EVBQ";
+    client_secret = "$pbkdf2-sha512$310000$RP9plwWlCWubeGu3X4AkFA$kJe3MFuZaLBGAFFLW9UXGbLO1BMscSbf54nOHYG7U2JjaQSwZp1GHJRWbuZCi99Qbl/lAkAoPlELAd1PdFOPhw";
 
     public = false;
     authorization_policy = "two_factor";
