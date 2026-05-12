@@ -37,8 +37,7 @@ let
     };
 
     secrets = {
-      # "PLACEHOLDER_DB_PASS" = config.age.secrets.atuin-db-pass.path;
-      "PLACEHOLDER_DB_PASS" = pkgs.writeText "db-pass" "atuin";
+      "PLACEHOLDER_DB_PASS" = config.age.secrets.atuin-db-pass.path;
     };
   };
 in

@@ -45,7 +45,7 @@ in
       };
     in
     {
-      home-lan-key = mkSecret "certs/home.lan.key";
+      radicale-crt-key = mkSecret "certs/home.lan.key";
     };
 
   virtualisation.quadlet =
@@ -97,7 +97,7 @@ in
             "${config.home.homeDirectory}/containers/radicale/config:/config:ro,U"
 
             # secrets
-            "${config.age.secrets.home-lan-key.path}:/run/secrets/HOME_LAN_KEY:ro"
+            "${config.age.secrets.radicale-crt-key.path}:/run/secrets/HOME_LAN_KEY:ro"
 
             # volumes
             "${volumes.radicale-data.ref}:/data:U"

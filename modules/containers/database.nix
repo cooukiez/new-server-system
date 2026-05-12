@@ -10,10 +10,10 @@
   pkgs,
   images,
   ports,
+  mkConf,
   ...
 }:
 let
-  # todo: make passwords secret
   services = [
     {
       name = "authelia";
@@ -24,50 +24,50 @@ let
       name = "lldap";
       user = "lldap";
       dbs = [ "lldap" ];
-      pass = "lldap";
+      pass = "@PLACEHOLDER_LLDAP_DB_PASS@";
     }
 
     {
       name = "atuin";
       user = "atuin";
       dbs = [ "atuin" ];
-      pass = "atuin";
+      pass = "@PLACEHOLDER_ATUIN_DB_PASS@";
     }
     {
       name = "ebk";
       user = "ebk";
       dbs = [ "ebk" ];
-      pass = "ebk";
+      pass = "@PLACEHOLDER_EBK_DB_PASS@";
     }
     {
       name = "gitea";
       user = "gitea";
       dbs = [ "gitea" ];
-      pass = "gitea";
+      pass = "@PLACEHOLDER_GITEA_DB_PASS@";
     }
     {
       name = "linkwarden";
       user = "linkwarden";
       dbs = [ "linkwarden" ];
-      pass = "linkwarden";
+      pass = "@PLACEHOLDER_LINK_DB_PASS@";
     }
     {
       name = "mail-archiver";
       user = "archiver";
       dbs = [ "mail-archiver" ];
-      pass = "archiver";
+      pass = "@PLACEHOLDER_ARCHIVER_DB_PASS@";
     }
     {
       name = "memos";
       user = "memos";
       dbs = [ "memos" ];
-      pass = "memos";
+      pass = "@PLACEHOLDER_MEMOS_DB_PASS@";
     }
     {
       name = "opengist";
       user = "opengist";
       dbs = [ "opengist" ];
-      pass = "opengist";
+      pass = "@PLACEHOLDER_OPENGIST_DB_PASS@";
     }
 
     {
@@ -77,7 +77,7 @@ let
         "lidarr-main"
         "lidarr-log"
       ];
-      pass = "lidarr";
+      pass = "@PLACEHOLDER_LIDARR_DB_PASS@";
     }
   ];
 
@@ -105,6 +105,31 @@ let
       '') service.dbs
     )}
   '';
+
+  # todo: auto run startup scripts
+  createConf = mkConf {
+    path = "containers/postgres/init-all-db.sql";
+    source = pkgs.writeText "init-all-db-template" ''
+      \set ON_ERROR_STOP off
+
+      ${builtins.concatStringsSep "\n" (map mkSql services)}
+    '';
+
+    secrets = {
+      PLACEHOLDER_LLDAP_DB_PASS = config.age.secrets.postgres-lldap-db-pass.path;
+
+      PLACEHOLDER_ATUIN_DB_PASS = config.age.secrets.postgres-atuin-db-pass.path;
+      PLACEHOLDER_EBK_DB_PASS = config.age.secrets.postgres-ebk-db-pass.path;
+      PLACEHOLDER_GITEA_DB_PASS = config.age.secrets.postgres-gitea-db-pass.path;
+      PLACEHOLDER_LINK_DB_PASS = config.age.secrets.postgres-link-db-pass.path;
+      PLACEHOLDER_ARCHIVER_DB_PASS = config.age.secrets.postgres-archiver-db-pass.path;
+      PLACEHOLDER_MEMOS_DB_PASS = config.age.secrets.postgres-memos-db-pass.path;
+      PLACEHOLDER_OPENGIST_DB_PASS = config.age.secrets.postgres-opengist-db-pass.path;
+      PLACEHOLDER_LIDARR_DB_PASS = config.age.secrets.postgres-lidarr-db-pass.path;
+    };
+
+    mode = "644";
+  };
 in
 {
   myServices.postgres = {
@@ -125,21 +150,25 @@ in
   age.secrets =
     let
       mkSecret = name: {
-        file = ../../secrets/db/${name}.age;
+        file = ../../secrets/${name}.age;
         mode = "444";
       };
     in
     {
-      postgres-pw = mkSecret "s_postgres-pw";
-      pgadmin-pw = mkSecret "s_pgadmin-pw";
+      postgres-lldap-db-pass = mkSecret "auth/ldap/s_db-pass";
+
+      postgres-atuin-db-pass = mkSecret "containers/atuin/s_db-pass";
+      postgres-ebk-db-pass = mkSecret "containers/ebk/s_db-pass";
+      postgres-gitea-db-pass = mkSecret "containers/gitea/s_db-pass";
+      postgres-link-db-pass = mkSecret "containers/link/s_db-pass";
+      postgres-archiver-db-pass = mkSecret "containers/archiver/s_db-pass";
+      postgres-memos-db-pass = mkSecret "containers/memos/s_db-pass";
+      postgres-opengist-db-pass = mkSecret "containers/opengist/s_db-pass";
+      postgres-lidarr-db-pass = mkSecret "containers/lidarr/s_db-pass";
+
+      postgres-pw = mkSecret "db/s_postgres-pw";
+      pgadmin-pw = mkSecret "db/s_pgadmin-pw";
     };
-
-  # todo: auto run startup scripts
-  home.file."containers/postgres/init-all-db.sql".text = ''
-    \set ON_ERROR_STOP off
-
-    ${builtins.concatStringsSep "\n" (map mkSql services)}
-  '';
 
   virtualisation.quadlet =
     let
@@ -167,6 +196,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-postgres" ''
+              ${createConf}
+            ''}"
+          ];
         };
 
         containerConfig = {

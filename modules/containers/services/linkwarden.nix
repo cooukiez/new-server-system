@@ -58,10 +58,7 @@ let
 
     secrets = {
       PLACEHOLDER_CLIENT_KEY = config.age.secrets.link-client-key.path;
-
-      # PLACEHOLDER_DB_PASS = config.age.secrets.link-db-pass.path;
-      PLACEHOLDER_DB_PASS = pkgs.writeText "db-pass" "linkwarden";
-
+      PLACEHOLDER_DB_PASS = config.age.secrets.link-db-pass.path;
       PLACEHOLDER_MEILI_KEY = config.age.secrets.link-meili-key.path;
       PLACEHOLDER_NEXT_AUTH = config.age.secrets.link-next-auth.path;
     };

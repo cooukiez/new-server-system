@@ -39,8 +39,7 @@ let
     };
 
     secrets = {
-      # "PLACEHOLDER_DB_PASS" = config.age.secrets.memos-db-pass.path;
-      "PLACEHOLDER_DB_PASS" = pkgs.writeText "db-pass" "memos";
+      "PLACEHOLDER_DB_PASS" = config.age.secrets.memos-db-pass.path;
     };
   };
 in

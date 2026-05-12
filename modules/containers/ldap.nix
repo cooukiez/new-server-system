@@ -39,8 +39,7 @@ let
     };
 
     secrets = {
-      # "PLACEHOLDER_DB_PASS" = config.age.secrets.lldap-db-pass.path;
-      "PLACEHOLDER_DB_PASS" = pkgs.writeText "db-pass" "lldap";
+      "PLACEHOLDER_DB_PASS" = config.age.secrets.lldap-db-pass.path;
     };
   };
 in

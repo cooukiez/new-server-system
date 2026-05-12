@@ -65,9 +65,7 @@ let
 
     secrets = {
       "PLACEHOLDER_API_KEY" = config.age.secrets.lidarr-api-key.path;
-
-      # "PLACEHOLDER_DB_PASS" = config.age.secrets.lidarr-db-pass.path;
-      "PLACEHOLDER_DB_PASS" = pkgs.writeText "db-pass" "lidarr";
+      "PLACEHOLDER_DB_PASS" = config.age.secrets.lidarr-db-pass.path;
     };
   };
 

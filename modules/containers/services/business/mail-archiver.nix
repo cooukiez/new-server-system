@@ -71,9 +71,7 @@ let
     secrets = {
       "PLACEHOLDER_ADMIN_PASS" = config.age.secrets.archiver-admin-pass.path;
       "PLACEHOLDER_CLIENT_KEY" = config.age.secrets.archiver-client-key.path;
-
-      # "PLACEHOLDER_DB_PASS" = config.age.secrets.archiver-db-pass.path;
-      "PLACEHOLDER_DB_PASS" = pkgs.writeText "db-pass" "archiver";
+      "PLACEHOLDER_DB_PASS" = config.age.secrets.archiver-db-pass.path;
     };
   };
 in
