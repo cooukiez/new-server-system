@@ -10,18 +10,31 @@
   pkgs,
   images,
   ports,
-  mkSecretEnv,
+  mkEnv,
   ...
 }:
 let
-  patcherScript =
-    mkSecretEnv "containers/memos/db-conn" "644"
-      (pkgs.writeText "db-conn" ''
-        MEMOS_DSN=postgres://memos:@PLACEHOLDER_DATABASE_PASS@@host.containers.internal:${toString ports.postgres}/memos?sslmode=disable
-      '')
-      {
-        "PLACEHOLDER_DATABASE_PASS" = (pkgs.writeText "db-pw" "memos");
-      };
+
+  createEnv = mkEnv {
+    path = "containers/memos/env";
+    vars = {
+      TZ = "Europe/Berlin";
+
+      MEMOS_DRIVER = "postgres";
+      MEMOS_DSN = "postgres://memos:@PLACEHOLDER_DB_PASS@@host.containers.internal:${toString ports.postgres}/memos?sslmode=disable";
+
+      MEMOS_ADDR = "0.0.0.0";
+      MEMOS_PORT = "5230";
+
+      MEMOS_INSTANCE_URL = config.myServices.memos.serviceConfig.href;
+
+      MEMOS_DATA = "/data";
+    };
+
+    secrets = {
+      "PLACEHOLDER_DB_PASS" = pkgs.writeText "db-pass" "memos";
+    };
+  };
 in
 {
   myServices.memos = {
@@ -72,8 +85,8 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-papra" ''
-              ${patcherScript}
+            "+${pkgs.writeShellScript "pre-memos" ''
+              ${createEnv}
             ''}"
           ];
         };
@@ -86,18 +99,8 @@ in
             "auth.home.lan:host-gateway"
           ];
 
-          environments = {
-            TZ = "Europe/Berlin";
-
-            MEMOS_PORT = "5230";
-            MEMOS_DRIVER = "postgres";
-            MEMOS_INSTANCE_URL = config.myServices.memos.serviceConfig.href;
-
-            MEMOS_DATA = "/data";
-          };
-
           environmentFiles = [
-            "secrets/containers/memos/db-conn"
+            "env/containers/memos/env"
           ];
 
           volumes = [

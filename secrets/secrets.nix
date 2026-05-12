@@ -65,8 +65,8 @@ in
   #
 
   # archiver
-  "containers/archiver/e_admin-pass.age".publicKeys = allKeys;
-  "containers/archiver/e_auth-client.age".publicKeys = allKeys;
+  "containers/archiver/s_admin-pass.age".publicKeys = allKeys;
+  "containers/archiver/s_auth-client.age".publicKeys = allKeys;
   "containers/archiver/s_db-pass.age".publicKeys = allKeys;
 
   # atuin

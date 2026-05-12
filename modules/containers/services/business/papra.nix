@@ -10,9 +10,7 @@
   pkgs,
   images,
   ports,
-  envSecretsPrefix,
   mkEnv,
-  mkSecretEnv,
   documentsPath,
   ...
 }:
@@ -33,16 +31,15 @@ let
 
       NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
 
+      AUTH_SECRET = "@PLACEHOLDER_AUTH_SECRET@";
       AUTH_FIRST_USER_AS_ADMIN = "true";
       AUTH_PROVIDERS_EMAIL_IS_ENABLED = "false";
 
       INTAKE_EMAILS_IS_ENABLED = "true";
       INTAKE_EMAILS_DRIVER = "catch-all";
 
-      # todo: make this private and update in node-red
-      INTAKE_EMAILS_WEBHOOK_SECRET = "JmNtFvWILKGALzaSTcebXtwFmOgbXiYO";
+      INTAKE_EMAILS_WEBHOOK_SECRET = "@PLACEHOLDER_WEBHOOK_SECRET@";
 
-      # authelia oidc configuration
       AUTH_PROVIDERS_CUSTOMS = "${builtins.toJSON [
         {
           providerId = "authelia";
@@ -50,7 +47,7 @@ let
           providerIconUrl = "https://www.authelia.com/images/branding/logo-cropped.png";
 
           clientId = "papra";
-          clientSecret = "@PLACEHOLDER_CLIENT_SECRET@";
+          clientSecret = "@PLACEHOLDER_CLIENT_KEY@";
 
           type = "oidc";
           discoveryUrl = "https://auth.home.lan/.well-known/openid-configuration";
@@ -64,7 +61,11 @@ let
     };
 
     secrets = {
-      "PLACEHOLDER_CLIENT_SECRET" = config.age.secrets.papra-client-key.path;
+      "PLACEHOLDER_AUTH_SECRET" = config.age.secrets.papra-auth-secret.path;
+      "PLACEHOLDER_CLIENT_KEY" = config.age.secrets.papra-client-key.path;
+
+      # todo: make this private and update in node-red
+      "PLACEHOLDER_WEBHOOK_SECRET" = pkgs.writeText "papra-secret" "JmNtFvWILKGALzaSTcebXtwFmOgbXiYO";
     };
   };
 in
@@ -88,14 +89,13 @@ in
     let
       mkSecret = name: {
         file = ../../../../secrets/containers/papra/${name}.age;
-        path = "${envSecretsPrefix}/containers/papra/${name}";
       };
     in
     {
-      papra-auth-secret = mkSecret "e_auth-secret";
-      papra-webhook-secret = mkSecret "e_webhook-secret";
-
+      papra-auth-secret = mkSecret "s_auth-secret";
       papra-client-key = mkSecret "s_auth-client";
+      papra-storage-key = mkSecret "s_storage-key";
+      papra-webhook-secret = mkSecret "s_webhook-secret";
     };
 
   virtualisation.quadlet =
@@ -136,9 +136,6 @@ in
           ];
 
           environmentFiles = [
-            "secrets/containers/papra/e_auth-secret"
-            "secrets/containers/papra/e_webhook-secret"
-
             "env/containers/papra/env"
           ];
 

@@ -10,9 +10,72 @@
   pkgs,
   images,
   ports,
+  mkEnv,
   envSecretsPrefix,
   ...
 }:
+let
+  createEnv = mkEnv {
+    path = "containers/archiver/env";
+    vars = {
+      TimeZone__DisplayTimeZoneId = "Europe/Berlin";
+
+      Authentication__Username = "admin";
+      Authentication__Password = "@PLACEHOLDER_ADMIN_PASS@";
+      Authentication__SessionTimeoutMinutes = "60";
+
+      BandwidthTracking__Enabled = "false";
+      BandwidthTracking__DailyLimitMb = "25000";
+
+      AllowedHosts = config.myServices.mailArchiver.serviceConfig.domain;
+
+      DatabaseMaintenance__Enabled = "true";
+      DatabaseMaintenance__DailyExecutionTime = "01:00";
+      DatabaseMaintenance__TimeoutMinutes = "30";
+
+      ConnectionStrings__DefaultConnection = builtins.concatStringsSep ";" [
+        "Host=host.containers.internal"
+        "Port=${toString ports.postgres}"
+        "Database=mail-archiver"
+
+        "Username=archiver"
+        "Password=@PLACEHOLDER_DB_PASS@"
+      ];
+
+      View__DefaultToPlainText = "true";
+      View__BlockExternalResources = "false";
+
+      # authelia oidc configuration
+      OAuth__Enabled = "true";
+      OAuth__Authority = "https://auth.home.lan";
+      OAuth__ClientId = "mail-archiver";
+      OAuth__ClientSecret = "@PLACEHOLDER_CLIENT_KEY@";
+
+      # scopes defined as indexed keys
+      OAuth__ClientScopes__0 = "openid";
+      OAuth__ClientScopes__1 = "profile";
+      OAuth__ClientScopes__2 = "email";
+      OAuth__ClientScopes__3 = "groups";
+
+      Kestrel__Limits__MaxRequestHeadersTotalSize = "65536";
+      Kestrel__Limits__MaxRequestHeaderFieldSize = "32768";
+      Kestrel__Endpoints__Http__Url = "http://0.0.0.0:5000";
+
+      OAuth__DisablePasswordLogin = "true";
+      OAuth__AutoApproveUsers = "true";
+
+      # automatic admins
+      OAuth__AdminEmails__0 = "management.homeserver@mailbox.org";
+      OAuth__AdminEmails__1 = "ludwig.geyer@mailbox.org";
+    };
+
+    secrets = {
+      "PLACEHOLDER_ADMIN_PASS" = config.age.secrets.archiver-admin-pass.path;
+      "PLACEHOLDER_CLIENT_KEY" = config.age.secrets.archiver-client-key.path;
+      "PLACEHOLDER_DB_PASS" = config.age.secrets.archiver-db-pass.path;
+    };
+  };
+in
 {
   myServices.mailArchiver = {
     serviceConfig = {
@@ -33,13 +96,12 @@
     let
       mkSecret = name: {
         file = ../../../../secrets/containers/archiver/${name}.age;
-        path = "${envSecretsPrefix}/containers/archiver/${name}";
-        mode = "444";
       };
     in
     {
-      archiver-admin-pass = mkSecret "e_admin-pass";
-      archiver-client-key = mkSecret "e_auth-client";
+      archiver-admin-pass = mkSecret "s_admin-pass";
+      archiver-client-key = mkSecret "s_auth-client";
+      archiver-db-pass = mkSecret "s_db-pass";
     };
 
   virtualisation.quadlet =
@@ -63,6 +125,12 @@
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-archiver" ''
+              ${createEnv}
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -73,54 +141,8 @@
             "auth.home.lan:host-gateway"
           ];
 
-          environments = {
-            TimeZone__DisplayTimeZoneId = "Europe/Berlin";
-
-            # todo: private db password
-            ConnectionStrings__DefaultConnection = "Host=host.containers.internal;Port=${toString ports.postgres};Database=mail-archiver;Username=archiver;Password=archiver";
-
-            # fallback credentials first login
-            Authentication__Username = "admin";
-            Authentication__SessionTimeoutMinutes = "60";
-
-            BandwidthTracking__Enabled = "false";
-            BandwidthTracking__DailyLimitMb = "25000";
-
-            AllowedHosts = config.myServices.mailArchiver.serviceConfig.domain;
-
-            DatabaseMaintenance__Enabled = "true";
-            DatabaseMaintenance__DailyExecutionTime = "01:00";
-            DatabaseMaintenance__TimeoutMinutes = "30";
-
-            View__DefaultToPlainText = "true";
-            View__BlockExternalResources = "false";
-
-            # authelia oidc configuration
-            OAuth__Enabled = "true";
-            OAuth__Authority = "https://auth.home.lan";
-            OAuth__ClientId = "mail-archiver";
-
-            # scopes defined as indexed keys
-            OAuth__ClientScopes__0 = "openid";
-            OAuth__ClientScopes__1 = "profile";
-            OAuth__ClientScopes__2 = "email";
-            OAuth__ClientScopes__3 = "groups";
-
-            Kestrel__Limits__MaxRequestHeadersTotalSize = "65536";
-            Kestrel__Limits__MaxRequestHeaderFieldSize = "32768";
-            Kestrel__Endpoints__Http__Url = "http://0.0.0.0:5000";
-
-            OAuth__DisablePasswordLogin = "true";
-            OAuth__AutoApproveUsers = "true";
-
-            # automatic admins
-            OAuth__AdminEmails__0 = "management.homeserver@mailbox.org";
-            OAuth__AdminEmails__1 = "ludwig.geyer@mailbox.org";
-          };
-
           environmentFiles = [
-            "secrets/containers/archiver/e_admin-pass"
-            "secrets/containers/archiver/e_auth-client"
+            "env/containers/archiver/env"
           ];
 
           volumes = [
