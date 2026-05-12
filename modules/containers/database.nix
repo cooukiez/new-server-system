@@ -69,6 +69,12 @@ let
       dbs = [ "opengist" ];
       pass = "@PLACEHOLDER_OPENGIST_DB_PASS@";
     }
+    {
+      name = "outline";
+      user = "outline";
+      dbs = [ "outline" ];
+      pass = "@PLACEHOLDER_OUTLINE_DB_PASS@";
+    }
 
     {
       name = "lidarr";
@@ -126,6 +132,7 @@ let
       PLACEHOLDER_ARCHIVER_DB_PASS = config.age.secrets.postgres-archiver-db-pass.path;
       PLACEHOLDER_MEMOS_DB_PASS = config.age.secrets.postgres-memos-db-pass.path;
       PLACEHOLDER_OPENGIST_DB_PASS = config.age.secrets.postgres-opengist-db-pass.path;
+      PLACEHOLDER_OUTLINE_DB_PASS = config.age.secrets.postgres-outline-db-pass.path;
       PLACEHOLDER_LIDARR_DB_PASS = config.age.secrets.postgres-lidarr-db-pass.path;
     };
 
@@ -165,6 +172,7 @@ in
       postgres-archiver-db-pass = mkSecret "containers/archiver/s_db-pass";
       postgres-memos-db-pass = mkSecret "containers/memos/s_db-pass";
       postgres-opengist-db-pass = mkSecret "containers/opengist/s_db-pass";
+      postgres-outline-db-pass = mkSecret "containers/outline/s_db-pass";
       postgres-lidarr-db-pass = mkSecret "containers/lidarr/s_db-pass";
 
       postgres-pw = mkSecret "db/s_postgres-pw";

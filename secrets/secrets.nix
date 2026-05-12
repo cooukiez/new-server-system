@@ -109,6 +109,12 @@ in
   "containers/opengist/s_auth-client.age".publicKeys = allKeys;
   "containers/opengist/s_db-pass.age".publicKeys = allKeys;
 
+  # outline
+  "containers/outline/s_auth-client.age".publicKeys = allKeys;
+  "containers/outline/s_db-pass.age".publicKeys = allKeys;
+  "containers/outline/s_secret-key.age".publicKeys = allKeys;
+  "containers/outline/s_utils-secret.age".publicKeys = allKeys;
+
   # papra
   "containers/papra/s_auth-client.age".publicKeys = allKeys;
   "containers/papra/s_auth-secret.age".publicKeys = allKeys;

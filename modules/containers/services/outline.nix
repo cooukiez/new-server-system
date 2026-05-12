@@ -93,8 +93,8 @@ in
       };
     in
     {
+      outline-client-key = mkSecret "s_auth-client";
       outline-db-pass = mkSecret "s_db-pass";
-      outline-client-key = mkSecret "s_client-key";
       outline-secret-key = mkSecret "s_secret-key";
       outline-utils-secret = mkSecret "s_utils-secret";
     };
