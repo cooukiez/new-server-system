@@ -10,33 +10,63 @@
   pkgs,
   images,
   ports,
-  envSecretsSuffix,
   envSecretsPrefix,
+  mkEnv,
+  mkSecretEnv,
   documentsPath,
   ...
 }:
 let
-  papraAuthSettings = {
-    providerId = "authelia";
-    providerName = "Authelia";
-    providerIconUrl = "https://www.authelia.com/images/branding/logo-cropped.png";
+  createEnv = mkEnv {
+    path = "containers/papra/env";
+    vars = {
+      TZ = "Europa/Berlin";
 
-    clientId = "papra";
-    clientSecret = "PLACEHOLDER_CLIENT_SECRET";
+      APP_BASE_URL = "https://papra.home.lan";
 
-    type = "oidc";
-    discoveryUrl = "https://auth.home.lan/.well-known/openid-configuration";
-    scopes = [
-      "openid"
-      "profile"
-      "email"
-    ];
+      PORT = "1221";
+      SERVER_HOSTNAME = "0.0.0.0";
+
+      DOCUMENT_STORAGE_FILESYSTEM_ROOT = "/data";
+      DOCUMENTS_CONTENT_EXTRACTION_ENABLED = "true";
+      DOCUMENTS_OCR_LANGUAGES = "deu,eng";
+
+      NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
+
+      AUTH_FIRST_USER_AS_ADMIN = "true";
+      AUTH_PROVIDERS_EMAIL_IS_ENABLED = "false";
+
+      INTAKE_EMAILS_IS_ENABLED = "true";
+      INTAKE_EMAILS_DRIVER = "catch-all";
+
+      # todo: make this private and update in node-red
+      INTAKE_EMAILS_WEBHOOK_SECRET = "JmNtFvWILKGALzaSTcebXtwFmOgbXiYO";
+
+      # authelia oidc configuration
+      AUTH_PROVIDERS_CUSTOMS = "${builtins.toJSON [
+        {
+          providerId = "authelia";
+          providerName = "Authelia";
+          providerIconUrl = "https://www.authelia.com/images/branding/logo-cropped.png";
+
+          clientId = "papra";
+          clientSecret = "@PLACEHOLDER_CLIENT_SECRET@";
+
+          type = "oidc";
+          discoveryUrl = "https://auth.home.lan/.well-known/openid-configuration";
+          scopes = [
+            "openid"
+            "profile"
+            "email"
+          ];
+        }
+      ]}";
+    };
+
+    secrets = {
+      "PLACEHOLDER_CLIENT_SECRET" = config.age.secrets.papra-client-key.path;
+    };
   };
-
-  papraAuthJson = builtins.toJSON [ papraAuthSettings ];
-
-  papraAuthUnpatchedPath = "${envSecretsSuffix}/containers/papra/auth-client-config";
-  papraAuthPatchedPath = "${envSecretsSuffix}/containers/papra/auth-client-config-patched";
 in
 {
   myServices.papra = {
@@ -54,12 +84,6 @@ in
     };
   };
 
-  home.file."${papraAuthUnpatchedPath}" = {
-    text = ''
-      AUTH_PROVIDERS_CUSTOMS=${papraAuthJson}
-    '';
-  };
-
   age.secrets =
     let
       mkSecret = name: {
@@ -69,7 +93,6 @@ in
     in
     {
       papra-auth-secret = mkSecret "e_auth-secret";
-      papra-storage-key = mkSecret "e_storage-key";
       papra-webhook-secret = mkSecret "e_webhook-secret";
 
       papra-client-key = mkSecret "s_auth-client";
@@ -98,14 +121,8 @@ in
           RestartSec = "10";
 
           ExecStartPre = [
-            # todo: write universal secrets patcher
             "+${pkgs.writeShellScript "pre-papra" ''
-              SECRET_VAL=$(${pkgs.coreutils}/bin/cat ${config.age.secrets.papra-client-key.path})
-
-              ${pkgs.gnused}/bin/sed "s|PLACEHOLDER_CLIENT_SECRET|$SECRET_VAL|g" \
-                ${papraAuthUnpatchedPath} > ${papraAuthPatchedPath}
-
-              ${pkgs.coreutils}/bin/chmod 644 ${papraAuthPatchedPath}
+              ${createEnv}
             ''}"
           ];
         };
@@ -118,33 +135,11 @@ in
             "auth.home.lan:host-gateway"
           ];
 
-          environments = {
-            TZ = "Europa/Berlin";
-
-            APP_BASE_URL = "https://papra.home.lan";
-
-            PORT = "1221";
-            SERVER_HOSTNAME = "0.0.0.0";
-
-            DOCUMENT_STORAGE_FILESYSTEM_ROOT = "/data";
-            DOCUMENTS_CONTENT_EXTRACTION_ENABLED = "true";
-            DOCUMENTS_OCR_LANGUAGES = "deu,eng";
-
-            NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
-
-            AUTH_FIRST_USER_AS_ADMIN = "true";
-            AUTH_PROVIDERS_EMAIL_IS_ENABLED = "false";
-
-            INTAKE_EMAILS_IS_ENABLED = "true";
-            INTAKE_EMAILS_DRIVER = "catch-all";
-            INTAKE_EMAILS_WEBHOOK_SECRET = "JmNtFvWILKGALzaSTcebXtwFmOgbXiYO";
-          };
-
           environmentFiles = [
             "secrets/containers/papra/e_auth-secret"
             "secrets/containers/papra/e_webhook-secret"
 
-            "secrets/containers/papra/auth-client-config-patched"
+            "env/containers/papra/env"
           ];
 
           volumes = [

@@ -31,8 +31,60 @@ in
       ...
     }:
     let
-      baseDir = ".config/containers/systemd";
-      mkPath = sub: "${config.home.homeDirectory}/${baseDir}/${sub}";
+      mkEnv =
+        {
+          path,
+          vars,
+          secrets,
+          mode ? "600",
+        }:
+        let
+          prefixDir = "${config.home.homeDirectory}/.config/containers/systemd/env";
+
+          target = "${prefixDir}/${path}";
+          targetDir = builtins.dirOf target;
+
+          envContent = lib.mapAttrsToList (n: v: "${n}=${v}") vars;
+          envFile = pkgs.writeText "env-template" (builtins.concatStringsSep "\n" envContent);
+
+          sed = "${pkgs.gnused}/bin/sed";
+          cat = "${pkgs.coreutils}/bin/cat";
+
+          sedCommands = lib.mapAttrsToList (
+            placeholder: path: "${sed} -i \"s|@${placeholder}@|$(${cat} ${path})|g\" \"${target}\""
+          ) secrets;
+        in
+        pkgs.writeShellScript "init-env-file" ''
+          set -euo pipefail
+          ${pkgs.coreutils}/bin/mkdir -p ${targetDir}
+          ${pkgs.coreutils}/bin/cp ${envFile} ${target}
+          ${pkgs.coreutils}/bin/chmod ${mode} ${target}
+
+          ${builtins.concatStringsSep "\n" sedCommands}
+        '';
+
+      mkSecretEnv =
+        relativePath: mode: template: mapping:
+        let
+          prefixDir = "${config.home.homeDirectory}/.config/containers/systemd/secrets";
+          target = "${prefixDir}/${relativePath}";
+          targetDir = builtins.dirOf target;
+
+          sed = "${pkgs.gnused}/bin/sed";
+          cat = "${pkgs.coreutils}/bin/cat";
+
+          sedCommands = lib.mapAttrsToList (
+            placeholder: path: "${sed} -i \"s|@${placeholder}@|$(${cat} ${path})|g\" \"${target}\""
+          ) mapping;
+        in
+        pkgs.writeShellScript "patch-secrets" ''
+          set -euo pipefail
+          ${pkgs.coreutils}/bin/mkdir -p "${targetDir}"
+          ${pkgs.coreutils}/bin/cp ${template} ${target}
+          ${pkgs.coreutils}/bin/chmod ${mode} ${target}
+
+          ${builtins.concatStringsSep "\n" sedCommands}
+        '';
     in
     {
       imports = [
@@ -69,26 +121,34 @@ in
         ./vpn.nix
       ];
 
-      _module.args = {
-        images = import ../../generated-images.nix;
+      _module.args =
+        let
+          baseDir = ".config/containers/systemd";
+          mkPath = sub: "${config.home.homeDirectory}/${baseDir}/${sub}";
+        in
+        {
+          images = import ../../generated-images.nix;
 
-        ports = hostConfig.ports;
+          ports = hostConfig.ports;
 
-        envSuffix = "${baseDir}/env";
-        envSecretsSuffix = "${baseDir}/secrets";
+          envSuffix = "${baseDir}/env";
+          envSecretsSuffix = "${baseDir}/secrets";
 
-        envPrefix = mkPath "env";
-        envSecretsPrefix = mkPath "secrets";
+          envPrefix = mkPath "env";
+          envSecretsPrefix = mkPath "secrets";
 
-        allServices = config.myServices;
-        publicServices = lib.filterAttrs (name: value: value.serviceConfig != null) config.myServices;
+          mkEnv = mkEnv;
+          mkSecretEnv = mkSecretEnv;
 
-        documentsPath = "/data/documents";
-        photosPath = "/media/photos";
+          allServices = config.myServices;
+          publicServices = lib.filterAttrs (name: value: value.serviceConfig != null) config.myServices;
 
-        musicPath = "/media/music";
-        downloadPath = "/media/download";
-      };
+          documentsPath = "/data/documents";
+          photosPath = "/media/photos";
+
+          musicPath = "/media/music";
+          downloadPath = "/media/download";
+        };
 
       systemd.user.services."podman-volume-provisioning" = {
         Unit = {

@@ -107,10 +107,10 @@ in
   "containers/opengist/s_db-pass.age".publicKeys = allKeys;
 
   # papra
-  "containers/papra/e_auth-secret.age".publicKeys = allKeys;
-  "containers/papra/e_storage-key.age".publicKeys = allKeys;
-  "containers/papra/e_webhook-secret.age".publicKeys = allKeys;
   "containers/papra/s_auth-client.age".publicKeys = allKeys;
+  "containers/papra/s_auth-secret.age".publicKeys = allKeys;
+  "containers/papra/s_storage-key.age".publicKeys = allKeys;
+  "containers/papra/s_webhook-secret.age".publicKeys = allKeys;
 
   # slskd
   "containers/slskd/e_pass.age".publicKeys = allKeys;

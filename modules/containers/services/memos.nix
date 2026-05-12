@@ -10,10 +10,19 @@
   pkgs,
   images,
   ports,
-  envSecretsPrefix,
+  mkSecretEnv,
   ...
 }:
-# todo: disable non oidc login
+let
+  patcherScript =
+    mkSecretEnv "containers/memos/db-conn" "644"
+      (pkgs.writeText "db-conn" ''
+        MEMOS_DSN=postgres://memos:@PLACEHOLDER_DATABASE_PASS@@host.containers.internal:${toString ports.postgres}/memos?sslmode=disable
+      '')
+      {
+        "PLACEHOLDER_DATABASE_PASS" = (pkgs.writeText "db-pw" "memos");
+      };
+in
 {
   myServices.memos = {
     serviceConfig = {
@@ -61,6 +70,12 @@
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-papra" ''
+              ${patcherScript}
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -78,13 +93,12 @@
             MEMOS_DRIVER = "postgres";
             MEMOS_INSTANCE_URL = config.myServices.memos.serviceConfig.href;
 
-            # todo: private db password
-            MEMOS_DSN = "postgres://memos:memos@host.containers.internal:${toString ports.postgres}/memos?sslmode=disable";
-
             MEMOS_DATA = "/data";
           };
 
-          environmentFiles = [ ];
+          environmentFiles = [
+            "secrets/containers/memos/db-conn"
+          ];
 
           volumes = [
             "/etc/timezone:/etc/timezone:ro"
