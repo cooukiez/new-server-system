@@ -69,7 +69,7 @@
           environments = {
             TZ = "Europe/Berlin";
 
-            # NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
+            NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
 
             NODE_RED_ENABLE_PROJECTS = "true";
             NODE_RED_ENABLE_SAFE_MODE = "false";

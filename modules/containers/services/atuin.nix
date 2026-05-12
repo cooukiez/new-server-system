@@ -31,7 +31,7 @@ let
           host = "host.containers.internal";
           port = toString ports.postgres;
         in
-        "postgres://${user}:${pass}@${host}:${port}/${name}";
+        "postgres://${user}:${pass}@${host}:${port}/${name}?sslmode=disable";
 
       RUST_LOG = "info,atuin_server=debug";
     };

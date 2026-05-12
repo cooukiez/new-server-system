@@ -212,8 +212,15 @@ in
         autoStart = true;
 
         unitConfig = {
-          Requires = [ "postgres.service" ];
-          After = [ "postgres.service" ];
+          Requires = [
+            "postgres.service"
+            "lldap.service"
+          ];
+
+          After = [
+            "postgres.service"
+            "lldap.service"
+          ];
         };
 
         serviceConfig = {

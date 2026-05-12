@@ -38,7 +38,7 @@ let
           host = "host.containers.internal";
           port = toString ports.postgres;
         in
-        "postgresql://${user}:${pass}@${host}:${port}/${name}";
+        "postgres://${user}:${pass}@${host}:${port}/${name}?sslmode=disable";
 
       MEILISEARCH_ENDPOINT = "http://linkwarden-meili:7700";
       MEILISEARCH_MASTER_KEY = "@PLACEHOLDER_MEILI_KEY@";
@@ -48,7 +48,7 @@ let
       AUTHELIA_CLIENT_ID = "linkwarden";
       AUTHELIA_CLIENT_SECRET = "@PLACEHOLDER_CLIENT_KEY@";
 
-      # NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
+      NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
 
       NEXTAUTH_URL = "https://links.home.lan/api/v1/auth";
       NEXTAUTH_SECRET = "@PLACEHOLDER_NEXT_AUTH@";

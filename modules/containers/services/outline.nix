@@ -17,7 +17,7 @@ let
   createEnv = mkEnv {
     path = "containers/outline/env";
     vars = {
-      URL = config.myServices.outline.serviceConfig.url;
+      URL = config.myServices.outline.serviceConfig.href;
       PORT = "3000";
 
       WEB_CONCURRENCY = "1";
@@ -36,9 +36,11 @@ let
           host = "host.containers.internal";
           port = toString ports.postgres;
         in
-        "postgres://${user}:${pass}@${host}:${port}/${name}";
+        "postgres://${user}:${pass}@${host}:${port}/${name}?sslmode=disable";
 
       REDIS_URL = "outline-redis:6379";
+
+      NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
 
       OIDC_CLIENT_ID = "outline";
       OIDC_CLIENT_SECRET = "@PLACEHOLDER_CLIENT_KEY@";
@@ -152,6 +154,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-outline" ''
+              ${createEnv}
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -159,9 +167,17 @@ in
           name = "outline";
           networks = [ "outline-net" ];
 
+          addHosts = [
+            "auth.home.lan:host-gateway"
+          ];
+
           environments = {
             TZ = "Europe/Berlin";
           };
+
+          environmentFiles = [
+            "env/containers/outline/env"
+          ];
 
           volumes = [
             "/etc/timezone:/etc/timezone:ro"

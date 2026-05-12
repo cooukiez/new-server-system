@@ -27,7 +27,7 @@ let
       DOCUMENTS_CONTENT_EXTRACTION_ENABLED = "true";
       DOCUMENTS_OCR_LANGUAGES = "deu,eng";
 
-      # NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
+      NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
 
       AUTH_SECRET = "@PLACEHOLDER_AUTH_SECRET@";
       AUTH_FIRST_USER_AS_ADMIN = "true";
@@ -77,7 +77,7 @@ in
 
       policy = "bypass";
 
-      icon = "papra";
+      icon = "https://avatars.githubusercontent.com/u/193336953?s=48&v=4";
     };
   };
 

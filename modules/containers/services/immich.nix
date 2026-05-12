@@ -190,7 +190,7 @@
             IMMICH_MACHINE_LEARNING_URL = "http://immich-ml:3003";
             REDIS_HOSTNAME = "immich-redis";
 
-            # NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
+            NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
           };
 
           volumes = [

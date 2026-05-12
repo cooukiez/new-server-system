@@ -21,7 +21,7 @@ let
       PORT = "3000";
       APP_URL = config.myServices.trek.serviceConfig.href;
 
-      # NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
+      NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
 
       # temporary for first run
       ADMIN_EMAIL = "trek@local";
