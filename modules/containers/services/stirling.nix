@@ -22,7 +22,7 @@
       subdomain = "pdf";
       port = ports.stirling;
 
-      policy = "one_factor";
+      policy = "two_factor";
       group = "users";
 
       icon = "stirling-pdf";

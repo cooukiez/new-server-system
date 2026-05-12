@@ -214,7 +214,7 @@ in
         subdomain = "glances";
         port = ports.glances;
 
-        policy = "one_factor";
+        policy = "two_factor";
         group = "admins";
 
         icon = "glances";
@@ -245,7 +245,7 @@ in
         subdomain = "prometheus";
         port = ports.prometheus;
 
-        policy = "one_factor";
+        policy = "two_factor";
         group = "admins";
 
         icon = "prometheus";

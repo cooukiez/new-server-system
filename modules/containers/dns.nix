@@ -99,7 +99,7 @@ in
       subdomain = "dns";
       port = ports.adguard;
 
-      policy = "one_factor";
+      policy = "two_factor";
       group = "admins";
 
       icon = "adguard-home";

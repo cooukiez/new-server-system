@@ -23,7 +23,7 @@
       subdomain = "flow";
       port = ports.nodeRed;
 
-      policy = "one_factor";
+      policy = "two_factor";
       group = "admins";
 
       icon = "https://avatars.githubusercontent.com/u/5375661?s=48&v=4";

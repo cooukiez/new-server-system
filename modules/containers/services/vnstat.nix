@@ -22,7 +22,7 @@
       subdomain = "vnstat";
       port = ports.vnstat;
 
-      policy = "one_factor";
+      policy = "two_factor";
       group = "admins";
 
       icon = "mdi-chart-timeline-variant";

@@ -27,7 +27,7 @@ in
       port = ports.radicale;
 
       disableProxy = true;
-      policy = "two_factor";
+      policy = "one_factor";
       group = "users";
 
       icon = "radicale";

@@ -101,6 +101,14 @@ in
 
       ${serviceHandlers}
 
+          @bak host bak.home.lan
+          handle @bak {
+            import auth_verify
+            reverse_proxy host.containers.internal:${toString ports.borg} {
+              header_up X-Remote-User {header.Remote-User}
+            }
+          }
+
           @dav host dav.home.lan
           handle @dav {
             import auth_verify

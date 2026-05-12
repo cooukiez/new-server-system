@@ -23,7 +23,9 @@
       subdomain = "bak";
       port = ports.borg;
 
-      policy = "bypass";
+      disableProxy = true;
+      policy = "two_factor";
+      group = "admins";
 
       icon = "https://avatars.githubusercontent.com/u/12418060?s=48&v=4";
     };
@@ -119,8 +121,8 @@
             REDIS_PORT = "6379";
 
             # todo: configure for authelia
-            # DISABLE_AUTHENTICATION = "true";
-            # PROXY_AUTH_HEADER = "X-Remote-User";
+            DISABLE_AUTHENTICATION = "true";
+            PROXY_AUTH_HEADER = "X-Remote-User";
           };
 
           volumes = [

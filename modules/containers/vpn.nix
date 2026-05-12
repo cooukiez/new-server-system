@@ -25,7 +25,7 @@ in
       subdomain = "vpn";
       port = ports.gluetunWebUI;
 
-      policy = "one_factor";
+      policy = "two_factor";
       group = "admins";
 
       icon = "gluetun";
