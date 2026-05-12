@@ -32,7 +32,7 @@ IMAGES = [
     {"name": "memos", "repo": "docker.io/neosmemo/memos", "tag": "stable"},
     {"name": "node-red", "repo": "docker.io/nodered/node-red", "tag": "latest"},
     {"name": "opengist", "repo": "ghcr.io/thomiceli/opengist", "tag": "latest"},
-    {"name": "outline", "repo": "docker.getoutline.com/outlinewiki/outline", "tag": "latest"},
+    {"name": "outline", "repo": "docker.io/outlinewiki/outline", "tag": "latest"},
     {"name": "stirling", "repo": "docker.io/stirlingtools/stirling-pdf", "tag": "latest"},
     {"name": "transfer-sh", "repo": "docker.io/dutchcoders/transfer.sh", "tag": "latest"},
     {"name": "trek", "repo": "docker.io/mauriceboe/trek", "tag": "latest"},

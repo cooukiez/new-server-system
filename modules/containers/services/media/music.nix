@@ -64,8 +64,8 @@ let
     });
 
     secrets = {
-      "PLACEHOLDER_API_KEY" = config.age.secrets.lidarr-api-key.path;
-      "PLACEHOLDER_DB_PASS" = config.age.secrets.lidarr-db-pass.path;
+      PLACEHOLDER_API_KEY = config.age.secrets.lidarr-api-key.path;
+      PLACEHOLDER_DB_PASS = config.age.secrets.lidarr-db-pass.path;
     };
   };
 
@@ -131,11 +131,11 @@ let
     };
 
     secrets = {
-      "PLACEHOLDER_GLUETUN_API_KEY" = config.age.secrets.slskd-gluetun-api-key.path;
-      "PLACEHOLDER_LIDARR_API_KEY" = config.age.secrets.slskd-lidarr-api-key.path;
-      "PLACEHOLDER_USER" = config.age.secrets.slskd-user.path;
-      "PLACEHOLDER_PASS" = config.age.secrets.slskd-pass.path;
-      "PLACEHOLDER_WEBUI_PASS" = config.age.secrets.slskd-webui-pass.path;
+      PLACEHOLDER_GLUETUN_API_KEY = config.age.secrets.slskd-gluetun-api-key.path;
+      PLACEHOLDER_LIDARR_API_KEY = config.age.secrets.slskd-lidarr-api-key.path;
+      PLACEHOLDER_USER = config.age.secrets.slskd-user.path;
+      PLACEHOLDER_PASS = config.age.secrets.slskd-pass.path;
+      PLACEHOLDER_WEBUI_PASS = config.age.secrets.slskd-webui-pass.path;
     };
   };
 in
@@ -183,6 +183,7 @@ in
       lidarr-db-pass = mkSecret "containers/lidarr/s_db-pass";
 
       slskd-gluetun-api-key = mkSecret "containers/gluetun/s_api-key";
+
       slskd-lidarr-api-key = mkSecret "containers/slskd/s_lidarr-api-key";
       slskd-user = mkSecret "containers/slskd/s_user";
       slskd-pass = mkSecret "containers/slskd/s_pass";

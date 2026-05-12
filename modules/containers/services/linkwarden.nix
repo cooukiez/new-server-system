@@ -48,7 +48,7 @@ let
       AUTHELIA_CLIENT_ID = "linkwarden";
       AUTHELIA_CLIENT_SECRET = "@PLACEHOLDER_CLIENT_KEY@";
 
-      NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
+      # NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
 
       NEXTAUTH_URL = "https://links.home.lan/api/v1/auth";
       NEXTAUTH_SECRET = "@PLACEHOLDER_NEXT_AUTH@";

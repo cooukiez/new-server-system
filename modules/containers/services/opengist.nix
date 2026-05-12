@@ -43,8 +43,8 @@ let
     };
 
     secrets = {
-      "PLACEHOLDER_CLIENT_KEY" = config.age.secrets.opengist-client-key.path;
-      "PLACEHOLDER_DB_PASS" = config.age.secrets.opengist-db-pass.path;
+      PLACEHOLDER_CLIENT_KEY = config.age.secrets.opengist-client-key.path;
+      PLACEHOLDER_DB_PASS = config.age.secrets.opengist-db-pass.path;
     };
   };
 in

@@ -99,6 +99,11 @@
     "imageDigest": "sha256:5cdaaeaf2d73a9c87100fed850416bc258e5ef1fe5208cfa9153f992a6285be5",
     "sha256": "sha256-DOFzmIj1gYbdoqCHjvyqePLR3giUfnfrcYzvlojVDQE="
   },
+  "outline": {
+    "imageName": "docker.io/outlinewiki/outline",
+    "imageDigest": "sha256:361df7040e6f0d7abac768b99f40122197921626a7e69501aabb5fcb496fc1b4",
+    "sha256": "sha256-zrPKfyOq8HR8n821ota6uopye7jglfeLe1HIrmMjjps="
+  },
   "stirling": {
     "imageName": "docker.io/stirlingtools/stirling-pdf",
     "imageDigest": "sha256:950c596db26e0764f642def2fd4f9ee904ff2ac16d83fe621ff731b771d9b385",

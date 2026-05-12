@@ -118,7 +118,7 @@
             REDIS_HOST = "borg-redis";
             REDIS_PORT = "6379";
 
-            # configure for authelia
+            # todo: configure for authelia
             # DISABLE_AUTHENTICATION = "true";
             # PROXY_AUTH_HEADER = "X-Remote-User";
           };

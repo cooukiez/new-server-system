@@ -25,7 +25,7 @@ let
     };
 
     secrets = {
-      "PLACEHOLDER_DB_PASS" = config.age.secrets.gitea-db-pass.path;
+      PLACEHOLDER_DB_PASS = config.age.secrets.gitea-db-pass.path;
     };
 
     mode = "644";

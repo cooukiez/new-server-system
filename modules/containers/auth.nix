@@ -222,16 +222,18 @@ in
 
           ExecStartPre =
             let
+              cfgSrc = "${config.home.homeDirectory}/containers/authelia/configuration.yml";
+              cfgLoc = "/opt/authelia/config/configuration.yml";
+
               jwkLocation = ".identity_providers.oidc.jwks[0].key";
             in
             [
-              # todo: better way of patching secrets
               "+${pkgs.writeShellScript "pre-authelia" ''
                 export JWT_SECRET=$(${pkgs.coreutils}/bin/cat ${config.age.secrets.auth-oidc-jwk.path})
 
-                ${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/authelia/configuration.yml /opt/authelia/config/configuration.yml
-                ${pkgs.yq-go}/bin/yq -i "${jwkLocation} = load_str(\"${config.age.secrets.auth-oidc-jwk.path}\")" /opt/authelia/config/configuration.yml
-                ${pkgs.coreutils}/bin/chmod 644 /opt/authelia/config/configuration.yml
+                ${pkgs.coreutils}/bin/cp ${cfgSrc} ${cfgLoc}
+                ${pkgs.yq-go}/bin/yq -i "${jwkLocation} = load_str(\"${config.age.secrets.auth-oidc-jwk.path}\")" ${cfgLoc}
+                ${pkgs.coreutils}/bin/chmod 644 ${cfgLoc}
               ''}"
             ];
         };

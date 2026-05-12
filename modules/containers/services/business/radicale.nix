@@ -91,13 +91,13 @@ in
             # certificates
             "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
             "/certs/ca.crt:/certs/ca.crt:ro"
+
+            # extra certificates
             "/certs/home.lan.crt:/certs/home.lan.crt:ro"
+            "${config.age.secrets.radicale-crt-key.path}:/run/secrets/HOME_LAN_KEY:ro"
 
             # config
             "${config.home.homeDirectory}/containers/radicale/config:/config:ro,U"
-
-            # secrets
-            "${config.age.secrets.radicale-crt-key.path}:/run/secrets/HOME_LAN_KEY:ro"
 
             # volumes
             "${volumes.radicale-data.ref}:/data:U"

@@ -27,7 +27,7 @@ let
       DOCUMENTS_CONTENT_EXTRACTION_ENABLED = "true";
       DOCUMENTS_OCR_LANGUAGES = "deu,eng";
 
-      NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
+      # NODE_EXTRA_CA_CERTS = "/certs/ca.crt";
 
       AUTH_SECRET = "@PLACEHOLDER_AUTH_SECRET@";
       AUTH_FIRST_USER_AS_ADMIN = "true";
@@ -59,9 +59,9 @@ let
     };
 
     secrets = {
-      "PLACEHOLDER_AUTH_SECRET" = config.age.secrets.papra-auth-secret.path;
-      "PLACEHOLDER_CLIENT_KEY" = config.age.secrets.papra-client-key.path;
-      "PLACEHOLDER_WEBHOOK_SECRET" = config.age.secrets.papra-webhook-secret.path;
+      PLACEHOLDER_AUTH_SECRET = config.age.secrets.papra-auth-secret.path;
+      PLACEHOLDER_CLIENT_KEY = config.age.secrets.papra-client-key.path;
+      PLACEHOLDER_WEBHOOK_SECRET = config.age.secrets.papra-webhook-secret.path;
     };
   };
 in

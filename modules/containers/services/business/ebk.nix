@@ -107,10 +107,7 @@ in
 
             # secrets
             "${config.age.secrets.ebk-client-key.path}:/run/secrets/EBK_CLIENT_KEY:ro"
-
-            # todo: replace this with actual password
-            "${pkgs.writeText "db-pass" "ebk"}:/run/secrets/EBK_DB_PASS:ro"
-
+            "${config.age.secrets.ebk-db-pass.path}:/run/secrets/EBK_DB_PASS:ro"
             "${config.age.secrets.ebk-secret-key.path}:/run/secrets/EBK_SECRET_KEY:ro"
 
             # volumes

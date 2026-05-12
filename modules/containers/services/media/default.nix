@@ -14,6 +14,7 @@
   downloadPath,
   ...
 }:
+# todo: ldap ssl
 {
   imports = [
     ./music.nix
