@@ -90,6 +90,8 @@ let
           BEGIN
             IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = '${service.user}') THEN
               CREATE USER ${service.user} WITH PASSWORD '${service.pass}';
+            ELSE
+              ALTER USER ${service.user} WITH PASSWORD '${service.pass}';
             END IF;
           END $$;''
       else
@@ -199,15 +201,6 @@ in
           ExecStartPre = [
             "+${pkgs.writeShellScript "pre-postgres" ''
               ${createConf}
-            ''}"
-          ];
-
-          ExecStartPost = [
-            "+${pkgs.writeShellScript "post-postgres" ''
-              until ${pkgs.podman}/bin/podman exec postgres pg_isready -U admin; do
-                sleep 1
-              done
-              ${pkgs.podman}/bin/podman exec postgres psql -U admin -d app_db -f /docker-entrypoint-initdb.d/init-all-db.sql
             ''}"
           ];
         };
