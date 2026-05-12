@@ -72,6 +72,10 @@ in
   # atuin
   "containers/atuin/s_db-pass.age".publicKeys = allKeys;
 
+  # borg
+  "containers/borg/s_admin-pass.age".publicKeys = allKeys;
+  "containers/borg/s_secret-key.age".publicKeys = allKeys;
+
   # ebk
   "containers/ebk/s_auth-client.age".publicKeys = allKeys;
   "containers/ebk/s_db-pass.age".publicKeys = allKeys;

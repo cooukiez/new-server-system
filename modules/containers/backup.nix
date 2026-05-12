@@ -114,17 +114,26 @@
           environments = {
             TZ = "Europe/Berlin";
 
+            ENVIRONMENT = "production";
+            PORT = "8081";
+
             PUID = "0";
             PGID = "0";
 
             REDIS_HOST = "borg-redis";
             REDIS_PORT = "6379";
 
+            DATA_DIR = "/data";
+            LOCAL_MOUNT_POINTS = "/local";
+
             # authelia proxy auth
             DISABLE_AUTHENTICATION = "true";
             PROXY_AUTH_HEADER = "X-Remote-User";
-          };
+            PROXY_AUTH_ROLE_HEADER = "X-Remote-Role";
 
+            LOG_LEVEL = "info";
+          };
+LOCAL_MOUNT_POINTS
           volumes = [
             "/etc/timezone:/etc/timezone:ro"
             "/etc/localtime:/etc/localtime:ro"

@@ -103,12 +103,25 @@ in
 
           @bak host bak.home.lan
           handle @bak {
-            import auth_verify
-            reverse_proxy host.containers.internal:${toString ports.borg} {
-              header_up X-Remote-User {header.Remote-User}
-            }
-          }
+              import auth_verify
 
+              @is_admin header_regexp Remote-Groups \badmins\b
+
+              handle @is_admin {
+                  reverse_proxy host.containers.internal:${toString ports.borg} {
+                      header_up X-Remote-User {header.Remote-User}
+                      header_up X-Remote-Role "admin"
+                  }
+              }
+
+              handle {
+                  reverse_proxy host.containers.internal:${toString ports.borg} {
+                      header_up X-Remote-User {header.Remote-User}
+                      header_up X-Remote-Role "user"
+                  }
+              }
+          }
+          
           @dav host dav.home.lan
           handle @dav {
             import auth_verify

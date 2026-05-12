@@ -236,9 +236,9 @@ in
             in
             [
               "+${pkgs.writeShellScript "pre-authelia" ''
-                export JWT_SECRET=$(${pkgs.coreutils}/bin/cat ${config.age.secrets.auth-oidc-jwk.path})
-
                 ${pkgs.coreutils}/bin/cp ${cfgSrc} ${cfgLoc}
+
+                export JWT_SECRET=$(${pkgs.coreutils}/bin/cat ${config.age.secrets.auth-oidc-jwk.path})
                 ${pkgs.yq-go}/bin/yq -i "${jwkLocation} = load_str(\"${config.age.secrets.auth-oidc-jwk.path}\")" ${cfgLoc}
                 ${pkgs.coreutils}/bin/chmod 644 ${cfgLoc}
               ''}"
