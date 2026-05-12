@@ -14,8 +14,8 @@
   lldapWeb = 17170;
 
   # database
-  pgadmin = 5434;
   postgres = 5432;
+  pgadmin = 5434;
 
   # dns
   adguard = 3000;

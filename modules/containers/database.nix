@@ -106,7 +106,6 @@ let
     )}
   '';
 
-  # todo: auto run startup scripts
   createConf = mkConf {
     path = "containers/postgres/init-all-db.sql";
     source = pkgs.writeText "init-all-db-template" ''
@@ -200,6 +199,15 @@ in
           ExecStartPre = [
             "+${pkgs.writeShellScript "pre-postgres" ''
               ${createConf}
+            ''}"
+          ];
+
+          ExecStartPost = [
+            "+${pkgs.writeShellScript "post-postgres" ''
+              until ${pkgs.podman}/bin/podman exec postgres pg_isready -U admin; do
+                sleep 1
+              done
+              ${pkgs.podman}/bin/podman exec postgres psql -U admin -d app_db -f /docker-entrypoint-initdb.d/init-all-db.sql
             ''}"
           ];
         };
