@@ -15,7 +15,7 @@
 }:
 let
   createEnv = mkEnv {
-    path = "containers/opengist/env";
+    path = "containers/trek/env";
     vars = {
       NODE_ENV = "production";
       PORT = "3000";

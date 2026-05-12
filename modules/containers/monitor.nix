@@ -255,21 +255,21 @@ in
 
   # grafana
   home.file."containers/grafana/grafana.ini".source =
-    (pkgs.formats.ini { }).generate "grafana.ini"
+    (pkgs.formats.ini { }).generate "grafana-settings"
       grafanaSettings;
 
   home.file."containers/grafana/provisioning/datasources/datasources.yaml".source =
-    (pkgs.formats.yaml { }).generate "datasources.yaml"
+    (pkgs.formats.yaml { }).generate "grafana-datasource-settings"
       grafanaDatasourceSettings;
 
   # prometheus
   home.file."containers/prometheus/prometheus.yml".source =
-    (pkgs.formats.yaml { }).generate "prometheus.yml"
+    (pkgs.formats.yaml { }).generate "prometheus-settings"
       prometheusSettings;
 
   # loki
   home.file."containers/loki/loki.yaml".source =
-    (pkgs.formats.yaml { }).generate "loki.yaml"
+    (pkgs.formats.yaml { }).generate "loki-settings"
       lokiSettings;
 
   age.secrets =

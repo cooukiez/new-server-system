@@ -185,7 +185,7 @@ in
   };
 
   home.file."containers/authelia/configuration.yml".source =
-    (pkgs.formats.yaml { }).generate "configuration.yml"
+    (pkgs.formats.yaml { }).generate "authelia-settings"
       autheliaSettings;
 
   age.secrets = builtins.mapAttrs (_: name: {

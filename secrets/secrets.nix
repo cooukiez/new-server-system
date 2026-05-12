@@ -122,7 +122,6 @@ in
   "containers/slskd/s_webui-pass.age".publicKeys = allKeys;
 
   # trek
-  "containers/trek/e_auth-client.age".publicKeys = allKeys;
   "containers/trek/s_auth-client.age".publicKeys = allKeys;
 
   #

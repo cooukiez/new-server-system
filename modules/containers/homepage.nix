@@ -201,7 +201,7 @@ in
       (name: value: {
         name = "containers/homepage/${name}.yaml";
         value = {
-          source = (pkgs.formats.yaml { }).generate "${name}.yaml" value;
+          source = (pkgs.formats.yaml { }).generate "homepage-${name}" value;
         };
       })
       {

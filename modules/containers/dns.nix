@@ -107,7 +107,7 @@ in
   };
 
   home.file."containers/adguard/AdGuardHome.yaml".source =
-    (pkgs.formats.yaml { }).generate "AdGuardHome.yaml"
+    (pkgs.formats.yaml { }).generate "adguard-settings"
       adguardSettings;
 
   virtualisation.quadlet =
