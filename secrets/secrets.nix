@@ -106,7 +106,7 @@ in
   "containers/memos/s_db-pass.age".publicKeys = allKeys;
 
   # opengist
-  "containers/opengist/e_auth-client.age".publicKeys = allKeys;
+  "containers/opengist/s_auth-client.age".publicKeys = allKeys;
   "containers/opengist/s_db-pass.age".publicKeys = allKeys;
 
   # papra

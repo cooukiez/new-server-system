@@ -18,10 +18,7 @@ let
   createEnv = mkEnv {
     path = "containers/memos/env";
     vars = {
-      TZ = "Europe/Berlin";
-
       MEMOS_DRIVER = "postgres";
-
       MEMOS_DSN =
         let
           name = "memos";
@@ -109,6 +106,10 @@ in
           addHosts = [
             "auth.home.lan:host-gateway"
           ];
+
+          environments = {
+            TZ = "Europe/Berlin";
+          };
 
           environmentFiles = [
             "env/containers/memos/env"

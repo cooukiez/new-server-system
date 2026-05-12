@@ -11,8 +11,6 @@
   images,
   ports,
   mkConf,
-  envSecretsPrefix,
-  mkEnv,
   musicPath,
   downloadPath,
   ...

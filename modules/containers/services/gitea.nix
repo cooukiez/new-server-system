@@ -17,8 +17,6 @@ let
   createEnv = mkEnv {
     path = "containers/gitea/env";
     vars = {
-      TZ = "Europe/Berlin";
-
       GITEA__database__DB_TYPE = "postgres";
       GITEA__database__HOST = "host.containers.internal:${toString ports.postgres}";
       GITEA__database__NAME = "gitea";
@@ -96,6 +94,10 @@ in
           addHosts = [
             "auth.home.lan:host-gateway"
           ];
+
+          environments = {
+            TZ = "Europe/Berlin";
+          };
 
           environmentFiles = [
             "env/containers/gitea/env"

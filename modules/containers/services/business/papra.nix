@@ -18,8 +18,6 @@ let
   createEnv = mkEnv {
     path = "containers/papra/env";
     vars = {
-      TZ = "Europa/Berlin";
-
       APP_BASE_URL = "https://papra.home.lan";
 
       PORT = "1221";
@@ -132,6 +130,10 @@ in
           addHosts = [
             "auth.home.lan:host-gateway"
           ];
+
+          environments = {
+            TZ = "Europe/Berlin";
+          };
 
           environmentFiles = [
             "env/containers/papra/env"

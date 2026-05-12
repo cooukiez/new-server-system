@@ -17,8 +17,6 @@ let
   createEnv = mkEnv {
     path = "containers/atuin/env";
     vars = {
-      TZ = "Europe/Berlin";
-
       ATUIN_HOST = "0.0.0.0";
       ATUIN_PORT = "8888";
 
@@ -104,6 +102,10 @@ in
           name = "atuin";
 
           exec = [ "start" ];
+
+          environments = {
+            TZ = "Europe/Berlin";
+          };
 
           environmentFiles = [
             "env/containers/atuin/env"

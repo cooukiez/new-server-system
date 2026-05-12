@@ -10,9 +10,34 @@
   pkgs,
   images,
   ports,
-  envSecretsPrefix,
+  mkEnv,
   ...
 }:
+let
+  createEnv = mkEnv {
+    path = "containers/opengist/env";
+    vars = {
+      OG_OPENGIST_HOME = "/opengist";
+
+      # todo: private db password
+      OG_DB_URI = "postgres://opengist:opengist@host.containers.internal:${toString ports.postgres}/opengist";
+      OG_EXTERNAL_URL = config.myServices.opengist.serviceConfig.href;
+
+      # authelia oidc configuration
+      OG_OIDC_PROVIDER_NAME = "authelia";
+      OG_OIDC_CLIENT_KEY = "opengist";
+      OG_OIDC_SECRET = "@PLACEHOLDER_CLIENT_KEY@";
+      OG_OIDC_DISCOVERY_URL = "https://auth.home.lan/.well-known/openid-configuration";
+
+      OG_OIDC_GROUP_CLAIM_NAME = "groups";
+      OG_OIDC_ADMIN_GROUP = "admins";
+    };
+
+    secrets = {
+      "PLACEHOLDER_AUTH_SECRET" = config.age.secrets.papra-auth-secret.path;
+    };
+  };
+in
 {
   myServices.opengist = {
     serviceConfig = {
@@ -75,26 +100,13 @@
 
           environments = {
             TZ = "Europe/Berlin";
+
             UID = "0";
             GID = "0";
-
-            OG_OPENGIST_HOME = "/opengist";
-
-            # todo: private db password
-            OG_DB_URI = "postgres://opengist:opengist@host.containers.internal:${toString ports.postgres}/opengist";
-            OG_EXTERNAL_URL = config.myServices.opengist.serviceConfig.href;
-
-            # authelia oidc configuration
-            OG_OIDC_PROVIDER_NAME = "authelia";
-            OG_OIDC_CLIENT_KEY = "opengist";
-            OG_OIDC_DISCOVERY_URL = "https://auth.home.lan/.well-known/openid-configuration";
-
-            OG_OIDC_GROUP_CLAIM_NAME = "groups";
-            OG_OIDC_ADMIN_GROUP = "admins";
           };
 
           environmentFiles = [
-            "secrets/containers/opengist/e_auth-client"
+            "env/containers/opengist/env"
           ];
 
           volumes = [

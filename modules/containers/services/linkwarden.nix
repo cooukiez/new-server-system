@@ -135,6 +135,10 @@ in
           name = "linkwarden-meili";
           networks = [ "linkwarden-net" ];
 
+          environments = {
+            TZ = "Europe/Berlin";
+          };
+
           environmentFiles = [
             "env/containers/link/meili/env"
           ];
@@ -182,6 +186,10 @@ in
           addHosts = [
             "auth.home.lan:host-gateway"
           ];
+
+          environments = {
+            TZ = "Europe/Berlin";
+          };
 
           environmentFiles = [
             "env/containers/link/link/env"
