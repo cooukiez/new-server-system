@@ -53,6 +53,7 @@
   linkwarden = 3020;
   mailArchiver = 5000;
   memos = 5230;
+  outline = 3090;
   papra = 1221;
   radicale = 5232;
   stirling = 9010;
