@@ -1,10 +1,9 @@
 /*
-  modules/containers/services/business/papra.nix
+modules/containers/services/business/papra.nix
 
-  part of server system
-  created 2026-04-16
+part of server system
+created 2026-04-16
 */
-
 {
   config,
   pkgs,
@@ -13,8 +12,7 @@
   mkEnv,
   documentsPath,
   ...
-}:
-let
+}: let
   createEnv = mkEnv {
     path = "containers/papra/env";
     vars = {
@@ -64,8 +62,7 @@ let
       PLACEHOLDER_WEBHOOK_SECRET = config.age.secrets.papra-webhook-secret.path;
     };
   };
-in
-{
+in {
   myServices.papra = {
     serviceConfig = {
       name = "Papra";
@@ -81,81 +78,77 @@ in
     };
   };
 
-  age.secrets =
-    let
-      mkSecret = name: {
-        file = ../../../../secrets/containers/papra/${name}.age;
-      };
-    in
-    {
-      papra-auth-secret = mkSecret "s_auth-secret";
-      papra-client-key = mkSecret "s_auth-client";
-      papra-storage-key = mkSecret "s_storage-key";
-      papra-webhook-secret = mkSecret "s_webhook-secret";
+  age.secrets = let
+    mkSecret = name: {
+      file = ../../../../secrets/containers/papra/${name}.age;
+    };
+  in {
+    papra-auth-secret = mkSecret "s_auth-secret";
+    papra-client-key = mkSecret "s_auth-client";
+    papra-storage-key = mkSecret "s_storage-key";
+    papra-webhook-secret = mkSecret "s_webhook-secret";
+  };
+
+  virtualisation.quadlet = let
+    inherit (config.virtualisation.quadlet) volumes networks pods;
+  in {
+    volumes.data-documents.volumeConfig = {
+      type = "bind";
+      device = documentsPath;
     };
 
-  virtualisation.quadlet =
-    let
-      inherit (config.virtualisation.quadlet) volumes networks pods;
-    in
-    {
-      volumes.data-documents.volumeConfig = {
-        type = "bind";
-        device = documentsPath;
+    volumes.papra-data.volumeConfig = {
+      type = "bind";
+      device = "/opt/papra/data";
+    };
+
+    containers.papra = {
+      autoStart = true;
+
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
+
+        ExecStartPre = [
+          "+${pkgs.writeShellScript "pre-papra" ''
+            ${createEnv}
+          ''}"
+        ];
       };
 
-      volumes.papra-data.volumeConfig = {
-        type = "bind";
-        device = "/opt/papra/data";
-      };
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.papra}";
+        name = "papra";
 
-      containers.papra = {
-        autoStart = true;
+        addHosts = [
+          "auth.home.lan:host-gateway"
+        ];
 
-        serviceConfig = {
-          Restart = "always";
-          RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-papra" ''
-              ${createEnv}
-            ''}"
-          ];
+        environments = {
+          TZ = "Europe/Berlin";
         };
 
-        containerConfig = {
-          image = "docker-archive:${pkgs.dockerTools.pullImage images.papra}";
-          name = "papra";
+        environmentFiles = [
+          "env/containers/papra/env"
+        ];
 
-          addHosts = [
-            "auth.home.lan:host-gateway"
-          ];
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
 
-          environments = {
-            TZ = "Europe/Berlin";
-          };
+          # certificates
+          "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
+          "/certs/ca.crt:/certs/ca.crt:ro"
 
-          environmentFiles = [
-            "env/containers/papra/env"
-          ];
+          # volumes
+          "${volumes.data-documents.ref}:/data:U"
+          "${volumes.papra-data.ref}:/app/app-data:U"
+        ];
 
-          volumes = [
-            "/etc/timezone:/etc/timezone:ro"
-            "/etc/localtime:/etc/localtime:ro"
-
-            # certificates
-            "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-            "/certs/ca.crt:/certs/ca.crt:ro"
-
-            # volumes
-            "${volumes.data-documents.ref}:/data:U"
-            "${volumes.papra-data.ref}:/app/app-data:U"
-          ];
-
-          publishPorts = [
-            "${toString ports.papra}:1221/tcp"
-          ];
-        };
+        publishPorts = [
+          "${toString ports.papra}:1221/tcp"
+        ];
       };
     };
+  };
 }

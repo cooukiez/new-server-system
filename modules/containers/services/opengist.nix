@@ -1,10 +1,9 @@
 /*
-  modules/containers/services/opengist.nix
+modules/containers/services/opengist.nix
 
-  part of server system
-  created 2026-04-20
+part of server system
+created 2026-04-20
 */
-
 {
   config,
   pkgs,
@@ -12,23 +11,20 @@
   ports,
   mkEnv,
   ...
-}:
-let
+}: let
   createEnv = mkEnv {
     path = "containers/opengist/env";
     vars = {
       OG_OPENGIST_HOME = "/opengist";
 
-      OG_DB_URI =
-        let
-          name = "opengist";
-          user = "opengist";
-          pass = "@PLACEHOLDER_DB_PASS@";
+      OG_DB_URI = let
+        name = "opengist";
+        user = "opengist";
+        pass = "@PLACEHOLDER_DB_PASS@";
 
-          host = "host.containers.internal";
-          port = toString ports.postgres;
-        in
-        "postgres://${user}:${pass}@${host}:${port}/${name}?sslmode=disable";
+        host = "host.containers.internal";
+        port = toString ports.postgres;
+      in "postgres://${user}:${pass}@${host}:${port}/${name}?sslmode=disable";
 
       OG_EXTERNAL_URL = config.myServices.opengist.serviceConfig.href;
 
@@ -47,8 +43,7 @@ let
       PLACEHOLDER_DB_PASS = config.age.secrets.opengist-db-pass.path;
     };
   };
-in
-{
+in {
   myServices.opengist = {
     serviceConfig = {
       name = "Opengist";
@@ -64,82 +59,78 @@ in
     };
   };
 
-  age.secrets =
-    let
-      mkSecret = name: {
-        file = ../../../secrets/containers/opengist/${name}.age;
-      };
-    in
-    {
-      opengist-client-key = mkSecret "s_auth-client";
-      opengist-db-pass = mkSecret "s_db-pass";
+  age.secrets = let
+    mkSecret = name: {
+      file = ../../../secrets/containers/opengist/${name}.age;
+    };
+  in {
+    opengist-client-key = mkSecret "s_auth-client";
+    opengist-db-pass = mkSecret "s_db-pass";
+  };
+
+  virtualisation.quadlet = let
+    inherit (config.virtualisation.quadlet) volumes networks pods;
+  in {
+    volumes.opengist-data.volumeConfig = {
+      type = "bind";
+      device = "/opt/opengist/data";
     };
 
-  virtualisation.quadlet =
-    let
-      inherit (config.virtualisation.quadlet) volumes networks pods;
-    in
-    {
-      volumes.opengist-data.volumeConfig = {
-        type = "bind";
-        device = "/opt/opengist/data";
+    containers.opengist = {
+      autoStart = true;
+
+      unitConfig = {
+        Requires = ["postgres.service"];
+        After = ["postgres.service"];
       };
 
-      containers.opengist = {
-        autoStart = true;
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
 
-        unitConfig = {
-          Requires = [ "postgres.service" ];
-          After = [ "postgres.service" ];
+        ExecStartPre = [
+          "+${pkgs.writeShellScript "pre-opengist" ''
+            ${createEnv}
+          ''}"
+        ];
+      };
+
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.opengist}";
+        name = "opengist";
+        user = "0:0";
+
+        addHosts = [
+          "auth.home.lan:host-gateway"
+        ];
+
+        environments = {
+          TZ = "Europe/Berlin";
+
+          UID = "0";
+          GID = "0";
         };
 
-        serviceConfig = {
-          Restart = "always";
-          RestartSec = "10";
+        environmentFiles = [
+          "env/containers/opengist/env"
+        ];
 
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-opengist" ''
-              ${createEnv}
-            ''}"
-          ];
-        };
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
 
-        containerConfig = {
-          image = "docker-archive:${pkgs.dockerTools.pullImage images.opengist}";
-          name = "opengist";
-          user = "0:0";
+          # certificates
+          "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
+          "/certs/ca.crt:/certs/ca.crt:ro"
 
-          addHosts = [
-            "auth.home.lan:host-gateway"
-          ];
+          "${volumes.opengist-data.ref}:/opengist:U"
+        ];
 
-          environments = {
-            TZ = "Europe/Berlin";
-
-            UID = "0";
-            GID = "0";
-          };
-
-          environmentFiles = [
-            "env/containers/opengist/env"
-          ];
-
-          volumes = [
-            "/etc/timezone:/etc/timezone:ro"
-            "/etc/localtime:/etc/localtime:ro"
-
-            # certificates
-            "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-            "/certs/ca.crt:/certs/ca.crt:ro"
-
-            "${volumes.opengist-data.ref}:/opengist:U"
-          ];
-
-          publishPorts = [
-            "${toString ports.opengist}:2222/tcp"
-            "${toString ports.opengistHttp}:6157/tcp"
-          ];
-        };
+        publishPorts = [
+          "${toString ports.opengist}:2222/tcp"
+          "${toString ports.opengistHttp}:6157/tcp"
+        ];
       };
     };
+  };
 }

@@ -1,10 +1,9 @@
 /*
-  users.nix
+users.nix
 
-  part of server system
-  created 2026-04-02
+part of server system
+created 2026-04-02
 */
-
 {
   admin = {
     email = "";
@@ -17,6 +16,6 @@
 
     sshPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGqloF2EAQJl6bwdOBhMXvkund47pwRzIQC8KMaiBEbK";
 
-    packages = pkgs: with pkgs; [ ];
+    packages = pkgs: with pkgs; [];
   };
 }

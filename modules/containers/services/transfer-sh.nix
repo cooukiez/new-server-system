@@ -1,18 +1,16 @@
 /*
-  modules/containers/services/transfer-sh.nix
+modules/containers/services/transfer-sh.nix
 
-  part of server system
-  created 2026-04-14
+part of server system
+created 2026-04-14
 */
-
 {
   config,
   pkgs,
   images,
   ports,
   ...
-}:
-{
+}: {
   myServices.transfer-sh = {
     serviceConfig = {
       name = "transfer.sh";
@@ -28,54 +26,52 @@
     };
   };
 
-  virtualisation.quadlet =
-    let
-      inherit (config.virtualisation.quadlet) volumes networks pods;
-    in
-    {
-      volumes.transfer-sh-data.volumeConfig = {
-        type = "bind";
-        device = "/opt/transfer-sh/data";
+  virtualisation.quadlet = let
+    inherit (config.virtualisation.quadlet) volumes networks pods;
+  in {
+    volumes.transfer-sh-data.volumeConfig = {
+      type = "bind";
+      device = "/opt/transfer-sh/data";
+    };
+
+    containers.transfer-sh = {
+      autoStart = true;
+
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
       };
 
-      containers.transfer-sh = {
-        autoStart = true;
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.transfer-sh}";
+        name = "transfer-sh";
 
-        serviceConfig = {
-          Restart = "always";
-          RestartSec = "10";
+        exec = [
+          "--provider"
+          "local"
+          "--basedir"
+          "/data"
+        ];
+
+        environments = {
+          TZ = "Europe/Berlin";
         };
 
-        containerConfig = {
-          image = "docker-archive:${pkgs.dockerTools.pullImage images.transfer-sh}";
-          name = "transfer-sh";
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
 
-          exec = [
-            "--provider"
-            "local"
-            "--basedir"
-            "/data"
-          ];
+          # certificates
+          "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
+          "/certs/ca.crt:/certs/ca.crt:ro"
 
-          environments = {
-            TZ = "Europe/Berlin";
-          };
+          "${volumes.transfer-sh-data.ref}:/data:U"
+        ];
 
-          volumes = [
-            "/etc/timezone:/etc/timezone:ro"
-            "/etc/localtime:/etc/localtime:ro"
-
-            # certificates
-            "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-            "/certs/ca.crt:/certs/ca.crt:ro"
-
-            "${volumes.transfer-sh-data.ref}:/data:U"
-          ];
-
-          publishPorts = [
-            "${toString ports.transferSH}:8080/tcp"
-          ];
-        };
+        publishPorts = [
+          "${toString ports.transferSH}:8080/tcp"
+        ];
       };
     };
+  };
 }

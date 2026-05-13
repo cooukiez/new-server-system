@@ -1,10 +1,9 @@
 /*
-  modules/services/default.nix
+modules/services/default.nix
 
-  part of server system
-  created 2026-05-10
+part of server system
+created 2026-05-10
 */
-
 {
   imports = [
     ./maintenance.nix

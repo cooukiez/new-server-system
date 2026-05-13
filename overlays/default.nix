@@ -1,16 +1,14 @@
 /*
-  overlays/default.nix
+overlays/default.nix
 
-  part of server system
-  created 2026-04-16
+part of server system
+created 2026-04-16
 */
-
 {
   inputs,
   system,
   ...
-}:
-{
+}: {
   additions = final: _prev: import ../pkgs final.pkgs;
 
   modifications = final: prev: {

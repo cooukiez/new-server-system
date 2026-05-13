@@ -1,10 +1,9 @@
 /*
-  modules/containers/services/outline.nix
+modules/containers/services/outline.nix
 
-  part of server system
-  created 2026-05-12
+part of server system
+created 2026-05-12
 */
-
 {
   config,
   pkgs,
@@ -12,8 +11,7 @@
   ports,
   mkEnv,
   ...
-}:
-let
+}: let
   createEnv = mkEnv {
     path = "containers/outline/env";
     vars = {
@@ -27,16 +25,14 @@ let
 
       DEFAULT_LANGUAGE = "en_US";
 
-      DATABASE_URL =
-        let
-          name = "outline";
-          user = "outline";
-          pass = "@PLACEHOLDER_DB_PASS@";
+      DATABASE_URL = let
+        name = "outline";
+        user = "outline";
+        pass = "@PLACEHOLDER_DB_PASS@";
 
-          host = "host.containers.internal";
-          port = toString ports.postgres;
-        in
-        "postgres://${user}:${pass}@${host}:${port}/${name}?sslmode=disable";
+        host = "host.containers.internal";
+        port = toString ports.postgres;
+      in "postgres://${user}:${pass}@${host}:${port}/${name}?sslmode=disable";
 
       REDIS_URL = "outline-redis:6379";
 
@@ -71,8 +67,7 @@ let
       PLACEHOLDER_UTILS_SECRET = config.age.secrets.outline-utils-secret.path;
     };
   };
-in
-{
+in {
   myServices.outline = {
     serviceConfig = {
       name = "Outline";
@@ -88,112 +83,108 @@ in
     };
   };
 
-  age.secrets =
-    let
-      mkSecret = name: {
-        file = ../../../secrets/containers/outline/${name}.age;
+  age.secrets = let
+    mkSecret = name: {
+      file = ../../../secrets/containers/outline/${name}.age;
+    };
+  in {
+    outline-client-key = mkSecret "s_auth-client";
+    outline-db-pass = mkSecret "s_db-pass";
+    outline-secret-key = mkSecret "s_secret-key";
+    outline-utils-secret = mkSecret "s_utils-secret";
+  };
+
+  virtualisation.quadlet = let
+    inherit (config.virtualisation.quadlet) volumes networks pods;
+  in {
+    networks.outline-net = {
+      networkConfig = {
+        internal = false;
       };
-    in
-    {
-      outline-client-key = mkSecret "s_auth-client";
-      outline-db-pass = mkSecret "s_db-pass";
-      outline-secret-key = mkSecret "s_secret-key";
-      outline-utils-secret = mkSecret "s_utils-secret";
     };
 
-  virtualisation.quadlet =
-    let
-      inherit (config.virtualisation.quadlet) volumes networks pods;
-    in
-    {
-      networks.outline-net = {
-        networkConfig = {
-          internal = false;
-        };
+    volumes.outline-data.volumeConfig = {
+      type = "bind";
+      device = "/opt/outline/data";
+    };
+
+    containers.outline-redis = {
+      autoStart = true;
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
       };
 
-      volumes.outline-data.volumeConfig = {
-        type = "bind";
-        device = "/opt/outline/data";
-      };
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.redis}";
+        name = "outline-redis";
+        networks = ["outline-net"];
 
-      containers.outline-redis = {
-        autoStart = true;
-        serviceConfig = {
-          Restart = "always";
-          RestartSec = "10";
-        };
-
-        containerConfig = {
-          image = "docker-archive:${pkgs.dockerTools.pullImage images.redis}";
-          name = "outline-redis";
-          networks = [ "outline-net" ];
-
-          volumes = [
-            "/etc/timezone:/etc/timezone:ro"
-            "/etc/localtime:/etc/localtime:ro"
-          ];
-        };
-      };
-
-      containers.outline = {
-        autoStart = true;
-
-        unitConfig = {
-          Requires = [
-            "postgres.service"
-            "outline-redis.service"
-          ];
-
-          After = [
-            "postgres.service"
-            "outline-redis.service"
-          ];
-        };
-
-        serviceConfig = {
-          Restart = "always";
-          RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-outline" ''
-              ${createEnv}
-            ''}"
-          ];
-        };
-
-        containerConfig = {
-          image = "docker-archive:${pkgs.dockerTools.pullImage images.outline}";
-          name = "outline";
-          networks = [ "outline-net" ];
-
-          addHosts = [
-            "auth.home.lan:host-gateway"
-          ];
-
-          environments = {
-            TZ = "Europe/Berlin";
-          };
-
-          environmentFiles = [
-            "env/containers/outline/env"
-          ];
-
-          volumes = [
-            "/etc/timezone:/etc/timezone:ro"
-            "/etc/localtime:/etc/localtime:ro"
-
-            # certificates
-            "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-            "/certs/ca.crt:/certs/ca.crt:ro"
-
-            "${volumes.outline-data.ref}:/data:U"
-          ];
-
-          publishPorts = [
-            "${toString ports.outline}:3000/tcp"
-          ];
-        };
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
+        ];
       };
     };
+
+    containers.outline = {
+      autoStart = true;
+
+      unitConfig = {
+        Requires = [
+          "postgres.service"
+          "outline-redis.service"
+        ];
+
+        After = [
+          "postgres.service"
+          "outline-redis.service"
+        ];
+      };
+
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
+
+        ExecStartPre = [
+          "+${pkgs.writeShellScript "pre-outline" ''
+            ${createEnv}
+          ''}"
+        ];
+      };
+
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.outline}";
+        name = "outline";
+        networks = ["outline-net"];
+
+        addHosts = [
+          "auth.home.lan:host-gateway"
+        ];
+
+        environments = {
+          TZ = "Europe/Berlin";
+        };
+
+        environmentFiles = [
+          "env/containers/outline/env"
+        ];
+
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
+
+          # certificates
+          "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
+          "/certs/ca.crt:/certs/ca.crt:ro"
+
+          "${volumes.outline-data.ref}:/data:U"
+        ];
+
+        publishPorts = [
+          "${toString ports.outline}:3000/tcp"
+        ];
+      };
+    };
+  };
 }

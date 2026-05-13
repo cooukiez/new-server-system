@@ -1,10 +1,9 @@
 /*
-  modules/containers/services/media/music.nix
+modules/containers/services/media/music.nix
 
-  part of server system
-  created 2026-04-19
+part of server system
+created 2026-04-19
 */
-
 {
   config,
   pkgs,
@@ -14,13 +13,12 @@
   musicPath,
   downloadPath,
   ...
-}:
-let
+}: let
   mkLidarrXml = attrs: ''
     <Config>
       ${builtins.concatStringsSep "\n  " (
-        pkgs.lib.mapAttrsToList (k: v: "<${k}>${toString v}</${k}>") attrs
-      )}
+      pkgs.lib.mapAttrsToList (k: v: "<${k}>${toString v}</${k}>") attrs
+    )}
     </Config>
   '';
 
@@ -72,14 +70,14 @@ let
   # slskd settings
   createSlskdConf = mkConf {
     path = "containers/slskd/slskd.yml";
-    source = (pkgs.formats.yaml { }).generate "slskd-settings" {
+    source = (pkgs.formats.yaml {}).generate "slskd-settings" {
       directories = {
         downloads = "/download/finished";
         incomplete = "/download/incomplete";
       };
 
       shares = {
-        directories = [ "/music" ];
+        directories = ["/music"];
       };
 
       web = {
@@ -138,8 +136,7 @@ let
       PLACEHOLDER_WEBUI_PASS = config.age.secrets.slskd-webui-pass.path;
     };
   };
-in
-{
+in {
   myServices = {
     lidarr = {
       serviceConfig = {
@@ -172,176 +169,172 @@ in
     };
   };
 
-  age.secrets =
-    let
-      mkSecret = name: {
-        file = ../../../../secrets/${name}.age;
-      };
-    in
-    {
-      lidarr-api-key = mkSecret "containers/lidarr/s_api-key";
-      lidarr-db-pass = mkSecret "containers/lidarr/s_db-pass";
+  age.secrets = let
+    mkSecret = name: {
+      file = ../../../../secrets/${name}.age;
+    };
+  in {
+    lidarr-api-key = mkSecret "containers/lidarr/s_api-key";
+    lidarr-db-pass = mkSecret "containers/lidarr/s_db-pass";
 
-      slskd-gluetun-api-key = mkSecret "containers/gluetun/s_api-key";
+    slskd-gluetun-api-key = mkSecret "containers/gluetun/s_api-key";
 
-      slskd-lidarr-api-key = mkSecret "containers/slskd/s_lidarr-api-key";
-      slskd-user = mkSecret "containers/slskd/s_user";
-      slskd-pass = mkSecret "containers/slskd/s_pass";
-      slskd-webui-pass = mkSecret "containers/slskd/s_webui-pass";
+    slskd-lidarr-api-key = mkSecret "containers/slskd/s_lidarr-api-key";
+    slskd-user = mkSecret "containers/slskd/s_user";
+    slskd-pass = mkSecret "containers/slskd/s_pass";
+    slskd-webui-pass = mkSecret "containers/slskd/s_webui-pass";
+  };
+
+  virtualisation.quadlet = let
+    inherit (config.virtualisation.quadlet) volumes networks pods;
+  in {
+    volumes.lidarr-data.volumeConfig = {
+      type = "bind";
+      device = "/opt/lidarr/data";
     };
 
-  virtualisation.quadlet =
-    let
-      inherit (config.virtualisation.quadlet) volumes networks pods;
-    in
-    {
-      volumes.lidarr-data.volumeConfig = {
-        type = "bind";
-        device = "/opt/lidarr/data";
+    volumes.lidarr-cache.volumeConfig = {
+      type = "bind";
+      device = "/opt/lidarr/cache";
+    };
+
+    volumes.slskd-download.volumeConfig = {
+      type = "bind";
+      device = "${downloadPath}/slskd";
+    };
+
+    volumes.slskd-data.volumeConfig = {
+      type = "bind";
+      device = "/opt/slskd/data";
+    };
+
+    # todo: bring deemix back
+    containers.lidarr = {
+      autoStart = true;
+
+      unitConfig = {
+        Requires = ["postgres.service"];
+        After = ["postgres.service"];
       };
 
-      volumes.lidarr-cache.volumeConfig = {
-        type = "bind";
-        device = "/opt/lidarr/cache";
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
+
+        ExecStartPre = [
+          "+${pkgs.writeShellScript "pre-lidarr" ''
+            ${createLidarrConf}
+
+            # deezer download
+            ${pkgs.coreutils}/bin/mkdir -p "${downloadPath}/deezer"
+            # spotify cache
+            ${pkgs.coreutils}/bin/mkdir -p "/opt/lidarr/cache/spotify"
+
+            ${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/lidarr/config.xml /opt/lidarr/data/config.xml
+            ${pkgs.coreutils}/bin/chmod 644 /opt/lidarr/data/config.xml
+          ''}"
+        ];
       };
 
-      volumes.slskd-download.volumeConfig = {
-        type = "bind";
-        device = "${downloadPath}/slskd";
-      };
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.lidarr}";
+        name = "lidarr";
+        userns = "keep-id:uid=10000,gid=10000";
+        networks = ["media-net"];
 
-      volumes.slskd-data.volumeConfig = {
-        type = "bind";
-        device = "/opt/slskd/data";
-      };
+        environments = {
+          TZ = "Europe/Berlin";
 
-      # todo: bring deemix back
-      containers.lidarr = {
-        autoStart = true;
-
-        unitConfig = {
-          Requires = [ "postgres.service" ];
-          After = [ "postgres.service" ];
+          PUID = "10000";
+          GUID = "10000";
         };
 
-        serviceConfig = {
-          Restart = "always";
-          RestartSec = "10";
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
 
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-lidarr" ''
-              ${createLidarrConf}
+          # certificates
+          "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
+          "/certs/ca.crt:/certs/ca.crt:ro"
 
-              # deezer download
-              ${pkgs.coreutils}/bin/mkdir -p "${downloadPath}/deezer"
-              # spotify cache
-              ${pkgs.coreutils}/bin/mkdir -p "/opt/lidarr/cache/spotify"
+          # volumes
+          "${volumes.lidarr-data.ref}:/config:U"
+          "${volumes.lidarr-cache.ref}:/cache:U"
 
-              ${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/lidarr/config.xml /opt/lidarr/data/config.xml
-              ${pkgs.coreutils}/bin/chmod 644 /opt/lidarr/data/config.xml
-            ''}"
-          ];
-        };
+          # media volumes
+          "${volumes.media-download.ref}:/download"
+          "${volumes.media-music.ref}:/music"
+        ];
 
-        containerConfig = {
-          image = "docker-archive:${pkgs.dockerTools.pullImage images.lidarr}";
-          name = "lidarr";
-          userns = "keep-id:uid=10000,gid=10000";
-          networks = [ "media-net" ];
-
-          environments = {
-            TZ = "Europe/Berlin";
-
-            PUID = "10000";
-            GUID = "10000";
-          };
-
-          volumes = [
-            "/etc/timezone:/etc/timezone:ro"
-            "/etc/localtime:/etc/localtime:ro"
-
-            # certificates
-            "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-            "/certs/ca.crt:/certs/ca.crt:ro"
-
-            # volumes
-            "${volumes.lidarr-data.ref}:/config:U"
-            "${volumes.lidarr-cache.ref}:/cache:U"
-
-            # media volumes
-            "${volumes.media-download.ref}:/download"
-            "${volumes.media-music.ref}:/music"
-          ];
-
-          publishPorts = [
-            "${toString ports.lidarr}:8686/tcp"
-          ];
-        };
-      };
-
-      containers.slskd = {
-        autoStart = true;
-
-        unitConfig = {
-          Requires = [ "gluetun.service" ];
-          After = [ "gluetun.service" ];
-        };
-
-        serviceConfig = {
-          Restart = "always";
-          RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-slskd" ''
-              ${createSlskdConf}
-
-              ${pkgs.coreutils}/bin/mkdir -p "${downloadPath}/slskd/finished"
-              ${pkgs.coreutils}/bin/mkdir -p "${downloadPath}/slskd/incomplete"
-            ''}"
-          ];
-        };
-
-        containerConfig = {
-          image = "docker-archive:${pkgs.dockerTools.pullImage images.slskd}";
-          name = "slskd";
-          userns = "keep-id:uid=10000,gid=10000";
-          user = "10000:10000";
-
-          networks = [
-            "media-net"
-            "vpn-service-net"
-          ];
-
-          environments = {
-            TZ = "Europe/Berlin";
-
-            SLSKD_REMOTE_CONFIGURATION = "false";
-          };
-
-          volumes = [
-            "/etc/timezone:/etc/timezone:ro"
-            "/etc/localtime:/etc/localtime:ro"
-
-            # certificates
-            "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-            "/certs/ca.crt:/certs/ca.crt:ro"
-
-            # config
-            "${config.home.homeDirectory}/containers/slskd/slskd.yml:/app/slskd.yml:ro"
-
-            # volumes
-            "${volumes.slskd-data.ref}:/app"
-
-            "${volumes.slskd-download.ref}:/download"
-            "${volumes.media-music.ref}:/music:ro"
-          ];
-
-          publishPorts = [
-            "${toString ports.slskdHttp}:5030/tcp"
-            "${toString ports.slskdHttps}:5031/tcp"
-            "${toString ports.slskdPeer}:50300/tcp"
-          ];
-        };
+        publishPorts = [
+          "${toString ports.lidarr}:8686/tcp"
+        ];
       };
     };
+
+    containers.slskd = {
+      autoStart = true;
+
+      unitConfig = {
+        Requires = ["gluetun.service"];
+        After = ["gluetun.service"];
+      };
+
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
+
+        ExecStartPre = [
+          "+${pkgs.writeShellScript "pre-slskd" ''
+            ${createSlskdConf}
+
+            ${pkgs.coreutils}/bin/mkdir -p "${downloadPath}/slskd/finished"
+            ${pkgs.coreutils}/bin/mkdir -p "${downloadPath}/slskd/incomplete"
+          ''}"
+        ];
+      };
+
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.slskd}";
+        name = "slskd";
+        userns = "keep-id:uid=10000,gid=10000";
+        user = "10000:10000";
+
+        networks = [
+          "media-net"
+          "vpn-service-net"
+        ];
+
+        environments = {
+          TZ = "Europe/Berlin";
+
+          SLSKD_REMOTE_CONFIGURATION = "false";
+        };
+
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
+
+          # certificates
+          "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
+          "/certs/ca.crt:/certs/ca.crt:ro"
+
+          # config
+          "${config.home.homeDirectory}/containers/slskd/slskd.yml:/app/slskd.yml:ro"
+
+          # volumes
+          "${volumes.slskd-data.ref}:/app"
+
+          "${volumes.slskd-download.ref}:/download"
+          "${volumes.media-music.ref}:/music:ro"
+        ];
+
+        publishPorts = [
+          "${toString ports.slskdHttp}:5030/tcp"
+          "${toString ports.slskdHttps}:5031/tcp"
+          "${toString ports.slskdPeer}:50300/tcp"
+        ];
+      };
+    };
+  };
 }

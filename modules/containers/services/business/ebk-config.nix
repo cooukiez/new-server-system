@@ -1,16 +1,14 @@
 /*
-  modules/containers/services/business/ebk-config.nix
+modules/containers/services/business/ebk-config.nix
 
-  part of server system
-  created 2026-04-21
+part of server system
+created 2026-04-21
 */
-
 {
   config,
   ports,
   ...
-}:
-{
+}: {
   # https://github.com/mayswind/ezbookkeeping/blob/e6c6d021124566325cdbafeb70616378dc9654f7/conf/ezbookkeeping.ini#L4
   ebkSettings = {
     global = {

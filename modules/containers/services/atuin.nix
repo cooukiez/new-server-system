@@ -1,10 +1,9 @@
 /*
-  modules/containers/services/atuin.nix
+modules/containers/services/atuin.nix
 
-  part of server system
-  created 2026-04-20
+part of server system
+created 2026-04-20
 */
-
 {
   config,
   pkgs,
@@ -12,8 +11,7 @@
   ports,
   mkEnv,
   ...
-}:
-let
+}: let
   createEnv = mkEnv {
     path = "containers/atuin/env";
     vars = {
@@ -22,16 +20,14 @@ let
 
       ATUIN_OPEN_REGISTRATION = "true";
 
-      ATUIN_DB_URI =
-        let
-          name = "atuin";
-          user = "atuin";
-          pass = "@PLACEHOLDER_DB_PASS@";
+      ATUIN_DB_URI = let
+        name = "atuin";
+        user = "atuin";
+        pass = "@PLACEHOLDER_DB_PASS@";
 
-          host = "host.containers.internal";
-          port = toString ports.postgres;
-        in
-        "postgres://${user}:${pass}@${host}:${port}/${name}?sslmode=disable";
+        host = "host.containers.internal";
+        port = toString ports.postgres;
+      in "postgres://${user}:${pass}@${host}:${port}/${name}?sslmode=disable";
 
       RUST_LOG = "info,atuin_server=debug";
     };
@@ -40,8 +36,7 @@ let
       PLACEHOLDER_DB_PASS = config.age.secrets.atuin-db-pass.path;
     };
   };
-in
-{
+in {
   myServices.atuin = {
     serviceConfig = {
       name = "Atuin";
@@ -57,74 +52,70 @@ in
     };
   };
 
-  age.secrets =
-    let
-      mkSecret = name: {
-        file = ../../../secrets/containers/atuin/${name}.age;
-      };
-    in
-    {
-      atuin-db-pass = mkSecret "s_db-pass";
+  age.secrets = let
+    mkSecret = name: {
+      file = ../../../secrets/containers/atuin/${name}.age;
+    };
+  in {
+    atuin-db-pass = mkSecret "s_db-pass";
+  };
+
+  virtualisation.quadlet = let
+    inherit (config.virtualisation.quadlet) volumes networks pods;
+  in {
+    volumes.atuin-config.volumeConfig = {
+      type = "bind";
+      device = "/opt/atuin/config";
     };
 
-  virtualisation.quadlet =
-    let
-      inherit (config.virtualisation.quadlet) volumes networks pods;
-    in
-    {
-      volumes.atuin-config.volumeConfig = {
-        type = "bind";
-        device = "/opt/atuin/config";
+    containers.atuin = {
+      autoStart = true;
+
+      unitConfig = {
+        Requires = ["postgres.service"];
+        After = ["postgres.service"];
       };
 
-      containers.atuin = {
-        autoStart = true;
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
 
-        unitConfig = {
-          Requires = [ "postgres.service" ];
-          After = [ "postgres.service" ];
+        ExecStartPre = [
+          "+${pkgs.writeShellScript "pre-atuin" ''
+            ${createEnv}
+          ''}"
+        ];
+      };
+
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.atuin}";
+        name = "atuin";
+
+        exec = ["start"];
+
+        environments = {
+          TZ = "Europe/Berlin";
         };
 
-        serviceConfig = {
-          Restart = "always";
-          RestartSec = "10";
+        environmentFiles = [
+          "env/containers/atuin/env"
+        ];
 
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-atuin" ''
-              ${createEnv}
-            ''}"
-          ];
-        };
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
 
-        containerConfig = {
-          image = "docker-archive:${pkgs.dockerTools.pullImage images.atuin}";
-          name = "atuin";
+          # certificates
+          "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
+          "/certs/ca.crt:/certs/ca.crt:ro"
 
-          exec = [ "start" ];
+          "${volumes.atuin-config.ref}:/config:U"
+        ];
 
-          environments = {
-            TZ = "Europe/Berlin";
-          };
-
-          environmentFiles = [
-            "env/containers/atuin/env"
-          ];
-
-          volumes = [
-            "/etc/timezone:/etc/timezone:ro"
-            "/etc/localtime:/etc/localtime:ro"
-
-            # certificates
-            "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-            "/certs/ca.crt:/certs/ca.crt:ro"
-
-            "${volumes.atuin-config.ref}:/config:U"
-          ];
-
-          publishPorts = [
-            "${toString ports.atuin}:8888/tcp"
-          ];
-        };
+        publishPorts = [
+          "${toString ports.atuin}:8888/tcp"
+        ];
       };
     };
+  };
 }

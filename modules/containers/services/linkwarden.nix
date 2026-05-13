@@ -1,10 +1,9 @@
 /*
-  modules/containers/services/linkwarden.nix
+modules/containers/services/linkwarden.nix
 
-  part of server system
-  created 2026-04-19
+part of server system
+created 2026-04-19
 */
-
 {
   config,
   pkgs,
@@ -12,8 +11,7 @@
   ports,
   mkEnv,
   ...
-}:
-let
+}: let
   createLinkwardenMeiliEnv = mkEnv {
     path = "containers/link/meili/env";
     vars = {
@@ -29,16 +27,14 @@ let
   createLinkwardenEnv = mkEnv {
     path = "containers/link/link/env";
     vars = {
-      DATABASE_URL =
-        let
-          name = "linkwarden";
-          user = "linkwarden";
-          pass = "@PLACEHOLDER_DB_PASS@";
+      DATABASE_URL = let
+        name = "linkwarden";
+        user = "linkwarden";
+        pass = "@PLACEHOLDER_DB_PASS@";
 
-          host = "host.containers.internal";
-          port = toString ports.postgres;
-        in
-        "postgres://${user}:${pass}@${host}:${port}/${name}?sslmode=disable";
+        host = "host.containers.internal";
+        port = toString ports.postgres;
+      in "postgres://${user}:${pass}@${host}:${port}/${name}?sslmode=disable";
 
       MEILISEARCH_ENDPOINT = "http://linkwarden-meili:7700";
       MEILISEARCH_MASTER_KEY = "@PLACEHOLDER_MEILI_KEY@";
@@ -63,8 +59,7 @@ let
       PLACEHOLDER_NEXT_AUTH = config.age.secrets.link-next-auth.path;
     };
   };
-in
-{
+in {
   myServices.linkwarden = {
     serviceConfig = {
       name = "Linkwarden";
@@ -80,133 +75,129 @@ in
     };
   };
 
-  age.secrets =
-    let
-      mkSecret = name: {
-        file = ../../../secrets/containers/link/${name}.age;
+  age.secrets = let
+    mkSecret = name: {
+      file = ../../../secrets/containers/link/${name}.age;
+    };
+  in {
+    link-client-key = mkSecret "s_auth-client";
+    link-db-pass = mkSecret "s_db-pass";
+    link-meili-key = mkSecret "s_meili-key";
+    link-next-auth = mkSecret "s_next-auth";
+  };
+
+  virtualisation.quadlet = let
+    inherit (config.virtualisation.quadlet) volumes networks pods;
+  in {
+    networks.linkwarden-net = {
+      networkConfig = {
+        internal = false;
       };
-    in
-    {
-      link-client-key = mkSecret "s_auth-client";
-      link-db-pass = mkSecret "s_db-pass";
-      link-meili-key = mkSecret "s_meili-key";
-      link-next-auth = mkSecret "s_next-auth";
     };
 
-  virtualisation.quadlet =
-    let
-      inherit (config.virtualisation.quadlet) volumes networks pods;
-    in
-    {
-      networks.linkwarden-net = {
-        networkConfig = {
-          internal = false;
-        };
+    volumes.linkwarden-meili.volumeConfig = {
+      type = "bind";
+      device = "/opt/linkwarden/meili";
+    };
+
+    volumes.linkwarden-data.volumeConfig = {
+      type = "bind";
+      device = "/opt/linkwarden/data";
+    };
+
+    containers.linkwarden-meili = {
+      autoStart = true;
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
+
+        ExecStartPre = [
+          "+${pkgs.writeShellScript "pre-linkwarden-meili" ''
+            ${createLinkwardenMeiliEnv}
+          ''}"
+        ];
       };
 
-      volumes.linkwarden-meili.volumeConfig = {
-        type = "bind";
-        device = "/opt/linkwarden/meili";
-      };
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.meili}";
+        name = "linkwarden-meili";
+        networks = ["linkwarden-net"];
 
-      volumes.linkwarden-data.volumeConfig = {
-        type = "bind";
-        device = "/opt/linkwarden/data";
-      };
-
-      containers.linkwarden-meili = {
-        autoStart = true;
-        serviceConfig = {
-          Restart = "always";
-          RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-linkwarden-meili" ''
-              ${createLinkwardenMeiliEnv}
-            ''}"
-          ];
+        environments = {
+          TZ = "Europe/Berlin";
         };
 
-        containerConfig = {
-          image = "docker-archive:${pkgs.dockerTools.pullImage images.meili}";
-          name = "linkwarden-meili";
-          networks = [ "linkwarden-net" ];
+        environmentFiles = [
+          "env/containers/link/meili/env"
+        ];
 
-          environments = {
-            TZ = "Europe/Berlin";
-          };
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
 
-          environmentFiles = [
-            "env/containers/link/meili/env"
-          ];
-
-          volumes = [
-            "/etc/timezone:/etc/timezone:ro"
-            "/etc/localtime:/etc/localtime:ro"
-
-            "${volumes.linkwarden-meili.ref}:/meili_data"
-          ];
-        };
-      };
-
-      containers.linkwarden = {
-        autoStart = true;
-
-        unitConfig = {
-          Requires = [
-            "postgres.service"
-            "linkwarden-meili.service"
-          ];
-
-          After = [
-            "postgres.service"
-            "linkwarden-meili.service"
-          ];
-        };
-
-        serviceConfig = {
-          Restart = "always";
-          RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-linkwarden" ''
-              ${createLinkwardenEnv}
-            ''}"
-          ];
-        };
-
-        containerConfig = {
-          image = "docker-archive:${pkgs.dockerTools.pullImage images.linkwarden}";
-          name = "linkwarden";
-          networks = [ "linkwarden-net" ];
-
-          addHosts = [
-            "auth.home.lan:host-gateway"
-          ];
-
-          environments = {
-            TZ = "Europe/Berlin";
-          };
-
-          environmentFiles = [
-            "env/containers/link/link/env"
-          ];
-
-          volumes = [
-            "/etc/timezone:/etc/timezone:ro"
-            "/etc/localtime:/etc/localtime:ro"
-
-            # certificates
-            "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-            "/certs/ca.crt:/certs/ca.crt:ro"
-
-            "${volumes.linkwarden-data.ref}:/data/data"
-          ];
-
-          publishPorts = [
-            "${toString ports.linkwarden}:3000/tcp"
-          ];
-        };
+          "${volumes.linkwarden-meili.ref}:/meili_data"
+        ];
       };
     };
+
+    containers.linkwarden = {
+      autoStart = true;
+
+      unitConfig = {
+        Requires = [
+          "postgres.service"
+          "linkwarden-meili.service"
+        ];
+
+        After = [
+          "postgres.service"
+          "linkwarden-meili.service"
+        ];
+      };
+
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
+
+        ExecStartPre = [
+          "+${pkgs.writeShellScript "pre-linkwarden" ''
+            ${createLinkwardenEnv}
+          ''}"
+        ];
+      };
+
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.linkwarden}";
+        name = "linkwarden";
+        networks = ["linkwarden-net"];
+
+        addHosts = [
+          "auth.home.lan:host-gateway"
+        ];
+
+        environments = {
+          TZ = "Europe/Berlin";
+        };
+
+        environmentFiles = [
+          "env/containers/link/link/env"
+        ];
+
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
+
+          # certificates
+          "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
+          "/certs/ca.crt:/certs/ca.crt:ro"
+
+          "${volumes.linkwarden-data.ref}:/data/data"
+        ];
+
+        publishPorts = [
+          "${toString ports.linkwarden}:3000/tcp"
+        ];
+      };
+    };
+  };
 }

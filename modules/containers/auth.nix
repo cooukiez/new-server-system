@@ -1,10 +1,9 @@
 /*
-  modules/containers/auth.nix
+modules/containers/auth.nix
 
-  part of server system
-  created 2026-04-19
+part of server system
+created 2026-04-19
 */
-
 {
   config,
   pkgs,
@@ -13,8 +12,7 @@
   ports,
   publicServices,
   ...
-}:
-let
+}: let
   sortedServiceList = lib.sort (a: b: a.serviceConfig.subdomain < b.serviceConfig.subdomain) (
     lib.attrValues publicServices
   );
@@ -46,33 +44,34 @@ let
 
     access_control = {
       default_policy = "deny";
-      rules = [
-        {
-          domain = "auth.home.lan";
-          policy = "bypass";
-        }
-        {
-          domain = "ldap.home.lan";
-          policy = "bypass";
-        }
-        {
-          domain = "home.lan";
-          policy = "bypass";
-        }
-      ]
-      ++ (map (
-        svc:
-        let
-          cfg = svc.serviceConfig;
-        in
-        {
-          domain = "${cfg.subdomain}.home.lan";
-          policy = cfg.policy;
-        }
-        // (lib.optionalAttrs (cfg.group != null) {
-          subject = [ "group:${cfg.group}" ];
-        })
-      ) sortedServiceList);
+      rules =
+        [
+          {
+            domain = "auth.home.lan";
+            policy = "bypass";
+          }
+          {
+            domain = "ldap.home.lan";
+            policy = "bypass";
+          }
+          {
+            domain = "home.lan";
+            policy = "bypass";
+          }
+        ]
+        ++ (map (
+            svc: let
+              cfg = svc.serviceConfig;
+            in
+              {
+                domain = "${cfg.subdomain}.home.lan";
+                policy = cfg.policy;
+              }
+              // (lib.optionalAttrs (cfg.group != null) {
+                subject = ["group:${cfg.group}"];
+              })
+          )
+          sortedServiceList);
     };
 
     session = {
@@ -167,8 +166,7 @@ let
     auth-oidc-hmac = "AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE";
     auth-mail-smtp = "AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE";
   };
-in
-{
+in {
   myServices.authelia = {
     serviceConfig = {
       name = "Authelia";
@@ -185,99 +183,99 @@ in
   };
 
   home.file."containers/authelia/configuration.yml".source =
-    (pkgs.formats.yaml { }).generate "authelia-settings"
-      autheliaSettings;
+    (pkgs.formats.yaml {}).generate "authelia-settings"
+    autheliaSettings;
 
-  age.secrets = builtins.mapAttrs (_: name: {
-    file = ../../secrets/${name}.age;
-  }) secretMap;
+  age.secrets =
+    builtins.mapAttrs (_: name: {
+      file = ../../secrets/${name}.age;
+    })
+    secretMap;
 
-  virtualisation.quadlet =
-    let
-      inherit (config.virtualisation.quadlet) volumes networks pods;
-    in
-    {
-      networks.auth-net = {
-        networkConfig = {
-          internal = false;
-        };
-      };
-
-      volumes.authelia-config.volumeConfig = {
-        type = "bind";
-        device = "/opt/authelia/config";
-      };
-
-      containers.authelia = {
-        autoStart = true;
-
-        unitConfig = {
-          Requires = [
-            "postgres.service"
-            "lldap.service"
-          ];
-
-          After = [
-            "postgres.service"
-            "lldap.service"
-          ];
-        };
-
-        serviceConfig = {
-          Restart = "always";
-          RestartSec = "10";
-
-          ExecStartPre =
-            let
-              cfgSrc = "${config.home.homeDirectory}/containers/authelia/configuration.yml";
-              cfgLoc = "/opt/authelia/config/configuration.yml";
-
-              jwkLocation = ".identity_providers.oidc.jwks[0].key";
-            in
-            [
-              "+${pkgs.writeShellScript "pre-authelia" ''
-                ${pkgs.coreutils}/bin/cp ${cfgSrc} ${cfgLoc}
-
-                export JWT_SECRET=$(${pkgs.coreutils}/bin/cat ${config.age.secrets.auth-oidc-jwk.path})
-                ${pkgs.yq-go}/bin/yq -i "${jwkLocation} = load_str(\"${config.age.secrets.auth-oidc-jwk.path}\")" ${cfgLoc}
-                ${pkgs.coreutils}/bin/chmod 644 ${cfgLoc}
-              ''}"
-            ];
-        };
-
-        containerConfig = {
-          image = "docker-archive:${pkgs.dockerTools.pullImage images.authelia}";
-          name = "authelia";
-          networks = [ "auth-net" ];
-
-          volumes =
-            (lib.mapAttrsToList (
-              name: mount: "${config.age.secrets.${name}.path}:/run/secrets/${mount}:ro"
-            ) secretMounts)
-            ++ [
-              "/etc/timezone:/etc/timezone:ro"
-              "/etc/localtime:/etc/localtime:ro"
-
-              # certificates
-              "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-              "/certs/ca.crt:/certs/ca.crt:ro"
-
-              "${volumes.authelia-config.ref}:/config:U"
-            ];
-
-          environments =
-            (lib.mapAttrs' (name: envVar: {
-              name = envVar;
-              value = "/run/secrets/${secretMounts.${name}}";
-            }) envMapping)
-            // {
-              TZ = "Europe/Berlin";
-            };
-
-          publishPorts = [
-            "${toString ports.authelia}:9091/tcp"
-          ];
-        };
+  virtualisation.quadlet = let
+    inherit (config.virtualisation.quadlet) volumes networks pods;
+  in {
+    networks.auth-net = {
+      networkConfig = {
+        internal = false;
       };
     };
+
+    volumes.authelia-config.volumeConfig = {
+      type = "bind";
+      device = "/opt/authelia/config";
+    };
+
+    containers.authelia = {
+      autoStart = true;
+
+      unitConfig = {
+        Requires = [
+          "postgres.service"
+          "lldap.service"
+        ];
+
+        After = [
+          "postgres.service"
+          "lldap.service"
+        ];
+      };
+
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
+
+        ExecStartPre = let
+          cfgSrc = "${config.home.homeDirectory}/containers/authelia/configuration.yml";
+          cfgLoc = "/opt/authelia/config/configuration.yml";
+
+          jwkLocation = ".identity_providers.oidc.jwks[0].key";
+        in [
+          "+${pkgs.writeShellScript "pre-authelia" ''
+            ${pkgs.coreutils}/bin/cp ${cfgSrc} ${cfgLoc}
+
+            export JWT_SECRET=$(${pkgs.coreutils}/bin/cat ${config.age.secrets.auth-oidc-jwk.path})
+            ${pkgs.yq-go}/bin/yq -i "${jwkLocation} = load_str(\"${config.age.secrets.auth-oidc-jwk.path}\")" ${cfgLoc}
+            ${pkgs.coreutils}/bin/chmod 644 ${cfgLoc}
+          ''}"
+        ];
+      };
+
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.authelia}";
+        name = "authelia";
+        networks = ["auth-net"];
+
+        volumes =
+          (lib.mapAttrsToList (
+              name: mount: "${config.age.secrets.${name}.path}:/run/secrets/${mount}:ro"
+            )
+            secretMounts)
+          ++ [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # certificates
+            "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
+            "/certs/ca.crt:/certs/ca.crt:ro"
+
+            "${volumes.authelia-config.ref}:/config:U"
+          ];
+
+        environments =
+          (lib.mapAttrs' (name: envVar: {
+              name = envVar;
+              value = "/run/secrets/${secretMounts.${name}}";
+            })
+            envMapping)
+          // {
+            TZ = "Europe/Berlin";
+          };
+
+        publishPorts = [
+          "${toString ports.authelia}:9091/tcp"
+        ];
+      };
+    };
+  };
 }

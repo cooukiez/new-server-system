@@ -1,10 +1,9 @@
 /*
-  modules/containers/vpn.nix
+modules/containers/vpn.nix
 
-  part of server system
-  created 2026-04-19
+part of server system
+created 2026-04-19
 */
-
 {
   config,
   pkgs,
@@ -12,8 +11,7 @@
   ports,
   mkEnv,
   ...
-}:
-let
+}: let
   createGluetunEnv = mkEnv {
     path = "containers/gluetun/env";
     vars = {
@@ -60,8 +58,7 @@ let
       PLACEHOLDER_GLUETUN_KEY = config.age.secrets.gluetun-api-key.path;
     };
   };
-in
-{
+in {
   myServices.gluetun = {
     serviceConfig = {
       description = "Server VPN Provider";
@@ -77,129 +74,125 @@ in
     };
   };
 
-  age.secrets =
-    let
-      mkSecret = name: {
-        file = ../../secrets/${name}.age;
+  age.secrets = let
+    mkSecret = name: {
+      file = ../../secrets/${name}.age;
+    };
+  in {
+    gluetun-api-key = mkSecret "containers/gluetun/s_api-key";
+    proton-key = mkSecret "proton-key";
+  };
+
+  virtualisation.quadlet = let
+    inherit (config.virtualisation.quadlet) volumes networks pods;
+  in {
+    networks.vpn-service-net = {
+      networkConfig = {
+        internal = false;
       };
-    in
-    {
-      gluetun-api-key = mkSecret "containers/gluetun/s_api-key";
-      proton-key = mkSecret "proton-key";
     };
 
-  virtualisation.quadlet =
-    let
-      inherit (config.virtualisation.quadlet) volumes networks pods;
-    in
-    {
-      networks.vpn-service-net = {
-        networkConfig = {
-          internal = false;
-        };
+    volumes.gluetun-data.volumeConfig = {
+      type = "bind";
+      device = "/opt/gluetun/data";
+    };
+
+    containers.gluetun = {
+      autoStart = true;
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
+
+        ExecStartPre = [
+          "+${pkgs.writeShellScript "pre-gluetun" ''
+            ${createGluetunEnv}
+          ''}"
+        ];
       };
 
-      volumes.gluetun-data.volumeConfig = {
-        type = "bind";
-        device = "/opt/gluetun/data";
-      };
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.gluetun}";
+        name = "gluetun";
+        networks = ["vpn-service-net"];
 
-      containers.gluetun = {
-        autoStart = true;
-        serviceConfig = {
-          Restart = "always";
-          RestartSec = "10";
+        addCapabilities = [
+          "NET_ADMIN"
+        ];
 
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-gluetun" ''
-              ${createGluetunEnv}
-            ''}"
-          ];
+        environments = {
+          TZ = "Europe/Berlin";
         };
 
-        containerConfig = {
-          image = "docker-archive:${pkgs.dockerTools.pullImage images.gluetun}";
-          name = "gluetun";
-          networks = [ "vpn-service-net" ];
+        environmentFiles = [
+          "env/containers/gluetun/env"
+        ];
 
-          addCapabilities = [
-            "NET_ADMIN"
-          ];
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
 
-          environments = {
-            TZ = "Europe/Berlin";
-          };
+          # secrets
+          "${config.age.secrets.proton-key.path}:/run/secrets/WIREGUARD_KEY:ro"
 
-          environmentFiles = [
-            "env/containers/gluetun/env"
-          ];
+          # volumes
+          "${volumes.gluetun-data.ref}:/gluetun:U"
+        ];
 
-          volumes = [
-            "/etc/timezone:/etc/timezone:ro"
-            "/etc/localtime:/etc/localtime:ro"
+        devices = [
+          "/dev/net/tun"
+        ];
 
-            # secrets
-            "${config.age.secrets.proton-key.path}:/run/secrets/WIREGUARD_KEY:ro"
+        publishPorts = [
+          "${toString ports.gluetun}:8888/tcp"
 
-            # volumes
-            "${volumes.gluetun-data.ref}:/gluetun:U"
-          ];
-
-          devices = [
-            "/dev/net/tun"
-          ];
-
-          publishPorts = [
-            "${toString ports.gluetun}:8888/tcp"
-
-            # qbittorrent
-            "${toString ports.qBittorrent}:8080/tcp"
-            "${toString ports.qBittorrentTorrenting}:6881/tcp"
-          ];
-        };
-      };
-
-      containers.gluetun-webui = {
-        autoStart = true;
-        serviceConfig = {
-          Restart = "always";
-          RestartSec = "10";
-
-          ExecStartPre = [
-            "+${pkgs.writeShellScript "pre-gluetun-webui" ''
-              ${createGluetunWebUIEnv}
-            ''}"
-          ];
-        };
-
-        containerConfig = {
-          image = "docker-archive:${pkgs.dockerTools.pullImage images.gluetun-webui}";
-          name = "gluetun-webui";
-          networks = [ "vpn-service-net" ];
-
-          addCapabilities = [ "NET_RAW" ];
-
-          environments = {
-            TZ = "Europe/Berlin";
-          };
-
-          environmentFiles = [
-            "env/containers/gluetun-webui/env"
-          ];
-
-          volumes = [
-            "/etc/timezone:/etc/timezone:ro"
-            "/etc/localtime:/etc/localtime:ro"
-
-            # certificates
-            "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-            "/certs/ca.crt:/certs/ca.crt:ro"
-          ];
-
-          publishPorts = [
-            "${toString ports.gluetunWebUI}:3000/tcp"
-          ];
-        };
+          # qbittorrent
+          "${toString ports.qBittorrent}:8080/tcp"
+          "${toString ports.qBittorrentTorrenting}:6881/tcp"
+        ];
       };
     };
+
+    containers.gluetun-webui = {
+      autoStart = true;
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
+
+        ExecStartPre = [
+          "+${pkgs.writeShellScript "pre-gluetun-webui" ''
+            ${createGluetunWebUIEnv}
+          ''}"
+        ];
+      };
+
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.gluetun-webui}";
+        name = "gluetun-webui";
+        networks = ["vpn-service-net"];
+
+        addCapabilities = ["NET_RAW"];
+
+        environments = {
+          TZ = "Europe/Berlin";
+        };
+
+        environmentFiles = [
+          "env/containers/gluetun-webui/env"
+        ];
+
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
+
+          # certificates
+          "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
+          "/certs/ca.crt:/certs/ca.crt:ro"
+        ];
+
+        publishPorts = [
+          "${toString ports.gluetunWebUI}:3000/tcp"
+        ];
+      };
+    };
+  };
 }
