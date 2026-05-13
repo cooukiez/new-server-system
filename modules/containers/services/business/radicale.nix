@@ -45,7 +45,7 @@ in
       };
     in
     {
-      radicale-crt-key = mkSecret "certs/home.lan.key";
+      radicale-crt-key = mkSecret "certs/home-lan-key";
     };
 
   virtualisation.quadlet =

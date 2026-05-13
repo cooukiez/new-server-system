@@ -141,6 +141,11 @@ in
   "db/s_postgres-pw.age".publicKeys = allKeys;
 
   #
+  # ssh keys
+  #
+  "ssh/admin.age".publicKeys = allKeys;
+
+  #
   # unsorted
   #
   "global-agenix.age".publicKeys = allKeys;

@@ -117,39 +117,36 @@
     ]) userList
   );
 
-  /*
-    age.secrets = lib.mapAttrs' (
+  age.secrets =
+    let
+      mkSecret =
+        name: path:
+        {
+          file = ../../secrets/${name}.age;
+          owner = "squ";
+          group = "squ";
+        }
+        // (if path != null then { inherit path; } else { });
+
+      mkCert = name: mkSecret "certs/${name}" "/etc/certs/${name}";
+    in
+    {
+      squ-config-key = mkSecret "global-agenix" null;
+
+      ca-key = mkCert "ca-key";
+      ca-srl = mkCert "ca-srl";
+      home-lan-csr = mkCert "home-lan-csr";
+      home-lan-key = mkCert "home-lan-key";
+    }
+    // lib.mapAttrs' (
       username: _:
       lib.nameValuePair "ssh-${username}" {
         file = ../../secrets/ssh/${username}.age;
         path = "/home/${username}/.ssh/id_ed25519";
         owner = username;
         group = "users";
-        mode = "600";
       }
     ) userList;
-  */
-
-  age.secrets =
-    let
-      mkSecret = name: {
-        file = ../../../secrets/${name}.age;
-        owner = "squ";
-        group = "squ";
-      };
-
-      mkSecretFull = name: path: {
-        file = ../../../secrets/${name}.age;
-        path = path;
-        owner = "squ";
-        group = "squ";
-      };
-    in
-    {
-      squ-config-key = mkSecret "globe-agenix";
-
-      ca-key = mkSecret "globe-agenix";
-    };
 
   home-manager = {
     useGlobalPkgs = false;
