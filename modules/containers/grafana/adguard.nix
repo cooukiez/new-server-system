@@ -12,9 +12,9 @@ let
   dashboardName = "Adguard";
   dashboardUid = "grgqhwe";
 
-  appName = "Adguardhome";
-  containerName = "adguardhome";
-  networkRelevantContainer = "adguardhome";
+  appName = "Adguard";
+  containerName = "adguard";
+  networkRelevantContainer = "adguard";
 in
 mkDashboard {
   name = dashboardName;
