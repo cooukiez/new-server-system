@@ -145,6 +145,12 @@
 
   services.haveged.enable = true;
 
+  zshSettings = {
+    userColor = "green";
+    systemColor = "yellow";
+    containerImageAliases = true;
+  };
+
   # disable documentation temporary
   documentation.nixos.enable = false;
 }

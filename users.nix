@@ -9,8 +9,14 @@
   admin = {
     email = "";
     fullName = "Admin";
+
     githubName = "";
     githubEmail = "";
+
     name = "admin";
+
+    sshPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGqloF2EAQJl6bwdOBhMXvkund47pwRzIQC8KMaiBEbK";
+
+    packages = pkgs: with pkgs; [ ];
   };
 }

@@ -15,6 +15,10 @@
   userList,
   ...
 }:
+let
+  squUid = toString hostConfig.squ.uid;
+  squGid = toString hostConfig.squ.gid;
+in
 {
   imports = [
     ./config.nix
@@ -108,8 +112,14 @@
   users.groups.squ.gid = hostConfig.squ.gid;
 
   systemd.tmpfiles.rules = [
-    "Z /etc/certs 0400 ${toString hostConfig.squ.uid} ${toString hostConfig.squ.gid} -"
-    "Z /certs 0400 ${toString hostConfig.squ.uid} ${toString hostConfig.squ.gid} -"
+    "d /etc/certs 0755 ${squUid} ${squGid} -"
+    "d /certs 0755 ${squUid} ${squGid} -"
+
+    "f+ /etc/certs/ca.crt 0444 ${squUid} ${squGid} - ${builtins.readFile ../../certs/ca.crt}"
+    "f+ /etc/certs/home.lan.crt 0444 ${squUid} ${squGid} - ${builtins.readFile ../../certs/home.lan.crt}"
+
+    "f+ /certs/ca.crt 0444 ${squUid} ${squGid} - ${builtins.readFile ../../certs/ca.crt}"
+    "f+ /certs/home.lan.crt 0444 ${squUid} ${squGid} - ${builtins.readFile ../../certs/home.lan.crt}"
   ]
   ++ lib.flatten (
     lib.mapAttrsToList (username: _: [
@@ -119,7 +129,7 @@
 
   age.secrets =
     let
-      mkSecret =
+      mkSquSecret =
         name: path:
         {
           file = ../../secrets/${name}.age;
@@ -128,15 +138,15 @@
         }
         // (if path != null then { inherit path; } else { });
 
-      mkCert = name: mkSecret "certs/${name}" "/etc/certs/${name}";
+      mkCert = name: certName: mkSquSecret "certs/${name}" "/etc/certs/${certName}";
     in
     {
-      squ-config-key = mkSecret "global-agenix" null;
+      squ-config-key = mkSquSecret "global-agenix" null;
 
-      ca-key = mkCert "ca-key";
-      ca-srl = mkCert "ca-srl";
-      home-lan-csr = mkCert "home-lan-csr";
-      home-lan-key = mkCert "home-lan-key";
+      ca-key = mkCert "ca-key" "ca.key";
+      ca-srl = mkCert "ca-srl" "ca.srl";
+      home-lan-csr = mkCert "home-lan-csr" "home.lan.csr";
+      home-lan-key = mkCert "home-lan-key" "home.lan.key";
     }
     // lib.mapAttrs' (
       username: _:
@@ -148,60 +158,123 @@
       }
     ) userList;
 
-  home-manager = {
-    useGlobalPkgs = false;
-    useUserPackages = true;
-    backupFileExtension = "hm-bak";
+  home-manager =
+    let
+      mkPrompt =
+        userColor: systemColor:
+        let
+          promptFirstColor = "%F{${userColor}}";
+          promptSecondColor = "%F{${systemColor}}";
+        in
+        "${promptFirstColor}%n@${promptSecondColor}%m%f:%~$";
+    in
+    {
+      useGlobalPkgs = false;
+      useUserPackages = true;
+      backupFileExtension = "hm-bak";
 
-    extraSpecialArgs = {
-      inherit
-        inputs
-        outputs
-        hostConfig
-        ;
+      extraSpecialArgs = {
+        inherit
+          inputs
+          outputs
+          hostConfig
+          ;
 
-      squConfigKeyPath = config.age.secrets.squ-config-key.path;
-    };
+        squUid = squUid;
+        squGid = squGid;
 
-    users.squ =
-      {
-        inputs,
-        squConfigKeyPath,
-        ...
-      }:
-      {
-        imports = [
-          inputs.quadlet-nix.homeManagerModules.quadlet
-          inputs.agenix.homeManagerModules.default
-        ];
-
-        nixpkgs = {
-          overlays = [
-            inputs.self.overlays.additions
-            inputs.self.overlays.modifications
-            inputs.self.overlays.unstable-packages
-
-            (final: prev: {
-              valkey = prev.valkey.overrideAttrs (oldAttrs: {
-                doCheck = false;
-              });
-            })
-          ];
-
-          config = {
-            allowUnfree = true;
-            permittedInsecurePackages = [
-              "ventoy-1.1.10"
-            ];
-          };
-        };
-
-        programs.zsh.enable = true;
-
-        age.identityPaths = [ squConfigKeyPath ];
-
-        systemd.user.startServices = "sd-switch";
-        home.stateVersion = "25.11";
+        squConfigKeyPath = config.age.secrets.squ-config-key.path;
+        mkZshPrompt = mkPrompt;
       };
-  };
+
+      users =
+        (lib.mapAttrs (
+          username: userConfig:
+          {
+            config,
+            hostConfig,
+            ...
+          }:
+          {
+            imports = [
+              inputs.agenix.homeManagerModules.default
+            ];
+
+            age.identityPaths = [ "${config.home.homeDirectory}/.ssh/id_ed25519" ];
+            _module.args.userConfig = userConfig;
+
+            home = {
+              username = username;
+              packages = userConfig.packages pkgs;
+
+              homeDirectory = "/home/${username}";
+              file.".ssh/id_ed25519.pub" = {
+                text = ''
+                  ${userConfig.sshPublicKey} ${username}@${hostConfig.hostname}
+                '';
+              };
+
+              stateVersion = "25.11";
+            };
+
+            programs.home-manager.enable = true;
+            programs.zsh.enable = true;
+
+            systemd.user.startServices = "sd-switch";
+          }
+        ) userList)
+        // {
+          squ =
+            {
+              inputs,
+              squConfigKeyPath,
+              mkZshPrompt,
+              ...
+            }:
+            {
+              imports = [
+                inputs.quadlet-nix.homeManagerModules.quadlet
+                inputs.agenix.homeManagerModules.default
+              ];
+
+              nixpkgs = {
+                overlays = [
+                  inputs.self.overlays.additions
+                  inputs.self.overlays.modifications
+                  inputs.self.overlays.unstable-packages
+
+                  (final: prev: {
+                    valkey = prev.valkey.overrideAttrs (oldAttrs: {
+                      doCheck = false;
+                    });
+                  })
+                ];
+
+                config = {
+                  allowUnfree = true;
+                  permittedInsecurePackages = [ ];
+                };
+              };
+
+              programs.zsh = {
+                enable = true;
+                shellAliases = {
+                  pg-admin = "podman exec -it postgres psql -U admin -d app_db";
+                  pg-init = "cat ~/containers/postgres/init-all-db.sql | podman exec -i postgres psql -U admin -d postgres";
+
+                  find-wrong-perms = "sudo find /opt/ -maxdepth 4 ! -user ${squUid} -o ! -group ${squGid}";
+                };
+
+                initContent = ''
+                  PROMPT='${mkZshPrompt "red" "yellow"}';
+                '';
+              };
+
+              age.identityPaths = [ squConfigKeyPath ];
+
+              systemd.user.startServices = "sd-switch";
+              home.stateVersion = "25.11";
+            };
+        };
+    };
 }
