@@ -109,6 +109,7 @@
 
   systemd.tmpfiles.rules = [
     "Z /etc/certs 0400 ${toString hostConfig.squ.uid} ${toString hostConfig.squ.gid} -"
+    "Z /certs 0400 ${toString hostConfig.squ.uid} ${toString hostConfig.squ.gid} -"
   ]
   ++ lib.flatten (
     lib.mapAttrsToList (username: _: [
@@ -129,13 +130,26 @@
     ) userList;
   */
 
-  age.secrets = {
-    squ-config-key = {
-      file = ../../secrets/global-agenix.age;
-      owner = "squ";
-      group = "squ";
+  age.secrets =
+    let
+      mkSecret = name: {
+        file = ../../../secrets/${name}.age;
+        owner = "squ";
+        group = "squ";
+      };
+
+      mkSecretFull = name: path: {
+        file = ../../../secrets/${name}.age;
+        path = path;
+        owner = "squ";
+        group = "squ";
+      };
+    in
+    {
+      squ-config-key = mkSecret "globe-agenix";
+
+      ca-key = mkSecret "globe-agenix";
     };
-  };
 
   home-manager = {
     useGlobalPkgs = false;

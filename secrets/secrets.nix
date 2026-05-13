@@ -55,10 +55,10 @@ in
   #
   # certs
   #
-  "certs/ca.key.age".publicKeys = allKeys;
-  "certs/ca.srl.age".publicKeys = allKeys;
-  "certs/home.lan.csr.age".publicKeys = allKeys;
-  "certs/home.lan.key.age".publicKeys = allKeys;
+  "certs/ca-key.age".publicKeys = allKeys;
+  "certs/ca-srl.age".publicKeys = allKeys;
+  "certs/home-lan-csr.age".publicKeys = allKeys;
+  "certs/home-lan-key.age".publicKeys = allKeys;
 
   #
   # containers
