@@ -1,8 +1,8 @@
 /*
-modules/containers/dns.nix
+  modules/containers/dns.nix
 
-part of server system
-created 2026-04-19
+  part of server system
+  created 2026-04-19
 */
 {
   config,
@@ -11,30 +11,33 @@ created 2026-04-19
   images,
   ports,
   ...
-}: let
+}:
+let
   adguardSettings = {
     http = {
       address = "0.0.0.0:3000";
     };
 
-    dns = let
-      ips = hostConfig.dnsServers;
-    in {
-      bind_hosts = ["0.0.0.0"];
-      port = 53;
+    dns =
+      let
+        ips = hostConfig.dnsServers;
+      in
+      {
+        bind_hosts = [ "0.0.0.0" ];
+        port = 53;
 
-      upstream_mode = "fastest_addr";
-      upstream_timeout = "2s";
-      upstream_dns = [
-        "https://cloudflare-dns.com/dns-query"
-        "https://mozilla.cloudflare-dns.com/dns-query"
-        "https://dns.google/dns-query"
-        "https://dns.quad9.net/dns-query"
-        "https://unfiltered.joindns4.eu/dns-query"
-      ];
+        upstream_mode = "fastest_addr";
+        upstream_timeout = "2s";
+        upstream_dns = [
+          "https://cloudflare-dns.com/dns-query"
+          "https://mozilla.cloudflare-dns.com/dns-query"
+          "https://dns.google/dns-query"
+          "https://dns.quad9.net/dns-query"
+          "https://unfiltered.joindns4.eu/dns-query"
+        ];
 
-      bootstrap_dns = ips;
-    };
+        bootstrap_dns = ips;
+      };
 
     dhcp = {
       enabled = false;
@@ -85,7 +88,8 @@ created 2026-04-19
 
     schema_version = 33;
   };
-in {
+in
+{
   myServices.adguard = {
     serviceConfig = {
       description = "Private DNS Server";
@@ -102,60 +106,62 @@ in {
   };
 
   home.file."containers/adguard/AdGuardHome.yaml".source =
-    (pkgs.formats.yaml {}).generate "adguard-settings"
-    adguardSettings;
+    (pkgs.formats.yaml { }).generate "adguard-settings"
+      adguardSettings;
 
-  virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes networks pods;
-  in {
-    volumes.adguard-conf.volumeConfig = {
-      type = "bind";
-      device = "/opt/adguard/conf";
-    };
-
-    volumes.adguard-work.volumeConfig = {
-      type = "bind";
-      device = "/opt/adguard/work";
-    };
-
-    containers.adguard = {
-      autoStart = true;
-      serviceConfig = {
-        Restart = "always";
-        RestartSec = "10";
-
-        ExecStartPre = [
-          "+${pkgs.writeShellScript "pre-adguard" ''
-            ${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/adguard/AdGuardHome.yaml /opt/adguard/conf/AdGuardHome.yaml
-            ${pkgs.coreutils}/bin/chmod 644 /opt/adguard/conf/AdGuardHome.yaml
-          ''}"
-        ];
+  virtualisation.quadlet =
+    let
+      inherit (config.virtualisation.quadlet) volumes networks pods;
+    in
+    {
+      volumes.adguard-conf.volumeConfig = {
+        type = "bind";
+        device = "/opt/adguard/conf";
       };
 
-      containerConfig = {
-        image = "docker-archive:${pkgs.dockerTools.pullImage images.adguard}";
-        name = "adguard";
-        addCapabilities = ["NET_BIND_SERVICE"];
+      volumes.adguard-work.volumeConfig = {
+        type = "bind";
+        device = "/opt/adguard/work";
+      };
 
-        environments = {
-          TZ = "Europe/Berlin";
+      containers.adguard = {
+        autoStart = true;
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-adguard" ''
+              ${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/adguard/AdGuardHome.yaml /opt/adguard/conf/AdGuardHome.yaml
+              ${pkgs.coreutils}/bin/chmod 644 /opt/adguard/conf/AdGuardHome.yaml
+            ''}"
+          ];
         };
 
-        volumes = [
-          "/etc/timezone:/etc/timezone:ro"
-          "/etc/localtime:/etc/localtime:ro"
+        containerConfig = {
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.adguard}";
+          name = "adguard";
+          addCapabilities = [ "NET_BIND_SERVICE" ];
 
-          # volumes
-          "${volumes.adguard-conf.ref}:/opt/adguardhome/conf:U"
-          "${volumes.adguard-work.ref}:/opt/adguardhome/work:U"
-        ];
+          environments = {
+            TZ = "Europe/Berlin";
+          };
 
-        publishPorts = [
-          "${toString ports.dns}:53/tcp"
-          "${toString ports.dns}:53/udp"
-          "${toString ports.adguard}:3000/tcp"
-        ];
+          volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # volumes
+            "${volumes.adguard-conf.ref}:/opt/adguardhome/conf:U"
+            "${volumes.adguard-work.ref}:/opt/adguardhome/work:U"
+          ];
+
+          publishPorts = [
+            "${toString ports.dns}:53/tcp"
+            "${toString ports.dns}:53/udp"
+            "${toString ports.adguard}:3000/tcp"
+          ];
+        };
       };
     };
-  };
 }

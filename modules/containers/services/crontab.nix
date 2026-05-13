@@ -1,8 +1,8 @@
 /*
-modules/containers/services/crontab.nix
+  modules/containers/services/crontab.nix
 
-part of server system
-created 2026-04-21
+  part of server system
+  created 2026-04-21
 */
 {
   config,
@@ -10,7 +10,8 @@ created 2026-04-21
   images,
   ports,
   ...
-}: {
+}:
+{
   myServices.crontab = {
     serviceConfig = {
       name = "Crontab UI";
@@ -27,48 +28,50 @@ created 2026-04-21
     };
   };
 
-  virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes networks pods;
-  in {
-    volumes.crontab-data.volumeConfig = {
-      type = "bind";
-      device = "/opt/crontab/data";
-    };
-
-    containers.crontab = {
-      autoStart = true;
-
-      serviceConfig = {
-        Restart = "always";
-        RestartSec = "10";
+  virtualisation.quadlet =
+    let
+      inherit (config.virtualisation.quadlet) volumes networks pods;
+    in
+    {
+      volumes.crontab-data.volumeConfig = {
+        type = "bind";
+        device = "/opt/crontab/data";
       };
 
-      containerConfig = {
-        image = "docker-archive:${pkgs.dockerTools.pullImage images.crontab}";
-        name = "crontab";
-        user = "0:0";
+      containers.crontab = {
+        autoStart = true;
 
-        environments = {
-          TZ = "Europe/Berlin";
-          PORT = "8000";
-
-          CRON_DB_PATH = "/data";
-          CRON_PATH = "/etc/crontabs";
-
-          ENABLE_AUTOSAVE = "true";
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
         };
 
-        volumes = [
-          "/etc/timezone:/etc/timezone:ro"
-          "/etc/localtime:/etc/localtime:ro"
+        containerConfig = {
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.crontab}";
+          name = "crontab";
+          user = "0:0";
 
-          "${volumes.crontab-data.ref}:/data:U"
-        ];
+          environments = {
+            TZ = "Europe/Berlin";
+            PORT = "8000";
 
-        publishPorts = [
-          "${toString ports.crontab}:8000/tcp"
-        ];
+            CRON_DB_PATH = "/data";
+            CRON_PATH = "/etc/crontabs";
+
+            ENABLE_AUTOSAVE = "true";
+          };
+
+          volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            "${volumes.crontab-data.ref}:/data:U"
+          ];
+
+          publishPorts = [
+            "${toString ports.crontab}:8000/tcp"
+          ];
+        };
       };
     };
-  };
 }

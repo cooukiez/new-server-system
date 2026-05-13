@@ -1,10 +1,11 @@
 /*
-disko-config.nix
+  disko-config.nix
 
-part of server system
-created 2026-04-02
+  part of server system
+  created 2026-04-02
 */
-{lib, ...}: {
+{ lib, ... }:
+{
   disko.devices = {
     disk = {
       dhs-disk = {
@@ -20,7 +21,7 @@ created 2026-04-02
                 type = "filesystem";
                 format = "vfat";
                 mountpoint = "/boot";
-                mountOptions = ["umask=0077"];
+                mountOptions = [ "umask=0077" ];
               };
             };
 

@@ -1,8 +1,8 @@
 /*
-modules/containers/reverse-proxy.nix
+  modules/containers/reverse-proxy.nix
 
-part of server system
-created 2026-04-19
+  part of server system
+  created 2026-04-19
 */
 {
   config,
@@ -13,7 +13,8 @@ created 2026-04-19
   ports,
   publicServices,
   ...
-}: let
+}:
+let
   sortedServiceList = lib.sort (a: b: a.serviceConfig.subdomain < b.serviceConfig.subdomain) (
     lib.filter (s: s.serviceConfig.disableProxy == false) (lib.attrValues publicServices)
   );
@@ -21,20 +22,22 @@ created 2026-04-19
   serviceHandlers = lib.trim (
     lib.concatStringsSep "\n" (
       map (
-        svc: let
+        svc:
+        let
           cfg = svc.serviceConfig;
-        in ''
+        in
+        ''
           @${cfg.serviceName} host ${cfg.subdomain}.home.lan
           handle @${cfg.serviceName} {
             import auth_verify
             reverse_proxy host.containers.internal:${toString cfg.port}
           }
         ''
-      )
-      sortedServiceList
+      ) sortedServiceList
     )
   );
-in {
+in
+{
   home.file."containers/caddy/Caddyfile" = {
     text = ''
         {
@@ -133,62 +136,64 @@ in {
     '';
   };
 
-  virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes networks pods;
-  in {
-    volumes.caddy-certs.volumeConfig = {
-      type = "bind";
-      device = "/etc/certs";
-    };
-
-    volumes.caddy-config.volumeConfig = {
-      type = "bind";
-      device = "/opt/caddy/config";
-    };
-
-    volumes.caddy-data.volumeConfig = {
-      type = "bind";
-      device = "/opt/caddy/data";
-    };
-
-    containers.caddy = {
-      autoStart = true;
-      serviceConfig = {
-        Restart = "always";
-        RestartSec = "10";
+  virtualisation.quadlet =
+    let
+      inherit (config.virtualisation.quadlet) volumes networks pods;
+    in
+    {
+      volumes.caddy-certs.volumeConfig = {
+        type = "bind";
+        device = "/etc/certs";
       };
 
-      containerConfig = {
-        image = "docker-archive:${pkgs.dockerTools.pullImage images.caddy}";
-        name = "caddy";
-        addCapabilities = ["NET_BIND_SERVICE"];
+      volumes.caddy-config.volumeConfig = {
+        type = "bind";
+        device = "/opt/caddy/config";
+      };
 
-        environments = {
-          TZ = "Europe/Berlin";
+      volumes.caddy-data.volumeConfig = {
+        type = "bind";
+        device = "/opt/caddy/data";
+      };
+
+      containers.caddy = {
+        autoStart = true;
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
         };
 
-        volumes = [
-          "/etc/timezone:/etc/timezone:ro"
-          "/etc/localtime:/etc/localtime:ro"
+        containerConfig = {
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.caddy}";
+          name = "caddy";
+          addCapabilities = [ "NET_BIND_SERVICE" ];
 
-          # config
-          "${config.home.homeDirectory}/containers/caddy/Caddyfile:/etc/caddy/Caddyfile:ro,U"
+          environments = {
+            TZ = "Europe/Berlin";
+          };
 
-          # volumes
-          "${volumes.caddy-certs.ref}:/certs:ro"
+          volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
 
-          "${volumes.caddy-config.ref}:/config:U"
-          "${volumes.caddy-data.ref}:/data:U"
-        ];
+            # config
+            "${config.home.homeDirectory}/containers/caddy/Caddyfile:/etc/caddy/Caddyfile:ro,U"
 
-        publishPorts = [
-          "${toString ports.caddyHttp}:80/tcp"
-          "${toString ports.caddyHttps}:443/tcp"
-          "${toString ports.caddyHttps}:443/udp"
+            # volumes
+            "${volumes.caddy-certs.ref}:/certs:ro"
 
-          "${toString ports.caddyAdmin}:2019/tcp"
-        ];
+            "${volumes.caddy-config.ref}:/config:U"
+            "${volumes.caddy-data.ref}:/data:U"
+          ];
+
+          publishPorts = [
+            "${toString ports.caddyHttp}:80/tcp"
+            "${toString ports.caddyHttps}:443/tcp"
+            "${toString ports.caddyHttps}:443/udp"
+
+            "${toString ports.caddyAdmin}:2019/tcp"
+          ];
+        };
       };
     };
-  };
 }

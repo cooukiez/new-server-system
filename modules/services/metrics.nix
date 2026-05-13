@@ -1,22 +1,24 @@
 /*
-modules/services/metrics.nix
+  modules/services/metrics.nix
 
-part of server system
-created 2026-04-17
+  part of server system
+  created 2026-04-17
 */
 {
   config,
   lib,
   hostConfig,
   ...
-}: let
+}:
+let
   cfg = config.networkConfig;
 
   mkEnableDefault = lib.mkOption {
     type = lib.types.bool;
     default = true;
   };
-in {
+in
+{
   options.networkConfig = {
     prometheus = mkEnableDefault;
     promtail = mkEnableDefault;

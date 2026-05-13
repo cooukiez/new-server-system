@@ -1,8 +1,8 @@
 /*
-hosts/dhs/host.nix
+  hosts/dhs/host.nix
 
-part of server system
-created 2026-05-10
+  part of server system
+  created 2026-05-10
 */
 {
   hostname = "dhs";

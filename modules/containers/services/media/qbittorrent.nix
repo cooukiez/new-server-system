@@ -1,8 +1,8 @@
 /*
-modules/containers/services/media/qbittorrent.nix
+  modules/containers/services/media/qbittorrent.nix
 
-part of server system
-created 2026-04-17
+  part of server system
+  created 2026-04-17
 */
 {
   config,
@@ -29,62 +29,64 @@ created 2026-04-17
     };
   };
 
-  virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes networks pods;
-  in {
-    volumes.qbittorrent-download.volumeConfig = {
-      type = "bind";
-      device = "${downloadPath}/qbittorrent";
-    };
-
-    volumes.qbittorrent-config.volumeConfig = {
-      type = "bind";
-      device = "/opt/qbittorrent/data";
-    };
-
-    containers.qbittorrent = {
-      autoStart = true;
-
-      unitConfig = {
-        Requires = ["gluetun.service"];
-        After = ["gluetun.service"];
+  virtualisation.quadlet =
+    let
+      inherit (config.virtualisation.quadlet) volumes networks pods;
+    in
+    {
+      volumes.qbittorrent-download.volumeConfig = {
+        type = "bind";
+        device = "${downloadPath}/qbittorrent";
       };
 
-      serviceConfig = {
-        Restart = "always";
-        RestartSec = "10";
+      volumes.qbittorrent-config.volumeConfig = {
+        type = "bind";
+        device = "/opt/qbittorrent/data";
       };
 
-      containerConfig = {
-        image = "docker-archive:${pkgs.dockerTools.pullImage images.qbittorrent}";
-        name = "qbittorrent";
+      containers.qbittorrent = {
+        autoStart = true;
 
-        # networking through gluetun
-        networks = ["container:gluetun"];
-
-        environments = {
-          TZ = "Europe/Berlin";
-
-          WEBUI_PORT = "8080";
-          TORRENTING_PORT = "6881";
-
-          QBT_WEBUI__SERVERDOMAINS = "*";
-          QBT_WEBUI__ADDRESS = "0.0.0.0";
-          QBT_WebUI__Port = "8080";
+        unitConfig = {
+          Requires = [ "gluetun.service" ];
+          After = [ "gluetun.service" ];
         };
 
-        volumes = [
-          "/etc/timezone:/etc/timezone:ro"
-          "/etc/localtime:/etc/localtime:ro"
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
+        };
 
-          # certificates
-          "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-          "/certs/ca.crt:/certs/ca.crt:ro"
+        containerConfig = {
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.qbittorrent}";
+          name = "qbittorrent";
 
-          "${volumes.qbittorrent-config.ref}:/config:U"
-          "${volumes.qbittorrent-download.ref}:/download:U"
-        ];
+          # networking through gluetun
+          networks = [ "container:gluetun" ];
+
+          environments = {
+            TZ = "Europe/Berlin";
+
+            WEBUI_PORT = "8080";
+            TORRENTING_PORT = "6881";
+
+            QBT_WEBUI__SERVERDOMAINS = "*";
+            QBT_WEBUI__ADDRESS = "0.0.0.0";
+            QBT_WebUI__Port = "8080";
+          };
+
+          volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # certificates
+            "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
+            "/certs/ca.crt:/certs/ca.crt:ro"
+
+            "${volumes.qbittorrent-config.ref}:/config:U"
+            "${volumes.qbittorrent-download.ref}:/download:U"
+          ];
+        };
       };
     };
-  };
 }

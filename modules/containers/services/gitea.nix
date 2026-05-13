@@ -1,8 +1,8 @@
 /*
-modules/containers/services/gitea.nix
+  modules/containers/services/gitea.nix
 
-part of server system
-created 2026-04-14
+  part of server system
+  created 2026-04-14
 */
 {
   config,
@@ -11,7 +11,8 @@ created 2026-04-14
   ports,
   mkEnv,
   ...
-}: let
+}:
+let
   createEnv = mkEnv {
     path = "containers/gitea/env";
     vars = {
@@ -28,7 +29,8 @@ created 2026-04-14
 
     mode = "644";
   };
-in {
+in
+{
   myServices.gitea = {
     serviceConfig = {
       name = "Gitea";
@@ -44,74 +46,78 @@ in {
     };
   };
 
-  age.secrets = let
-    mkSecret = name: {
-      file = ../../../secrets/containers/gitea/${name}.age;
-    };
-  in {
-    gitea-db-pass = mkSecret "s_db-pass";
-  };
-
-  virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes networks pods;
-  in {
-    volumes.gitea-data.volumeConfig = {
-      type = "bind";
-      device = "/opt/gitea/data";
+  age.secrets =
+    let
+      mkSecret = name: {
+        file = ../../../secrets/containers/gitea/${name}.age;
+      };
+    in
+    {
+      gitea-db-pass = mkSecret "s_db-pass";
     };
 
-    containers.gitea = {
-      autoStart = true;
-
-      unitConfig = {
-        Requires = ["postgres.service"];
-        After = ["postgres.service"];
+  virtualisation.quadlet =
+    let
+      inherit (config.virtualisation.quadlet) volumes networks pods;
+    in
+    {
+      volumes.gitea-data.volumeConfig = {
+        type = "bind";
+        device = "/opt/gitea/data";
       };
 
-      serviceConfig = {
-        Restart = "always";
-        RestartSec = "10";
+      containers.gitea = {
+        autoStart = true;
 
-        ExecStartPre = [
-          "+${pkgs.writeShellScript "pre-gitea" ''
-            ${createEnv}
-          ''}"
-        ];
-      };
-
-      containerConfig = {
-        image = "docker-archive:${pkgs.dockerTools.pullImage images.gitea}";
-        name = "gitea";
-
-        addHosts = [
-          "auth.home.lan:host-gateway"
-        ];
-
-        environments = {
-          TZ = "Europe/Berlin";
+        unitConfig = {
+          Requires = [ "postgres.service" ];
+          After = [ "postgres.service" ];
         };
 
-        environmentFiles = [
-          "env/containers/gitea/env"
-        ];
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
 
-        volumes = [
-          "/etc/timezone:/etc/timezone:ro"
-          "/etc/localtime:/etc/localtime:ro"
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-gitea" ''
+              ${createEnv}
+            ''}"
+          ];
+        };
 
-          # certificates
-          "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-          "/certs/ca.crt:/certs/ca.crt:ro"
+        containerConfig = {
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.gitea}";
+          name = "gitea";
 
-          # volumes
-          "${volumes.gitea-data.ref}:/data:U"
-        ];
+          addHosts = [
+            "auth.home.lan:host-gateway"
+          ];
 
-        publishPorts = [
-          "${toString ports.giteaHttp}:3000/tcp"
-          "${toString ports.gitea}:22/tcp"
-        ];
+          environments = {
+            TZ = "Europe/Berlin";
+          };
+
+          environmentFiles = [
+            "env/containers/gitea/env"
+          ];
+
+          volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # certificates
+            "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
+            "/certs/ca.crt:/certs/ca.crt:ro"
+
+            # volumes
+            "${volumes.gitea-data.ref}:/data:U"
+          ];
+
+          publishPorts = [
+            "${toString ports.giteaHttp}:3000/tcp"
+            "${toString ports.gitea}:22/tcp"
+          ];
+        };
       };
     };
-  };
 }

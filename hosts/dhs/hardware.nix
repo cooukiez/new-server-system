@@ -1,8 +1,8 @@
 /*
-hosts/dhs/hardware.nix
+  hosts/dhs/hardware.nix
 
-part of server system
-created 2026-05-10
+  part of server system
+  created 2026-05-10
 */
 {
   inputs,
@@ -11,9 +11,11 @@ created 2026-05-10
   lib,
   hostConfig,
   ...
-}: let
+}:
+let
   unstablePkgs = inputs.nixpkgs-unstable.legacyPackages.${hostConfig.system};
-in {
+in
+{
   disabledModules = [
     "hardware/facter"
   ];

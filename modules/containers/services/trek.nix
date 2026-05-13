@@ -1,8 +1,8 @@
 /*
-modules/containers/services/trek.nix
+  modules/containers/services/trek.nix
 
-part of server system
-created 2026-04-20
+  part of server system
+  created 2026-04-20
 */
 {
   config,
@@ -11,7 +11,8 @@ created 2026-04-20
   ports,
   mkEnv,
   ...
-}: let
+}:
+let
   createEnv = mkEnv {
     path = "containers/trek/env";
     vars = {
@@ -43,7 +44,8 @@ created 2026-04-20
       PLACEHOLDER_CLIENT_KEY = config.age.secrets.trek-client-key.path;
     };
   };
-in {
+in
+{
   myServices.trek = {
     serviceConfig = {
       name = "TREK";
@@ -58,73 +60,77 @@ in {
     };
   };
 
-  age.secrets = let
-    mkSecret = name: {
-      file = ../../../secrets/containers/trek/${name}.age;
-    };
-  in {
-    trek-client-key = mkSecret "s_auth-client";
-  };
-
-  virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes networks pods;
-  in {
-    volumes.trek-data.volumeConfig = {
-      type = "bind";
-      device = "/opt/trek/data";
+  age.secrets =
+    let
+      mkSecret = name: {
+        file = ../../../secrets/containers/trek/${name}.age;
+      };
+    in
+    {
+      trek-client-key = mkSecret "s_auth-client";
     };
 
-    volumes.trek-uploads.volumeConfig = {
-      type = "bind";
-      device = "/opt/trek/uploads";
-    };
-
-    containers.trek = {
-      autoStart = true;
-
-      serviceConfig = {
-        Restart = "always";
-        RestartSec = "10";
-
-        ExecStartPre = [
-          "+${pkgs.writeShellScript "pre-trek" ''
-            ${createEnv}
-          ''}"
-        ];
+  virtualisation.quadlet =
+    let
+      inherit (config.virtualisation.quadlet) volumes networks pods;
+    in
+    {
+      volumes.trek-data.volumeConfig = {
+        type = "bind";
+        device = "/opt/trek/data";
       };
 
-      containerConfig = {
-        image = "docker-archive:${pkgs.dockerTools.pullImage images.trek}";
-        name = "trek";
+      volumes.trek-uploads.volumeConfig = {
+        type = "bind";
+        device = "/opt/trek/uploads";
+      };
 
-        addHosts = [
-          "auth.home.lan:host-gateway"
-        ];
+      containers.trek = {
+        autoStart = true;
 
-        environments = {
-          TZ = "Europe/Berlin";
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-trek" ''
+              ${createEnv}
+            ''}"
+          ];
         };
 
-        environmentFiles = [
-          "env/containers/trek/env"
-        ];
+        containerConfig = {
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.trek}";
+          name = "trek";
 
-        volumes = [
-          "/etc/timezone:/etc/timezone:ro"
-          "/etc/localtime:/etc/localtime:ro"
+          addHosts = [
+            "auth.home.lan:host-gateway"
+          ];
 
-          # certificates
-          "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-          "/certs/ca.crt:/certs/ca.crt:ro"
+          environments = {
+            TZ = "Europe/Berlin";
+          };
 
-          "${volumes.trek-data.ref}:/app/data:U"
-          "${volumes.trek-uploads.ref}:/app/uploads:U"
-        ];
+          environmentFiles = [
+            "env/containers/trek/env"
+          ];
 
-        publishPorts = [
-          "${toString ports.trek}:3000/tcp"
-        ];
+          volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # certificates
+            "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
+            "/certs/ca.crt:/certs/ca.crt:ro"
+
+            "${volumes.trek-data.ref}:/app/data:U"
+            "${volumes.trek-uploads.ref}:/app/uploads:U"
+          ];
+
+          publishPorts = [
+            "${toString ports.trek}:3000/tcp"
+          ];
+        };
       };
     };
-  };
 }

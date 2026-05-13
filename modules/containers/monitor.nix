@@ -1,8 +1,8 @@
 /*
-modules/containers/monitor.nix
+  modules/containers/monitor.nix
 
-part of server system
-created 2026-04-19
+  part of server system
+  created 2026-04-19
 */
 {
   config,
@@ -10,7 +10,8 @@ created 2026-04-19
   images,
   ports,
   ...
-}: let
+}:
+let
   prometheusDatasource = "PBFA97CFB590B2093";
   lokiDatasource = "P8E80F9AEF21F6940";
 
@@ -142,16 +143,16 @@ created 2026-04-19
     scrape_configs = [
       {
         job_name = "prometheus";
-        static_configs = [{targets = ["127.0.0.1:9090"];}];
+        static_configs = [ { targets = [ "127.0.0.1:9090" ]; } ];
       }
       {
         job_name = "podman";
-        static_configs = [{targets = ["podman-exporter:9882"];}];
+        static_configs = [ { targets = [ "podman-exporter:9882" ]; } ];
       }
       {
         job_name = "node";
         static_configs = [
-          {targets = ["host.containers.internal:${toString ports.nodeExporter}"];}
+          { targets = [ "host.containers.internal:${toString ports.nodeExporter}" ]; }
         ];
       }
     ];
@@ -192,7 +193,8 @@ created 2026-04-19
       }
     ];
   };
-in {
+in
+{
   imports = [
     ./grafana
   ];
@@ -252,97 +254,100 @@ in {
 
   # grafana
   home.file."containers/grafana/grafana.ini".source =
-    (pkgs.formats.ini {}).generate "grafana-settings"
-    grafanaSettings;
+    (pkgs.formats.ini { }).generate "grafana-settings"
+      grafanaSettings;
 
   home.file."containers/grafana/provisioning/datasources/datasources.yaml".source =
-    (pkgs.formats.yaml {}).generate "grafana-datasource-settings"
-    grafanaDatasourceSettings;
+    (pkgs.formats.yaml { }).generate "grafana-datasource-settings"
+      grafanaDatasourceSettings;
 
   # prometheus
   home.file."containers/prometheus/prometheus.yml".source =
-    (pkgs.formats.yaml {}).generate "prometheus-settings"
-    prometheusSettings;
+    (pkgs.formats.yaml { }).generate "prometheus-settings"
+      prometheusSettings;
 
   # loki
   home.file."containers/loki/loki.yaml".source =
-    (pkgs.formats.yaml {}).generate "loki-settings"
-    lokiSettings;
+    (pkgs.formats.yaml { }).generate "loki-settings"
+      lokiSettings;
 
-  age.secrets = let
-    mkSecret = name: {
-      file = ../../secrets/containers/grafana/${name}.age;
-    };
-  in {
-    grafana-client-key = mkSecret "s_auth-client";
-  };
-
-  virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes networks pods;
-  in {
-    networks.monitoring = {
-      networkConfig = {
-        internal = false;
+  age.secrets =
+    let
+      mkSecret = name: {
+        file = ../../secrets/containers/grafana/${name}.age;
       };
+    in
+    {
+      grafana-client-key = mkSecret "s_auth-client";
     };
 
-    volumes =
-      builtins.mapAttrs
-      (name: device: {
-        volumeConfig = {
-          type = "bind";
-          inherit device;
+  virtualisation.quadlet =
+    let
+      inherit (config.virtualisation.quadlet) volumes networks pods;
+    in
+    {
+      networks.monitoring = {
+        networkConfig = {
+          internal = false;
         };
-      })
-      {
-        grafana-provisioning = "/opt/grafana/provisioning";
-        grafana-data = "/opt/grafana/data";
-        grafana-plugins = "/opt/grafana/plugins";
-        grafana-log = "/opt/grafana/log";
-
-        prometheus-data = "/opt/prometheus/data";
-        loki-data = "/opt/loki/data";
       };
 
-    containers.grafana = {
-      autoStart = true;
-      serviceConfig = {
-        Restart = "always";
-        RestartSec = "10";
+      volumes =
+        builtins.mapAttrs
+          (name: device: {
+            volumeConfig = {
+              type = "bind";
+              inherit device;
+            };
+          })
+          {
+            grafana-provisioning = "/opt/grafana/provisioning";
+            grafana-data = "/opt/grafana/data";
+            grafana-plugins = "/opt/grafana/plugins";
+            grafana-log = "/opt/grafana/log";
 
-        ExecStartPre = [
-          "+${pkgs.writeShellScript "pre-grafana" ''
-            ${pkgs.coreutils}/bin/cp -rfL ${config.home.homeDirectory}/containers/grafana/provisioning/. /opt/grafana/provisioning/
-          ''}"
-        ];
-      };
+            prometheus-data = "/opt/prometheus/data";
+            loki-data = "/opt/loki/data";
+          };
 
-      containerConfig = {
-        image = "docker-archive:${pkgs.dockerTools.pullImage images.grafana}";
-        name = "grafana";
-        networks = ["monitoring.network"];
+      containers.grafana = {
+        autoStart = true;
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
 
-        userns = "keep-id:uid=472,gid=472";
-
-        addHosts = [
-          "auth.home.lan:host-gateway"
-        ];
-
-        environments = {
-          TZ = "Europe/Berlin";
-
-          GF_PLUGINS_PREINSTALL = "grafana-clock-panel,grafana-simple-json-datasource";
-
-          GF_PATHS_CONFIG = grafanaPaths.config;
-          GF_PATHS_PROVISIONING = grafanaPaths.provisioning;
-
-          GF_PATHS_DATA = grafanaPaths.data;
-          GF_PATHS_PLUGINS = grafanaPaths.plugins;
-          GF_PATHS_LOGS = grafanaPaths.log;
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-grafana" ''
+              ${pkgs.coreutils}/bin/cp -rfL ${config.home.homeDirectory}/containers/grafana/provisioning/. /opt/grafana/provisioning/
+            ''}"
+          ];
         };
 
-        volumes =
-          [
+        containerConfig = {
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.grafana}";
+          name = "grafana";
+          networks = [ "monitoring.network" ];
+
+          userns = "keep-id:uid=472,gid=472";
+
+          addHosts = [
+            "auth.home.lan:host-gateway"
+          ];
+
+          environments = {
+            TZ = "Europe/Berlin";
+
+            GF_PLUGINS_PREINSTALL = "grafana-clock-panel,grafana-simple-json-datasource";
+
+            GF_PATHS_CONFIG = grafanaPaths.config;
+            GF_PATHS_PROVISIONING = grafanaPaths.provisioning;
+
+            GF_PATHS_DATA = grafanaPaths.data;
+            GF_PATHS_PLUGINS = grafanaPaths.plugins;
+            GF_PATHS_LOGS = grafanaPaths.log;
+          };
+
+          volumes = [
             "/etc/timezone:/etc/timezone:ro"
             "/etc/localtime:/etc/localtime:ro"
 
@@ -364,126 +369,126 @@ in {
             "log"
           ]);
 
-        publishPorts = [
-          "${toString ports.grafana}:3000/tcp"
-        ];
-      };
-    };
-
-    containers.prometheus = {
-      autoStart = true;
-      serviceConfig = {
-        Restart = "always";
-        RestartSec = "10";
+          publishPorts = [
+            "${toString ports.grafana}:3000/tcp"
+          ];
+        };
       };
 
-      containerConfig = {
-        image = "docker-archive:${pkgs.dockerTools.pullImage images.prometheus}";
-        name = "prometheus";
-        networks = ["monitoring.network"];
-
-        userns = "keep-id:uid=65534,gid=65534";
-
-        environments = {
-          TZ = "Europe/Berlin";
+      containers.prometheus = {
+        autoStart = true;
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
         };
 
-        volumes = [
-          "/etc/timezone:/etc/timezone:ro"
-          "/etc/localtime:/etc/localtime:ro"
+        containerConfig = {
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.prometheus}";
+          name = "prometheus";
+          networks = [ "monitoring.network" ];
 
-          # certificates
-          "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-          "/certs/ca.crt:/certs/ca.crt:ro"
+          userns = "keep-id:uid=65534,gid=65534";
 
-          # config
-          "${config.home.homeDirectory}/containers/prometheus/prometheus.yml:${prometheusPaths.config}:ro,U"
+          environments = {
+            TZ = "Europe/Berlin";
+          };
 
-          # volumes
-          "${volumes.prometheus-data.ref}:${prometheusPaths.data}:U"
-        ];
+          volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
 
-        publishPorts = [
-          "${toString ports.prometheus}:9090/tcp"
-        ];
+            # certificates
+            "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
+            "/certs/ca.crt:/certs/ca.crt:ro"
 
-        exec = [
-          "--config.file=${prometheusPaths.config}"
-          "--storage.tsdb.path=${prometheusPaths.data}"
+            # config
+            "${config.home.homeDirectory}/containers/prometheus/prometheus.yml:${prometheusPaths.config}:ro,U"
 
-          "--web.console.libraries=/usr/share/prometheus/console_libraries"
-          "--web.console.templates=/usr/share/prometheus/consoles"
-        ];
+            # volumes
+            "${volumes.prometheus-data.ref}:${prometheusPaths.data}:U"
+          ];
+
+          publishPorts = [
+            "${toString ports.prometheus}:9090/tcp"
+          ];
+
+          exec = [
+            "--config.file=${prometheusPaths.config}"
+            "--storage.tsdb.path=${prometheusPaths.data}"
+
+            "--web.console.libraries=/usr/share/prometheus/console_libraries"
+            "--web.console.templates=/usr/share/prometheus/consoles"
+          ];
+        };
       };
-    };
 
-    containers.podman-exporter = {
-      autoStart = true;
-      serviceConfig = {
-        Restart = "always";
-        RestartSec = "10";
-      };
-
-      containerConfig = {
-        image = "docker-archive:${pkgs.dockerTools.pullImage images.prometheus-podman-exporter}";
-        name = "podman-exporter";
-        networks = ["monitoring.network"];
-
-        environments = {
-          TZ = "Europe/Berlin";
+      containers.podman-exporter = {
+        autoStart = true;
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
         };
 
-        volumes = [
-          "/etc/timezone:/etc/timezone:ro"
-          "/etc/localtime:/etc/localtime:ro"
+        containerConfig = {
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.prometheus-podman-exporter}";
+          name = "podman-exporter";
+          networks = [ "monitoring.network" ];
 
-          # podman socket
-          "/run/user/10000/podman/podman.sock:/run/podman/podman.sock:ro,U"
-        ];
+          environments = {
+            TZ = "Europe/Berlin";
+          };
 
-        environments = {
-          CONTAINER_HOST = "unix:///run/podman/podman.sock";
+          volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # podman socket
+            "/run/user/10000/podman/podman.sock:/run/podman/podman.sock:ro,U"
+          ];
+
+          environments = {
+            CONTAINER_HOST = "unix:///run/podman/podman.sock";
+          };
+
+          exec = [
+            "--collector.enable-all"
+          ];
+        };
+      };
+
+      containers.loki = {
+        autoStart = true;
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
         };
 
-        exec = [
-          "--collector.enable-all"
-        ];
-      };
-    };
+        containerConfig = {
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.loki}";
+          name = "loki";
+          networks = [ "monitoring.network" ];
 
-    containers.loki = {
-      autoStart = true;
-      serviceConfig = {
-        Restart = "always";
-        RestartSec = "10";
-      };
+          environments = {
+            TZ = "Europe/Berlin";
+          };
 
-      containerConfig = {
-        image = "docker-archive:${pkgs.dockerTools.pullImage images.loki}";
-        name = "loki";
-        networks = ["monitoring.network"];
+          volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
 
-        environments = {
-          TZ = "Europe/Berlin";
+            # config
+            "${config.home.homeDirectory}/containers/loki/loki.yaml:${lokiPaths.config}:ro,U"
+
+            # volumes
+            "${volumes.loki-data.ref}:/loki:U"
+          ];
+
+          exec = [
+            "-config.file=${lokiPaths.config}"
+          ];
+
+          publishPorts = [ "${toString ports.loki}:3100/tcp" ];
         };
-
-        volumes = [
-          "/etc/timezone:/etc/timezone:ro"
-          "/etc/localtime:/etc/localtime:ro"
-
-          # config
-          "${config.home.homeDirectory}/containers/loki/loki.yaml:${lokiPaths.config}:ro,U"
-
-          # volumes
-          "${volumes.loki-data.ref}:/loki:U"
-        ];
-
-        exec = [
-          "-config.file=${lokiPaths.config}"
-        ];
-
-        publishPorts = ["${toString ports.loki}:3100/tcp"];
       };
     };
-  };
 }

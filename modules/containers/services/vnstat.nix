@@ -1,8 +1,8 @@
 /*
-modules/containers/services/vnstat.nix
+  modules/containers/services/vnstat.nix
 
-part of server system
-created 2026-04-16
+  part of server system
+  created 2026-04-16
 */
 {
   config,
@@ -10,7 +10,8 @@ created 2026-04-16
   images,
   ports,
   ...
-}: {
+}:
+{
   myServices.vnstat = {
     serviceConfig = {
       name = "VNStat Dashboard";
@@ -27,48 +28,50 @@ created 2026-04-16
     };
   };
 
-  virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes networks pods;
-  in {
-    # vnstat database
-    volumes.vnstat-db.volumeConfig = {
-      type = "bind";
-      device = "/var/lib/vnstat";
-    };
-
-    containers.vnstat-dashboard = {
-      autoStart = true;
-      serviceConfig = {
-        Restart = "always";
-        RestartSec = "10";
+  virtualisation.quadlet =
+    let
+      inherit (config.virtualisation.quadlet) volumes networks pods;
+    in
+    {
+      # vnstat database
+      volumes.vnstat-db.volumeConfig = {
+        type = "bind";
+        device = "/var/lib/vnstat";
       };
 
-      containerConfig = {
-        image = "docker-archive:${pkgs.dockerTools.pullImage images.vnstat-dashboard}";
-        name = "vnstat-dashboard";
-
-        environments = {
-          TZ = "Europe/Berlin";
-
-          PORT = "80";
-          ALLOWED_PREFIXES = "enp";
+      containers.vnstat-dashboard = {
+        autoStart = true;
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
         };
 
-        volumes = [
-          "/etc/timezone:/etc/timezone:ro"
-          "/etc/localtime:/etc/localtime:ro"
+        containerConfig = {
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.vnstat-dashboard}";
+          name = "vnstat-dashboard";
 
-          # certificates
-          "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-          "/certs/ca.crt:/certs/ca.crt:ro"
+          environments = {
+            TZ = "Europe/Berlin";
 
-          "${volumes.vnstat-db.ref}:/var/lib/vnstat:ro"
-        ];
+            PORT = "80";
+            ALLOWED_PREFIXES = "enp";
+          };
 
-        publishPorts = [
-          "${toString ports.vnstat}:80/tcp"
-        ];
+          volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
+
+            # certificates
+            "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
+            "/certs/ca.crt:/certs/ca.crt:ro"
+
+            "${volumes.vnstat-db.ref}:/var/lib/vnstat:ro"
+          ];
+
+          publishPorts = [
+            "${toString ports.vnstat}:80/tcp"
+          ];
+        };
       };
     };
-  };
 }

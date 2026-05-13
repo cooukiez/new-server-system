@@ -1,8 +1,8 @@
 /*
-modules/containers/auth/oidc-clients.nix
+  modules/containers/auth/oidc-clients.nix
 
-part of server system
-created 2026-04-12
+  part of server system
+  created 2026-04-12
 */
 [
   {
@@ -31,8 +31,8 @@ created 2026-04-12
       "groups"
     ];
 
-    response_types = ["code"];
-    grant_types = ["authorization_code"];
+    response_types = [ "code" ];
+    grant_types = [ "authorization_code" ];
 
     access_token_signed_response_alg = "RS256";
     userinfo_signed_response_alg = "none";
@@ -62,8 +62,8 @@ created 2026-04-12
       "email"
     ];
 
-    response_types = ["code"];
-    grant_types = ["authorization_code"];
+    response_types = [ "code" ];
+    grant_types = [ "authorization_code" ];
 
     access_token_signed_response_alg = "none";
     userinfo_signed_response_alg = "none";
@@ -89,8 +89,8 @@ created 2026-04-12
       "email"
     ];
 
-    response_types = ["code"];
-    grant_types = ["authorization_code"];
+    response_types = [ "code" ];
+    grant_types = [ "authorization_code" ];
 
     access_token_signed_response_alg = "none";
     userinfo_signed_response_alg = "none";
@@ -117,8 +117,8 @@ created 2026-04-12
       "email"
     ];
 
-    response_types = ["code"];
-    grant_types = ["authorization_code"];
+    response_types = [ "code" ];
+    grant_types = [ "authorization_code" ];
 
     access_token_signed_response_alg = "none";
     userinfo_signed_response_alg = "none";
@@ -145,8 +145,8 @@ created 2026-04-12
       "groups"
     ];
 
-    response_types = ["code"];
-    grant_types = ["authorization_code"];
+    response_types = [ "code" ];
+    grant_types = [ "authorization_code" ];
 
     access_token_signed_response_alg = "none";
     userinfo_signed_response_alg = "none";
@@ -172,8 +172,8 @@ created 2026-04-12
       "groups"
     ];
 
-    response_types = ["code"];
-    grant_types = ["authorization_code"];
+    response_types = [ "code" ];
+    grant_types = [ "authorization_code" ];
 
     access_token_signed_response_alg = "none";
     userinfo_signed_response_alg = "none";
@@ -198,8 +198,8 @@ created 2026-04-12
       "email"
     ];
 
-    response_types = ["code"];
-    grant_types = ["authorization_code"];
+    response_types = [ "code" ];
+    grant_types = [ "authorization_code" ];
 
     access_token_signed_response_alg = "none";
     userinfo_signed_response_alg = "none";
@@ -225,8 +225,8 @@ created 2026-04-12
       "groups"
     ];
 
-    response_types = ["code"];
-    grant_types = ["authorization_code"];
+    response_types = [ "code" ];
+    grant_types = [ "authorization_code" ];
 
     access_token_signed_response_alg = "none";
     userinfo_signed_response_alg = "none";
@@ -252,7 +252,7 @@ created 2026-04-12
       "email"
     ];
 
-    response_types = ["code"];
+    response_types = [ "code" ];
     grant_types = [
       "authorization_code"
       "refresh_token"
@@ -282,8 +282,8 @@ created 2026-04-12
       "email"
     ];
 
-    response_types = ["code"];
-    grant_types = ["authorization_code"];
+    response_types = [ "code" ];
+    grant_types = [ "authorization_code" ];
 
     access_token_signed_response_alg = "none";
     userinfo_signed_response_alg = "none";
@@ -310,8 +310,8 @@ created 2026-04-12
       "groups"
     ];
 
-    response_types = ["code"];
-    grant_types = ["authorization_code"];
+    response_types = [ "code" ];
+    grant_types = [ "authorization_code" ];
 
     access_token_signed_response_alg = "none";
     userinfo_signed_response_alg = "none";

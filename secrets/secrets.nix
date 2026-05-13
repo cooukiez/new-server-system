@@ -1,8 +1,8 @@
 /*
-secrets/secrets.nix
+  secrets/secrets.nix
 
-part of server system
-created 2026-04-20
+  part of server system
+  created 2026-04-20
 */
 let
   rootLaptop = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOe6C64fZmVmZN1uQSJexFBoQRFaQXOpfg9piE+r8cdQ";
@@ -28,10 +28,11 @@ let
     adminUser
     dhsServer
   ];
-in {
+in
+{
   /*
-  s_ = normal secret
-  e_ = secret combined with environment variable
+    s_ = normal secret
+    e_ = secret combined with environment variable
   */
 
   #

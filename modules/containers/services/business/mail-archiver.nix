@@ -1,8 +1,8 @@
 /*
-modules/containers/services/business/mail-archiver.nix
+  modules/containers/services/business/mail-archiver.nix
 
-part of server system
-created 2026-04-20
+  part of server system
+  created 2026-04-20
 */
 {
   config,
@@ -11,7 +11,8 @@ created 2026-04-20
   ports,
   mkEnv,
   ...
-}: let
+}:
+let
   createEnv = mkEnv {
     path = "containers/archiver/env";
     vars = {
@@ -72,7 +73,8 @@ created 2026-04-20
       PLACEHOLDER_DB_PASS = config.age.secrets.archiver-db-pass.path;
     };
   };
-in {
+in
+{
   myServices.mailArchiver = {
     serviceConfig = {
       name = "Mail-Archiver";
@@ -88,70 +90,74 @@ in {
     };
   };
 
-  age.secrets = let
-    mkSecret = name: {
-      file = ../../../../secrets/containers/archiver/${name}.age;
-    };
-  in {
-    archiver-admin-pass = mkSecret "s_admin-pass";
-    archiver-client-key = mkSecret "s_auth-client";
-    archiver-db-pass = mkSecret "s_db-pass";
-  };
-
-  virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes networks pods;
-  in {
-    volumes.mail-archiver-protection-keys.volumeConfig = {
-      type = "bind";
-      device = "/opt/mail-archiver/protection-keys";
+  age.secrets =
+    let
+      mkSecret = name: {
+        file = ../../../../secrets/containers/archiver/${name}.age;
+      };
+    in
+    {
+      archiver-admin-pass = mkSecret "s_admin-pass";
+      archiver-client-key = mkSecret "s_auth-client";
+      archiver-db-pass = mkSecret "s_db-pass";
     };
 
-    containers.mail-archiver = {
-      autoStart = true;
-
-      unitConfig = {
-        Requires = ["postgres.service"];
-        After = ["postgres.service"];
+  virtualisation.quadlet =
+    let
+      inherit (config.virtualisation.quadlet) volumes networks pods;
+    in
+    {
+      volumes.mail-archiver-protection-keys.volumeConfig = {
+        type = "bind";
+        device = "/opt/mail-archiver/protection-keys";
       };
 
-      serviceConfig = {
-        Restart = "always";
-        RestartSec = "10";
+      containers.mail-archiver = {
+        autoStart = true;
 
-        ExecStartPre = [
-          "+${pkgs.writeShellScript "pre-archiver" ''
-            ${createEnv}
-          ''}"
-        ];
-      };
+        unitConfig = {
+          Requires = [ "postgres.service" ];
+          After = [ "postgres.service" ];
+        };
 
-      containerConfig = {
-        image = "docker-archive:${pkgs.dockerTools.pullImage images.mail-archiver}";
-        name = "mail-archiver";
+        serviceConfig = {
+          Restart = "always";
+          RestartSec = "10";
 
-        addHosts = [
-          "auth.home.lan:host-gateway"
-        ];
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-archiver" ''
+              ${createEnv}
+            ''}"
+          ];
+        };
 
-        environmentFiles = [
-          "env/containers/archiver/env"
-        ];
+        containerConfig = {
+          image = "docker-archive:${pkgs.dockerTools.pullImage images.mail-archiver}";
+          name = "mail-archiver";
 
-        volumes = [
-          "/etc/timezone:/etc/timezone:ro"
-          "/etc/localtime:/etc/localtime:ro"
+          addHosts = [
+            "auth.home.lan:host-gateway"
+          ];
 
-          # certificates
-          "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
-          "/certs/ca.crt:/certs/ca.crt:ro"
+          environmentFiles = [
+            "env/containers/archiver/env"
+          ];
 
-          "${volumes.mail-archiver-protection-keys.ref}:/app/DataProtection-Keys:U"
-        ];
+          volumes = [
+            "/etc/timezone:/etc/timezone:ro"
+            "/etc/localtime:/etc/localtime:ro"
 
-        publishPorts = [
-          "${toString ports.mailArchiver}:5000/tcp"
-        ];
+            # certificates
+            "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
+            "/certs/ca.crt:/certs/ca.crt:ro"
+
+            "${volumes.mail-archiver-protection-keys.ref}:/app/DataProtection-Keys:U"
+          ];
+
+          publishPorts = [
+            "${toString ports.mailArchiver}:5000/tcp"
+          ];
+        };
       };
     };
-  };
 }

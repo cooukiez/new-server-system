@@ -1,8 +1,8 @@
 /*
-generated-images.nix
+  generated-images.nix
 
-part of server system
-created 2026-05-11
+  part of server system
+  created 2026-05-11
 */
 {
   ebk = {

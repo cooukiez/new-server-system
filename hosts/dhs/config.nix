@@ -1,8 +1,8 @@
 /*
-hosts/dhs/config.nix
+  hosts/dhs/config.nix
 
-part of server system
-created 2026-05-10
+  part of server system
+  created 2026-05-10
 */
 {
   config,
@@ -10,7 +10,8 @@ created 2026-05-10
   lib,
   hostConfig,
   ...
-}: {
+}:
+{
   # boot configuration
   boot = {
     kernelPackages = pkgs.linuxPackages_6_18;
@@ -36,7 +37,7 @@ created 2026-05-10
     plymouth-quit-wait.enable = false;
   };
 
-  systemd.targets.network-online.wantedBy = ["multi-user.target"];
+  systemd.targets.network-online.wantedBy = [ "multi-user.target" ];
 
   # timezone
   time.timeZone = "Europe/Berlin";
@@ -110,7 +111,7 @@ created 2026-05-10
 
   # locale configuration
   i18n.defaultLocale = "en_US.UTF-8";
-  i18n.extraLocales = [];
+  i18n.extraLocales = [ ];
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "en_IE.UTF-8";
     LC_IDENTIFICATION = "en_IE.UTF-8";

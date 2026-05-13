@@ -1,8 +1,8 @@
 /*
-hosts/dhs/ports.nix
+  hosts/dhs/ports.nix
 
-part of server system
-created 2026-04-20
+  part of server system
+  created 2026-04-20
 */
 {
   #
