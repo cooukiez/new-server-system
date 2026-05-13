@@ -150,6 +150,7 @@ in
   #
   "global-agenix.age".publicKeys = allKeys;
   "proton-key.age".publicKeys = allKeys;
+  "github-token.age".publicKeys = allKeys;
 
   # tailscale
   "tailscale-api.age".publicKeys = allKeys;

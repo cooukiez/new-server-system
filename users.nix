@@ -10,8 +10,8 @@
     email = "";
     fullName = "Admin";
 
-    githubName = "";
-    githubEmail = "";
+    gitName = "cooukiez";
+    gitEmail = "ludwig-geyer@web.de";
 
     name = "admin";
 

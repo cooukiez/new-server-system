@@ -217,6 +217,35 @@ in
               stateVersion = "25.11";
             };
 
+            # age.secrets.github-token.file = ../../github-token.age;
+
+            programs.git =
+              let
+                /*
+                  gitSecretHelperScript = ''
+                    if [ "$1" = "get" ]; then
+                      token=$(cat ${config.age.secrets.github-token.path})
+                      echo "username=${userConfig.gitName}"
+                      echo "password=$token"
+                    fi
+                  '';
+
+                  gitSecretHelper = pkgs.writeShellScript "git-secret-helper" gitSecretHelperScript;
+                */
+              in
+              {
+                enable = true;
+
+                settings = {
+                  user = {
+                    name = userConfig.gitName;
+                    email = userConfig.gitEmail;
+                  };
+
+                  # credential.helper = "${gitSecretHelper}";
+                };
+              };
+
             programs.home-manager.enable = true;
             programs.zsh.enable = true;
 
