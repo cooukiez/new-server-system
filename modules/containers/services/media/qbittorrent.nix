@@ -13,6 +13,7 @@
   downloadPath,
   ...
 }:
+# todo: configure all options and make config declarative
 {
   myServices.qbittorrent = {
     serviceConfig = {
@@ -69,6 +70,10 @@
 
             WEBUI_PORT = "8080";
             TORRENTING_PORT = "6881";
+
+            QBT_WEBUI__SERVERDOMAINS = "*";
+            QBT_WEBUI__ADDRESS = "0.0.0.0";
+            QBT_WebUI__Port = "8080";
           };
 
           volumes = [

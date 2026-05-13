@@ -10,11 +10,56 @@
   pkgs,
   images,
   ports,
+  mkEnv,
   ...
 }:
 let
-  # todo: gluetun key in agenix
-  gluetunKey = "169qzBxFa0ET26rkTWa3akmVopysVilS";
+  createGluetunEnv = mkEnv {
+    path = "containers/gluetun/env";
+    vars = {
+      VPN_SERVICE_PROVIDER = "protonvpn";
+      VPN_TYPE = "wireguard";
+
+      SERVER_COUNTRIES = "Netherlands";
+
+      FREE_ONLY = "on";
+
+      HTTP_CONTROL_SERVER_ADDRESS = ":8888";
+      HTTP_CONTROL_SERVER_AUTH_DEFAULT_ROLE = builtins.toJSON {
+        auth = "apikey";
+        apikey = "@PLACEHOLDER_GLUETUN_KEY@";
+      };
+
+      VPN_PORT_FORWARDING = "false";
+      VPN_LAN_LEAK_ENABLED = "false";
+
+      WIREGUARD_MTU = "1420";
+      WIREGUARD_PERSISTENT_KEEPALIVE_INTERVAL = "25s";
+      WIREGUARD_PRIVATE_KEY_SECRETFILE = "/run/secrets/WIREGUARD_KEY";
+
+      FIREWALL = "off";
+
+      BORINGPOLL_GLUETUNCOM = "on";
+    };
+
+    secrets = {
+      PLACEHOLDER_GLUETUN_KEY = config.age.secrets.gluetun-api-key.path;
+    };
+  };
+
+  createGluetunWebUIEnv = mkEnv {
+    path = "containers/gluetun-webui/env";
+    vars = {
+      GLUETUN_CONTROL_URL = "http://gluetun:8888";
+      GLUETUN_API_KEY = "@PLACEHOLDER_GLUETUN_KEY@";
+
+      TRUST_PROXY = "true";
+    };
+
+    secrets = {
+      PLACEHOLDER_GLUETUN_KEY = config.age.secrets.gluetun-api-key.path;
+    };
+  };
 in
 {
   myServices.gluetun = {
@@ -39,6 +84,7 @@ in
       };
     in
     {
+      gluetun-api-key = mkSecret "containers/gluetun/s_api-key";
       proton-key = mkSecret "proton-key";
     };
 
@@ -63,6 +109,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-gluetun" ''
+              ${createGluetunEnv}
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -76,27 +128,11 @@ in
 
           environments = {
             TZ = "Europe/Berlin";
-
-            VPN_SERVICE_PROVIDER = "protonvpn";
-            VPN_TYPE = "wireguard";
-
-            SERVER_COUNTRIES = "Netherlands";
-
-            FREE_ONLY = "on";
-
-            HTTP_CONTROL_SERVER_ADDRESS = ":8888";
-            HTTP_CONTROL_SERVER_AUTH_DEFAULT_ROLE = "{\"auth\":\"apikey\",\"apikey\":\"${gluetunKey}\"}";
-            VPN_PORT_FORWARDING = "false";
-            VPN_LAN_LEAK_ENABLED = "false";
-
-            WIREGUARD_MTU = "1420";
-            WIREGUARD_PERSISTENT_KEEPALIVE_INTERVAL = "25s";
-            WIREGUARD_PRIVATE_KEY_SECRETFILE = "/run/secrets/WIREGUARD_KEY";
-
-            FIREWALL = "off";
-
-            BORINGPOLL_GLUETUNCOM = "on";
           };
+
+          environmentFiles = [
+            "env/containers/gluetun/env"
+          ];
 
           volumes = [
             "/etc/timezone:/etc/timezone:ro"
@@ -128,6 +164,12 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = "10";
+
+          ExecStartPre = [
+            "+${pkgs.writeShellScript "pre-gluetun-webui" ''
+              ${createGluetunWebUIEnv}
+            ''}"
+          ];
         };
 
         containerConfig = {
@@ -139,12 +181,11 @@ in
 
           environments = {
             TZ = "Europe/Berlin";
-
-            GLUETUN_CONTROL_URL = "http://gluetun:8888";
-            GLUETUN_API_KEY = gluetunKey;
-
-            TRUST_PROXY = "true";
           };
+
+          environmentFiles = [
+            "env/containers/gluetun-webui/env"
+          ];
 
           volumes = [
             "/etc/timezone:/etc/timezone:ro"
