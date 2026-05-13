@@ -207,6 +207,33 @@
     token_endpoint_auth_method = "client_secret_post";
   }
   {
+    client_id = "opengist";
+    client_name = "Opengist";
+    client_secret = "$pbkdf2-sha512$310000$wX7aZ2/8eWwCdm6NRuIo9g$GZDOlfO39o9tB9m/97xbHC/HRQmXpDAlSDSgdbMsaPEpfFBvvwUhadp5I1urVltCdFe6KKp2EAA7n0vghhvVgA";
+
+    public = false;
+    authorization_policy = "two_factor";
+    require_pkce = false;
+
+    redirect_uris = [
+      "https://gists.home.lan/oauth/openid-connect/callback"
+    ];
+
+    scopes = [
+      "openid"
+      "profile"
+      "email"
+      "groups"
+    ];
+
+    response_types = [ "code" ];
+    grant_types = [ "authorization_code" ];
+
+    access_token_signed_response_alg = "none";
+    userinfo_signed_response_alg = "none";
+    token_endpoint_auth_method = "client_secret_post";
+  }
+  {
     client_id = "outline";
     client_name = "Outline";
     client_secret = "$pbkdf2-sha512$310000$Tw0Q1hvxCwnE.w6HOtq5MA$8VMzgoouUbGqZSf5ofbGHtXE/2f.bYldTKbOrcmz8d2hy4M/oenTvGPC0gFIuB3gnrq6MtaZMdCQ50dGNUSBew";

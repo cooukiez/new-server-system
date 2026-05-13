@@ -103,6 +103,8 @@ in
         isNormalUser = true;
         createHome = true;
 
+        extraGroups = [ "keys" ];
+
         linger = true;
         autoSubUidGidRange = true;
         shell = pkgs.zsh;
@@ -115,11 +117,11 @@ in
     "d /etc/certs 0755 ${squUid} ${squGid} -"
     "d /certs 0755 ${squUid} ${squGid} -"
 
-    "f+ /etc/certs/ca.crt 0444 ${squUid} ${squGid} - ${../../certs/ca.crt}"
-    "f+ /etc/certs/home.lan.crt 0444 ${squUid} ${squGid} - ${../../certs/home.lan.crt}"
+    "f+ /etc/certs/ca.crt 0755 ${squUid} ${squGid} - ${../../certs/ca.crt}"
+    "f+ /etc/certs/home.lan.crt 0755 ${squUid} ${squGid} - ${../../certs/home.lan.crt}"
 
-    "f+ /certs/ca.crt 0444 ${squUid} ${squGid} - ${../../certs/ca.crt}"
-    "f+ /certs/home.lan.crt 0444 ${squUid} ${squGid} - ${../../certs/home.lan.crt}"
+    "f+ /certs/ca.crt 0755 ${squUid} ${squGid} - ${../../certs/ca.crt}"
+    "f+ /certs/home.lan.crt 0755 ${squUid} ${squGid} - ${../../certs/home.lan.crt}"
   ]
   ++ lib.flatten (
     lib.mapAttrsToList (username: _: [
@@ -128,27 +130,7 @@ in
   );
 
   age.secrets =
-    let
-      mkSquSecret =
-        name: path:
-        {
-          file = ../../secrets/${name}.age;
-          owner = "squ";
-          group = "squ";
-        }
-        // (if path != null then { inherit path; } else { });
-
-      mkCert = name: certName: mkSquSecret "certs/${name}" "/etc/certs/${certName}";
-    in
-    {
-      squ-config-key = mkSquSecret "global-agenix" null;
-
-      ca-key = mkCert "ca-key" "ca.key";
-      ca-srl = mkCert "ca-srl" "ca.srl";
-      home-lan-csr = mkCert "home-lan-csr" "home.lan.csr";
-      home-lan-key = mkCert "home-lan-key" "home.lan.key";
-    }
-    // lib.mapAttrs' (
+    lib.mapAttrs' (
       username: _:
       lib.nameValuePair "ssh-${username}" {
         file = ../../secrets/ssh/${username}.age;
@@ -156,7 +138,14 @@ in
         owner = username;
         group = "users";
       }
-    ) userList;
+    ) userList
+    // {
+      squ-config-key = {
+        file = ../../secrets/global-agenix.age;
+        owner = "squ";
+        group = "squ";
+      };
+    };
 
   home-manager = {
     useGlobalPkgs = false;
@@ -291,11 +280,25 @@ in
                     "${promptFirstColor}%n@${promptSecondColor}%m%f:%~$";
                 in
                 ''
-                  PROMPT='${mkPrompt "red" "yellow"} ';
+                  PROMPT='${mkPrompt "magenta" "yellow"} ';
                 '';
             };
 
             age.identityPaths = [ squConfigKeyPath ];
+
+            age.secrets =
+              let
+                mkCert = name: certName: {
+                  file = ../../secrets/certs/${name}.age;
+                  path = "/etc/certs/${certName}";
+                };
+              in
+              {
+                ca-key = mkCert "ca-key" "ca.key";
+                ca-srl = mkCert "ca-srl" "ca.srl";
+                home-lan-csr = mkCert "home-lan-csr" "home.lan.csr";
+                home-lan-key = mkCert "home-lan-key" "home.lan.key";
+              };
 
             systemd.user.startServices = "sd-switch";
             home.stateVersion = "25.11";
