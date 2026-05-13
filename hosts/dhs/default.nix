@@ -115,11 +115,11 @@ in
     "d /etc/certs 0755 ${squUid} ${squGid} -"
     "d /certs 0755 ${squUid} ${squGid} -"
 
-    "f+ /etc/certs/ca.crt 0444 ${squUid} ${squGid} - ${builtins.readFile ../../certs/ca.crt}"
-    "f+ /etc/certs/home.lan.crt 0444 ${squUid} ${squGid} - ${builtins.readFile ../../certs/home.lan.crt}"
+    "f+ /etc/certs/ca.crt 0444 ${squUid} ${squGid} - ${../../certs/ca.crt}"
+    "f+ /etc/certs/home.lan.crt 0444 ${squUid} ${squGid} - ${../../certs/home.lan.crt}"
 
-    "f+ /certs/ca.crt 0444 ${squUid} ${squGid} - ${builtins.readFile ../../certs/ca.crt}"
-    "f+ /certs/home.lan.crt 0444 ${squUid} ${squGid} - ${builtins.readFile ../../certs/home.lan.crt}"
+    "f+ /certs/ca.crt 0444 ${squUid} ${squGid} - ${../../certs/ca.crt}"
+    "f+ /certs/home.lan.crt 0444 ${squUid} ${squGid} - ${../../certs/home.lan.crt}"
   ]
   ++ lib.flatten (
     lib.mapAttrsToList (username: _: [
@@ -158,152 +158,148 @@ in
       }
     ) userList;
 
-  home-manager =
-    let
-      mkPrompt =
-        userColor: systemColor:
-        let
-          promptFirstColor = "%F{${userColor}}";
-          promptSecondColor = "%F{${systemColor}}";
-        in
-        "${promptFirstColor}%n@${promptSecondColor}%m%f:%~$";
-    in
-    {
-      useGlobalPkgs = false;
-      useUserPackages = true;
-      backupFileExtension = "hm-bak";
+  home-manager = {
+    useGlobalPkgs = false;
+    useUserPackages = true;
+    backupFileExtension = "hm-bak";
 
-      extraSpecialArgs = {
-        inherit
-          inputs
-          outputs
-          hostConfig
-          ;
+    extraSpecialArgs = {
+      inherit
+        inputs
+        outputs
+        hostConfig
+        ;
 
-        squUid = squUid;
-        squGid = squGid;
+      squUid = squUid;
+      squGid = squGid;
 
-        squConfigKeyPath = config.age.secrets.squ-config-key.path;
-        mkZshPrompt = mkPrompt;
-      };
+      squConfigKeyPath = config.age.secrets.squ-config-key.path;
+    };
 
-      users =
-        (lib.mapAttrs (
-          username: userConfig:
+    users =
+      (lib.mapAttrs (
+        username: userConfig:
+        {
+          config,
+          hostConfig,
+          ...
+        }:
+        {
+          imports = [
+            inputs.agenix.homeManagerModules.default
+          ];
+
+          age.identityPaths = [ "${config.home.homeDirectory}/.ssh/id_ed25519" ];
+          _module.args.userConfig = userConfig;
+
+          home = {
+            username = username;
+            packages = userConfig.packages pkgs;
+
+            homeDirectory = "/home/${username}";
+            file.".ssh/id_ed25519.pub" = {
+              text = ''
+                ${userConfig.sshPublicKey} ${username}@${hostConfig.hostname}
+              '';
+            };
+
+            stateVersion = "25.11";
+          };
+
+          age.secrets.github-token.file = ../../secrets/github-token.age;
+
+          programs.git =
+            let
+              gitSecretHelperScript = ''
+                if [ "$1" = "get" ]; then
+                  token=$(cat ${config.age.secrets.github-token.path})
+                  echo "username=${userConfig.gitName}"
+                  echo "password=$token"
+                fi
+              '';
+
+              gitSecretHelper = pkgs.writeShellScript "git-secret-helper" gitSecretHelperScript;
+            in
+            {
+              enable = true;
+
+              settings = {
+                user = {
+                  name = userConfig.gitName;
+                  email = userConfig.gitEmail;
+                };
+
+                credential.helper = "${gitSecretHelper}";
+              };
+            };
+
+          programs.home-manager.enable = true;
+          programs.zsh.enable = true;
+
+          systemd.user.startServices = "sd-switch";
+        }
+      ) userList)
+      // {
+        squ =
           {
-            config,
-            hostConfig,
+            inputs,
+            squConfigKeyPath,
             ...
           }:
           {
             imports = [
+              inputs.quadlet-nix.homeManagerModules.quadlet
               inputs.agenix.homeManagerModules.default
             ];
 
-            age.identityPaths = [ "${config.home.homeDirectory}/.ssh/id_ed25519" ];
-            _module.args.userConfig = userConfig;
+            nixpkgs = {
+              overlays = [
+                inputs.self.overlays.additions
+                inputs.self.overlays.modifications
+                inputs.self.overlays.unstable-packages
 
-            home = {
-              username = username;
-              packages = userConfig.packages pkgs;
-
-              homeDirectory = "/home/${username}";
-              file.".ssh/id_ed25519.pub" = {
-                text = ''
-                  ${userConfig.sshPublicKey} ${username}@${hostConfig.hostname}
-                '';
-              };
-
-              stateVersion = "25.11";
-            };
-
-            # age.secrets.github-token.file = ../../github-token.age;
-
-            programs.git =
-              let
-                /*
-                  gitSecretHelperScript = ''
-                    if [ "$1" = "get" ]; then
-                      token=$(cat ${config.age.secrets.github-token.path})
-                      echo "username=${userConfig.gitName}"
-                      echo "password=$token"
-                    fi
-                  '';
-
-                  gitSecretHelper = pkgs.writeShellScript "git-secret-helper" gitSecretHelperScript;
-                */
-              in
-              {
-                enable = true;
-
-                settings = {
-                  user = {
-                    name = userConfig.gitName;
-                    email = userConfig.gitEmail;
-                  };
-
-                  # credential.helper = "${gitSecretHelper}";
-                };
-              };
-
-            programs.home-manager.enable = true;
-            programs.zsh.enable = true;
-
-            systemd.user.startServices = "sd-switch";
-          }
-        ) userList)
-        // {
-          squ =
-            {
-              inputs,
-              squConfigKeyPath,
-              mkZshPrompt,
-              ...
-            }:
-            {
-              imports = [
-                inputs.quadlet-nix.homeManagerModules.quadlet
-                inputs.agenix.homeManagerModules.default
+                (final: prev: {
+                  valkey = prev.valkey.overrideAttrs (oldAttrs: {
+                    doCheck = false;
+                  });
+                })
               ];
 
-              nixpkgs = {
-                overlays = [
-                  inputs.self.overlays.additions
-                  inputs.self.overlays.modifications
-                  inputs.self.overlays.unstable-packages
-
-                  (final: prev: {
-                    valkey = prev.valkey.overrideAttrs (oldAttrs: {
-                      doCheck = false;
-                    });
-                  })
-                ];
-
-                config = {
-                  allowUnfree = true;
-                  permittedInsecurePackages = [ ];
-                };
+              config = {
+                allowUnfree = true;
+                permittedInsecurePackages = [ ];
               };
-
-              programs.zsh = {
-                enable = true;
-                shellAliases = {
-                  pg-admin = "podman exec -it postgres psql -U admin -d app_db";
-                  pg-init = "cat ~/containers/postgres/init-all-db.sql | podman exec -i postgres psql -U admin -d postgres";
-
-                  find-wrong-perms = "sudo find /opt/ -maxdepth 4 ! -user ${squUid} -o ! -group ${squGid}";
-                };
-
-                initContent = ''
-                  PROMPT='${mkZshPrompt "red" "yellow"}';
-                '';
-              };
-
-              age.identityPaths = [ squConfigKeyPath ];
-
-              systemd.user.startServices = "sd-switch";
-              home.stateVersion = "25.11";
             };
-        };
-    };
+
+            programs.zsh = {
+              enable = true;
+              shellAliases = {
+                pg-admin = "podman exec -it postgres psql -U admin -d app_db";
+                pg-init = "cat ~/containers/postgres/init-all-db.sql | podman exec -i postgres psql -U admin -d postgres";
+
+                find-wrong-perms = "sudo find /opt/ -maxdepth 4 ! -user ${squUid} -o ! -group ${squGid}";
+              };
+
+              initContent =
+                let
+                  mkPrompt =
+                    userColor: systemColor:
+                    let
+                      promptFirstColor = "%F{${userColor}}";
+                      promptSecondColor = "%F{${systemColor}}";
+                    in
+                    "${promptFirstColor}%n@${promptSecondColor}%m%f:%~$";
+                in
+                ''
+                  PROMPT='${mkPrompt "red" "yellow"} ';
+                '';
+            };
+
+            age.identityPaths = [ squConfigKeyPath ];
+
+            systemd.user.startServices = "sd-switch";
+            home.stateVersion = "25.11";
+          };
+      };
+  };
 }
