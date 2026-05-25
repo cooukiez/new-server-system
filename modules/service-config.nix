@@ -1,18 +1,16 @@
 /*
-  modules/service-config.nix
+modules/service-config.nix
 
-  part of server system
-  created 2026-04-19
+part of server system
+created 2026-04-19
 */
 {
   config,
   lib,
   ...
-}:
-let
+}: let
   homeDir = config.home.homeDirectory;
-in
-{
+in {
   options.myServices = lib.mkOption {
     type = lib.types.attrsOf (
       lib.types.submodule (
@@ -20,17 +18,14 @@ in
           config,
           name,
           ...
-        }:
-        let
+        }: let
           serviceName = name;
-        in
-        {
+        in {
           options = {
             serviceConfig = lib.mkOption {
               type = lib.types.nullOr (
                 lib.types.submodule (
-                  { config, ... }:
-                  {
+                  {config, ...}: {
                     options = {
                       serviceName = lib.mkOption {
                         type = lib.types.str;
@@ -43,7 +38,7 @@ in
                         default = serviceName;
                       };
 
-                      description = lib.mkOption { type = lib.types.str; };
+                      description = lib.mkOption {type = lib.types.str;};
 
                       serviceType = lib.mkOption {
                         type = lib.types.enum [
@@ -57,7 +52,7 @@ in
                         default = "Apps";
                       };
 
-                      port = lib.mkOption { type = lib.types.int; };
+                      port = lib.mkOption {type = lib.types.int;};
 
                       subdomain = lib.mkOption {
                         type = lib.types.str;
@@ -96,7 +91,7 @@ in
                         default = null;
                       };
 
-                      icon = lib.mkOption { type = lib.types.str; };
+                      icon = lib.mkOption {type = lib.types.str;};
                     };
                   }
                 )
@@ -109,6 +104,6 @@ in
       )
     );
 
-    default = { };
+    default = {};
   };
 }

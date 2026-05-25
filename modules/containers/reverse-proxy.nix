@@ -1,8 +1,8 @@
 /*
-  modules/containers/reverse-proxy.nix
+modules/containers/reverse-proxy.nix
 
-  part of server system
-  created 2026-04-19
+part of server system
+created 2026-04-19
 */
 {
   config,
@@ -13,8 +13,7 @@
   ports,
   publicServices,
   ...
-}:
-let
+}: let
   sortedServiceList = lib.sort (a: b: a.serviceConfig.subdomain < b.serviceConfig.subdomain) (
     lib.filter (s: s.serviceConfig.disableProxy == false) (lib.attrValues publicServices)
   );
@@ -22,22 +21,20 @@ let
   serviceHandlers = lib.trim (
     lib.concatStringsSep "\n" (
       map (
-        svc:
-        let
+        svc: let
           cfg = svc.serviceConfig;
-        in
-        ''
+        in ''
           @${cfg.serviceName} host ${cfg.subdomain}.home.lan
           handle @${cfg.serviceName} {
             import auth_verify
             reverse_proxy host.containers.internal:${toString cfg.port}
           }
         ''
-      ) sortedServiceList
+      )
+      sortedServiceList
     )
   );
-in
-{
+in {
   home.file."containers/caddy/Caddyfile" = {
     text = ''
         {
@@ -130,9 +127,13 @@ in
             redir /remote.php/carddav /carddav/
 
             import auth_verify
+            reverse_proxy host.containers.internal:${toString ports.radicale}
+
+            /*
             reverse_proxy host.containers.internal:${toString ports.radicale} {
               header_up X-Remote-User {header.Remote-User}
             }
+            */
           }
 
           handle {
@@ -142,64 +143,62 @@ in
     '';
   };
 
-  virtualisation.quadlet =
-    let
-      inherit (config.virtualisation.quadlet) volumes networks pods;
-    in
-    {
-      volumes.caddy-certs.volumeConfig = {
-        type = "bind";
-        device = "/etc/certs";
+  virtualisation.quadlet = let
+    inherit (config.virtualisation.quadlet) volumes;
+  in {
+    volumes.caddy-certs.volumeConfig = {
+      type = "bind";
+      device = "/etc/certs";
+    };
+
+    volumes.caddy-config.volumeConfig = {
+      type = "bind";
+      device = "/opt/caddy/config";
+    };
+
+    volumes.caddy-data.volumeConfig = {
+      type = "bind";
+      device = "/opt/caddy/data";
+    };
+
+    containers.caddy = {
+      autoStart = true;
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
       };
 
-      volumes.caddy-config.volumeConfig = {
-        type = "bind";
-        device = "/opt/caddy/config";
-      };
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.caddy}";
+        name = "caddy";
+        addCapabilities = ["NET_BIND_SERVICE"];
 
-      volumes.caddy-data.volumeConfig = {
-        type = "bind";
-        device = "/opt/caddy/data";
-      };
-
-      containers.caddy = {
-        autoStart = true;
-        serviceConfig = {
-          Restart = "always";
-          RestartSec = "10";
+        environments = {
+          TZ = "Europe/Berlin";
         };
 
-        containerConfig = {
-          image = "docker-archive:${pkgs.dockerTools.pullImage images.caddy}";
-          name = "caddy";
-          addCapabilities = [ "NET_BIND_SERVICE" ];
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
 
-          environments = {
-            TZ = "Europe/Berlin";
-          };
+          # config
+          "${config.home.homeDirectory}/containers/caddy/Caddyfile:/etc/caddy/Caddyfile:ro,U"
 
-          volumes = [
-            "/etc/timezone:/etc/timezone:ro"
-            "/etc/localtime:/etc/localtime:ro"
+          # volumes
+          "${volumes.caddy-certs.ref}:/certs:ro"
 
-            # config
-            "${config.home.homeDirectory}/containers/caddy/Caddyfile:/etc/caddy/Caddyfile:ro,U"
+          "${volumes.caddy-config.ref}:/config:U"
+          "${volumes.caddy-data.ref}:/data:U"
+        ];
 
-            # volumes
-            "${volumes.caddy-certs.ref}:/certs:ro"
+        publishPorts = [
+          "${toString ports.caddyHttp}:80/tcp"
+          "${toString ports.caddyHttps}:443/tcp"
+          "${toString ports.caddyHttps}:443/udp"
 
-            "${volumes.caddy-config.ref}:/config:U"
-            "${volumes.caddy-data.ref}:/data:U"
-          ];
-
-          publishPorts = [
-            "${toString ports.caddyHttp}:80/tcp"
-            "${toString ports.caddyHttps}:443/tcp"
-            "${toString ports.caddyHttps}:443/udp"
-
-            "${toString ports.caddyAdmin}:2019/tcp"
-          ];
-        };
+          "${toString ports.caddyAdmin}:2019/tcp"
+        ];
       };
     };
+  };
 }

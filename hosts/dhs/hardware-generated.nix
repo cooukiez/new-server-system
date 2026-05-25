@@ -1,16 +1,15 @@
 /*
-  hosts/dhs/hardware-generated.nix
+hosts/dhs/hardware-generated.nix
 
-  part of server system
-  created 2026-04-16
+part of server system
+created 2026-04-16
 */
 {
   config,
   lib,
   modulesPath,
   ...
-}:
-{
+}: {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
@@ -22,9 +21,9 @@
     "sd_mod"
   ];
 
-  boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [ "kvm-intel" ];
-  boot.extraModulePackages = [ ];
+  boot.initrd.kernelModules = [];
+  boot.kernelModules = ["kvm-intel"];
+  boot.extraModulePackages = [];
 
   fileSystems."/" = {
     device = "zroot/local/root";
@@ -65,7 +64,7 @@
     fsType = "zfs";
   };
 
-  swapDevices = [ ];
+  swapDevices = [];
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;

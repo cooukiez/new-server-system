@@ -1,11 +1,10 @@
 /*
-  modules/containers/services/business/radicale-config.nix
+modules/containers/services/business/radicale-config.nix
 
-  part of server system
-  created 2026-05-11
+part of server system
+created 2026-05-11
 */
-{ ports, ... }:
-{
+{ports, ...}: {
   # https://github.com/tomsquest/docker-radicale/blob/3f35011e6ff560acb78b42437ec1bdad35c592b8/config
   radicaleSettings = {
     server = {
@@ -35,7 +34,8 @@
     };
 
     auth = {
-      type = "http_x_remote_user";
+      type = "ldap";
+      # type = "http_x_remote_user";
 
       # cache_logins = false;
       # cache_successful_logins_expiry = 15;
