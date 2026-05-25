@@ -9,7 +9,6 @@
   pkgs,
   images,
   ports,
-  envSecretsPrefix,
   ...
 }:
 let

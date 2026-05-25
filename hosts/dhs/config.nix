@@ -78,6 +78,8 @@
 
         1221 # for papra
         2283 # for immich
+        5232 # for radicale
+        8010 # for transfer-sh
         8096 # for jellyfin
       ];
 

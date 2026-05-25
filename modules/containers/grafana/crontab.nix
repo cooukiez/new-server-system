@@ -1,5 +1,5 @@
 /*
-  modules/containers/grafana/adguard.nix
+  modules/containers/grafana/crontab.nix
 
   part of server system
   created 2026-04-10
@@ -9,12 +9,12 @@
   mkPanel,
 }:
 let
-  dashboardName = "Adguard";
-  dashboardUid = "adguard";
+  dashboardName = "Crontab";
+  dashboardUid = "crontab";
 
-  appName = "Adguard";
-  containerName = "adguard";
-  networkRelevantContainer = "adguard";
+  appName = "Crontab";
+  containerName = "crontab";
+  networkRelevantContainer = "crontab";
 in
 mkDashboard {
   name = dashboardName;

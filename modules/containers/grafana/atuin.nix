@@ -1,5 +1,5 @@
 /*
-  modules/containers/grafana/adguard.nix
+  modules/containers/grafana/atuin.nix
 
   part of server system
   created 2026-04-10
@@ -9,12 +9,12 @@
   mkPanel,
 }:
 let
-  dashboardName = "Adguard";
-  dashboardUid = "adguard";
+  dashboardName = "Atuin";
+  dashboardUid = "atuin";
 
-  appName = "Adguard";
-  containerName = "adguard";
-  networkRelevantContainer = "adguard";
+  appName = "Atuin";
+  containerName = "atuin";
+  networkRelevantContainer = "atuin";
 in
 mkDashboard {
   name = dashboardName;

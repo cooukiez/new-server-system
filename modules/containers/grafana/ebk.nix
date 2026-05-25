@@ -9,12 +9,12 @@
   mkPanel,
 }:
 let
-  dashboardName = "Adguard";
-  dashboardUid = "adguard";
+  dashboardName = "Ezbookkeeping";
+  dashboardUid = "ezbookkeeping";
 
-  appName = "Adguard";
-  containerName = "adguard";
-  networkRelevantContainer = "adguard";
+  appName = "Ebk";
+  containerName = "ebk";
+  networkRelevantContainer = "ebk";
 in
 mkDashboard {
   name = dashboardName;

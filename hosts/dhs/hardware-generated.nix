@@ -6,7 +6,6 @@
 */
 {
   config,
-  pkgs,
   lib,
   modulesPath,
   ...
