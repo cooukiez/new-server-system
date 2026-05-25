@@ -36,7 +36,7 @@ created 2026-04-19
   };
 
   virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes networks pods;
+    inherit (config.virtualisation.quadlet) volumes;
   in {
     networks.immich-net = {
       networkConfig = {

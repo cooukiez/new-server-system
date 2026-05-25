@@ -219,9 +219,7 @@ in {
     homepage-tailscale = mkSecret "tailscale-api";
   };
 
-  virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes networks pods;
-  in {
+  virtualisation.quadlet = {
     containers.homepage = {
       autoStart = true;
       serviceConfig = {

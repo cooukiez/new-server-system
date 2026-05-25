@@ -28,15 +28,8 @@ created 2026-04-19
     };
   };
 
-  age.secrets = let
-    mkSecret = name: {
-      file = ../../../secrets/${name}.age;
-      path = "${envSecretsPrefix}/${name}";
-    };
-  in {};
-
   virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes networks pods;
+    inherit (config.virtualisation.quadlet) volumes;
   in {
     volumes.node-red-data.volumeConfig = {
       type = "bind";

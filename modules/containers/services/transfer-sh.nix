@@ -27,7 +27,7 @@ created 2026-04-14
   };
 
   virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes networks pods;
+    inherit (config.virtualisation.quadlet) volumes;
   in {
     volumes.transfer-sh-data.volumeConfig = {
       type = "bind";

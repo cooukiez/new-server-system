@@ -106,7 +106,7 @@ in {
     adguardSettings;
 
   virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes networks pods;
+    inherit (config.virtualisation.quadlet) volumes;
   in {
     volumes.adguard-conf.volumeConfig = {
       type = "bind";

@@ -9,7 +9,6 @@ created 2026-04-19
   pkgs,
   images,
   ports,
-  envSecretsPrefix,
   ...
 }: let
   ebkSettings = (import ./ebk-config.nix {inherit config ports;}).ebkSettings;
@@ -45,7 +44,7 @@ in {
   };
 
   virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes networks pods;
+    inherit (config.virtualisation.quadlet) volumes;
   in {
     volumes.ebk-data.volumeConfig = {
       type = "bind";
