@@ -123,6 +123,12 @@ in
 
           @dav host dav.home.lan
           handle @dav {
+            redir /.well-known/carddav /
+            redir /.well-known/caldav /
+            redir /remote.php/webdav /
+            redir /remote.php/caldav /caldav/
+            redir /remote.php/carddav /carddav/
+
             import auth_verify
             reverse_proxy host.containers.internal:${toString ports.radicale} {
               header_up X-Remote-User {header.Remote-User}
