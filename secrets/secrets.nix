@@ -2,7 +2,7 @@
 secrets/secrets.nix
 
 part of server system
-created 2026-04-20
+created 2026-05-13 by ludw
 */
 let
   rootLaptop = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOe6C64fZmVmZN1uQSJexFBoQRFaQXOpfg9piE+r8cdQ";

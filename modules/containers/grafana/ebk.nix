@@ -1,8 +1,8 @@
 /*
-modules/containers/grafana/adguard.nix
+modules/containers/grafana/ebk.nix
 
 part of server system
-created 2026-04-10
+created 2026-05-13 by ludw
 */
 {
   mkDashboard,

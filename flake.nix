@@ -2,7 +2,7 @@
 flake.nix
 
 part of server system
-created 2026-04-16
+created 2026-05-13 by ludw
 */
 {
   description = "system configuration for home server";

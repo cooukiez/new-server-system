@@ -2,7 +2,7 @@
 modules/containers/services/business/radicale-config.nix
 
 part of server system
-created 2026-05-11
+created 2026-05-13 by ludw
 */
 {ports, ...}: {
   # https://github.com/tomsquest/docker-radicale/blob/3f35011e6ff560acb78b42437ec1bdad35c592b8/config

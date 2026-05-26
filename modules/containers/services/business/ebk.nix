@@ -2,7 +2,7 @@
 modules/containers/services/business/ebk.nix
 
 part of server system
-created 2026-04-19
+created 2026-05-13 by ludw
 */
 {
   config,

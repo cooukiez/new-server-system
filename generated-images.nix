@@ -2,7 +2,7 @@
 generated-images.nix
 
 part of server system
-created 2026-05-11
+created 2026-05-13 by ludw
 */
 {
   ebk = {

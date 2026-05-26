@@ -2,7 +2,7 @@
 modules/services/metrics.nix
 
 part of server system
-created 2026-04-17
+created 2026-05-13 by ludw
 */
 {
   config,
