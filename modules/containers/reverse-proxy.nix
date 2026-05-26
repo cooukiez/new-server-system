@@ -129,11 +129,9 @@ in {
             import auth_verify
             reverse_proxy host.containers.internal:${toString ports.radicale}
 
-            /*
-            reverse_proxy host.containers.internal:${toString ports.radicale} {
-              header_up X-Remote-User {header.Remote-User}
-            }
-            */
+            # reverse_proxy host.containers.internal:${toString ports.radicale} {
+            #   header_up X-Remote-User {header.Remote-User}
+            # }
           }
 
           handle {

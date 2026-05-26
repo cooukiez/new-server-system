@@ -36,6 +36,7 @@ in {
   age.secrets = let
     mkSecret = name: {
       file = ../../../../secrets/${name}.age;
+      mode = "444";
     };
   in {
     radicale-crt-key = mkSecret "certs/home-lan-key";

@@ -9,7 +9,6 @@ created 2026-04-19
   pkgs,
   images,
   ports,
-  envSecretsPrefix,
   ...
 }: {
   myServices.nodeRed = {
