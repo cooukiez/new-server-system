@@ -73,16 +73,6 @@ created 2026-05-13 by ludw
       dbs = ["outline"];
       pass = "@PLACEHOLDER_OUTLINE_DB_PASS@";
     }
-
-    {
-      name = "lidarr";
-      user = "lidarr";
-      dbs = [
-        "lidarr-main"
-        "lidarr-log"
-      ];
-      pass = "@PLACEHOLDER_LIDARR_DB_PASS@";
-    }
   ];
 
   mkSql = service: ''
