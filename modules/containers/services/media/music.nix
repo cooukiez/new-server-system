@@ -10,7 +10,6 @@ created 2026-04-19
   images,
   ports,
   mkConf,
-  musicPath,
   downloadPath,
   ...
 }: let
@@ -48,11 +47,11 @@ created 2026-04-19
       UpdateMechanism = "Docker";
 
       # postgres configuration
-      PostgresUser = "lidarr";
+      PostgresUser = "admin";
       PostgresPassword = "@PLACEHOLDER_DB_PASS@";
 
-      PostgresHost = "host.containers.internal";
-      PostgresPort = "${toString ports.postgres}";
+      PostgresHost = "lidarr-postgres";
+      PostgresPort = "5432";
 
       PostgresMainDb = "lidarr-main";
       PostgresLogDb = "lidarr-log";
@@ -186,8 +185,13 @@ in {
   };
 
   virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes networks pods;
+    inherit (config.virtualisation.quadlet) volumes;
   in {
+    volumes.lidarr-db.volumeConfig = {
+      type = "bind";
+      device = "/opt/lidarr/db";
+    };
+
     volumes.lidarr-data.volumeConfig = {
       type = "bind";
       device = "/opt/lidarr/data";
@@ -196,6 +200,11 @@ in {
     volumes.lidarr-cache.volumeConfig = {
       type = "bind";
       device = "/opt/lidarr/cache";
+    };
+
+    volumes.deezer-download.volumeConfig = {
+      type = "bind";
+      device = "${downloadPath}/deezer";
     };
 
     volumes.slskd-download.volumeConfig = {
@@ -208,13 +217,41 @@ in {
       device = "/opt/slskd/data";
     };
 
-    # todo: bring deemix back
+    containers.lidarr-postgres = {
+      autoStart = true;
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
+      };
+
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.postgres}";
+        name = "lidarr-postgres";
+        networks = ["media-net" "postgres-net"];
+
+        environments = {
+          POSTGRES_USER = "admin";
+          POSTGRES_PASSWORD_FILE = "/run/secrets/LIDARR_DB_PASS";
+
+          POSTGRES_DB = "lidarr-main";
+        };
+
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
+
+          "${volumes.lidarr-db.ref}:/var/lib/postgresql:U"
+          "${config.age.secrets.lidarr-db-pass.path}:/run/secrets/LIDARR_DB_PASS:ro"
+        ];
+      };
+    };
+
     containers.lidarr = {
       autoStart = true;
 
       unitConfig = {
-        Requires = ["postgres.service"];
-        After = ["postgres.service"];
+        Requires = ["lidarr-postgres.service"];
+        After = ["lidarr-postgres.service"];
       };
 
       serviceConfig = {
@@ -225,9 +262,9 @@ in {
           "+${pkgs.writeShellScript "pre-lidarr" ''
             ${createLidarrConf}
 
-            # deezer download
-            ${pkgs.coreutils}/bin/mkdir -p "${downloadPath}/deezer"
-            # spotify cache
+            ${pkgs.coreutils}/bin/mkdir -p "${downloadPath}/deezer/plugin"
+            ${pkgs.coreutils}/bin/mkdir -p "${downloadPath}/deezer/deemix"
+
             ${pkgs.coreutils}/bin/mkdir -p "/opt/lidarr/cache/spotify"
 
             ${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/lidarr/config.xml /opt/lidarr/data/config.xml
@@ -271,6 +308,10 @@ in {
         ];
       };
     };
+
+    # todo: bring deemix back
+
+    # todo: use soularr
 
     containers.slskd = {
       autoStart = true;
