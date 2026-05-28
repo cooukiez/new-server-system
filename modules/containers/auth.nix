@@ -206,17 +206,46 @@ in {
       device = "/opt/authelia/config";
     };
 
+    containers.authelia-postgres = {
+      autoStart = true;
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
+      };
+
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.postgres}";
+        name = "authelia-postgres";
+        networks = ["auth-net" "postgres-net"];
+
+        environments = {
+          POSTGRES_USER = "admin";
+          POSTGRES_PASSWORD_FILE = "/run/secrets/AUTHELIA_DB_PASS";
+
+          POSTGRES_DB = "lidarr-main";
+        };
+
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
+
+          "${volumes.lidarr-db.ref}:/var/lib/postgresql:U"
+          "${config.age.secrets.lidarr-db-pass.path}:/run/secrets/LIDARR_DB_PASS:ro"
+        ];
+      };
+    };
+
     containers.authelia = {
       autoStart = true;
 
       unitConfig = {
         Requires = [
-          "postgres.service"
+          "authelia-postgres.service"
           "lldap.service"
         ];
 
         After = [
-          "postgres.service"
+          "authelia-postgres.service"
           "lldap.service"
         ];
       };

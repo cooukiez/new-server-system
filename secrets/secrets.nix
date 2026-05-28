@@ -13,13 +13,6 @@ let
   adminUser = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGqloF2EAQJl6bwdOBhMXvkund47pwRzIQC8KMaiBEbK admin@dhs";
   dhsServer = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID7ao1FUxiK3WeHSeVsxlrIMWlFJVsHndjadOxzP4taE root@dhs";
 
-  serverKeys = [
-    globalAgenix
-
-    adminUser
-    dhsServer
-  ];
-
   allKeys = [
     rootLaptop
 
@@ -37,6 +30,7 @@ in {
   #
   # auth
   #
+  "auth/s_db-pass.age".publicKeys = allKeys;
   "auth/s_jwt-secret.age".publicKeys = allKeys;
   "auth/s_mail-smtp.age".publicKeys = allKeys;
   "auth/s_oidc-hmac.age".publicKeys = allKeys;
