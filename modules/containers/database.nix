@@ -14,18 +14,6 @@ created 2026-05-13 by ludw
 }: let
   services = [
     {
-      name = "authelia";
-      user = "admin";
-      dbs = ["authelia"];
-    }
-    {
-      name = "lldap";
-      user = "lldap";
-      dbs = ["lldap"];
-      pass = "@PLACEHOLDER_LLDAP_DB_PASS@";
-    }
-
-    {
       name = "atuin";
       user = "atuin";
       dbs = ["atuin"];

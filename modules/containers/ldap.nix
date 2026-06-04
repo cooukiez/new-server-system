@@ -28,8 +28,8 @@ created 2026-05-13 by ludw
         user = "lldap";
         pass = "@PLACEHOLDER_DB_PASS@";
 
-        host = "host.containers.internal";
-        port = toString ports.postgres;
+        host = "lldap-postgres";
+        port = "5432";
       in "postgres://${user}:${pass}@${host}:${port}/${name}?sslmode=disable";
     };
 
@@ -69,17 +69,51 @@ in {
   virtualisation.quadlet = let
     inherit (config.virtualisation.quadlet) volumes;
   in {
+    volumes.lldap-db.volumeConfig = {
+      type = "bind";
+      device = "/opt/lldap/db";
+    };
+
     volumes.lldap-data.volumeConfig = {
       type = "bind";
       device = "/opt/lldap/data";
+    };
+
+    containers.lldap-postgres = {
+      autoStart = true;
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
+      };
+
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.postgres}";
+        name = "lldap-postgres";
+        networks = ["auth-net" "postgres-net"];
+
+        environments = {
+          POSTGRES_USER = "admin";
+          POSTGRES_PASSWORD_FILE = "/run/secrets/LLDAP_DB_PASS";
+
+          POSTGRES_DB = "lldap";
+        };
+
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
+
+          "${volumes.authelia-db.ref}:/var/lib/postgresql:U"
+          "${config.age.secrets.lldap-db-pass.path}:/run/secrets/LLDAP_DB_PASS:ro"
+        ];
+      };
     };
 
     containers.lldap = {
       autoStart = true;
 
       unitConfig = {
-        Requires = ["postgres.service"];
-        After = ["postgres.service"];
+        Requires = ["lldap-postgres.service"];
+        After = ["lldap-postgres.service"];
       };
 
       serviceConfig = {

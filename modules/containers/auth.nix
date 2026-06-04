@@ -116,7 +116,7 @@ created 2026-05-13 by ludw
 
     storage = {
       postgres = {
-        address = "tcp://host.containers.internal:${toString ports.postgres}";
+        address = "tcp://authelia-postgres:5432";
         database = "authelia";
         username = "admin";
       };
@@ -137,7 +137,7 @@ created 2026-05-13 by ludw
     auth-jwt = "auth/s_jwt-secret";
     auth-session = "auth/s_session";
 
-    auth-postgres-pw = "db/s_postgres-pw";
+    auth-db-pass = "auth/s_db-pass";
     auth-storage-key = "auth/s_storage-key";
 
     auth-oidc-hmac = "auth/s_oidc-hmac";
@@ -150,7 +150,7 @@ created 2026-05-13 by ludw
     auth-ldap-pw = "AUTH_LDAP_PASSWORD";
     auth-jwt = "AUTH_JWT_SECRET";
     auth-session = "AUTH_SESSION_SECRET";
-    auth-postgres-pw = "AUTH_POSTGRES_PASSWORD";
+    auth-db-pass = "AUTH_DB_PASS";
     auth-storage-key = "AUTH_STORAGE_KEY";
     auth-oidc-hmac = "AUTH_OIDC_HMAC_SECRET";
     auth-oidc-jwk = "AUTH_OIDC_JWK_KEY";
@@ -161,7 +161,7 @@ created 2026-05-13 by ludw
     auth-ldap-pw = "AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE";
     auth-jwt = "AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE";
     auth-session = "AUTHELIA_SESSION_SECRET_FILE";
-    auth-postgres-pw = "AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE";
+    auth-db-pass = "AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE";
     auth-storage-key = "AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE";
     auth-oidc-hmac = "AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE";
     auth-mail-smtp = "AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE";
@@ -206,6 +206,11 @@ in {
       device = "/opt/authelia/config";
     };
 
+    volumes.authelia-db.volumeConfig = {
+      type = "bind";
+      device = "/opt/authelia/db";
+    };
+
     containers.authelia-postgres = {
       autoStart = true;
       serviceConfig = {
@@ -220,17 +225,17 @@ in {
 
         environments = {
           POSTGRES_USER = "admin";
-          POSTGRES_PASSWORD_FILE = "/run/secrets/AUTHELIA_DB_PASS";
+          POSTGRES_PASSWORD_FILE = "/run/secrets/AUTH_DB_PASS";
 
-          POSTGRES_DB = "lidarr-main";
+          POSTGRES_DB = "authelia";
         };
 
         volumes = [
           "/etc/timezone:/etc/timezone:ro"
           "/etc/localtime:/etc/localtime:ro"
 
-          "${volumes.lidarr-db.ref}:/var/lib/postgresql:U"
-          "${config.age.secrets.lidarr-db-pass.path}:/run/secrets/LIDARR_DB_PASS:ro"
+          "${volumes.authelia-db.ref}:/var/lib/postgresql:U"
+          "${config.age.secrets.auth-db-pass.path}:/run/secrets/AUTH_DB_PASS:ro"
         ];
       };
     };
