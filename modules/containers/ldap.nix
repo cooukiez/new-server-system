@@ -25,12 +25,12 @@ created 2026-05-13 by ludw
 
       LLDAP_DATABASE_URL = let
         name = "lldap";
-        user = "lldap";
+        user = "admin";
         pass = "@PLACEHOLDER_DB_PASS@";
 
         host = "lldap-postgres";
         port = "5432";
-      in "postgres://${user}:${pass}@${host}:${port}/${name}?sslmode=disable";
+      in "postgres://${user}:${pass}@${host}:${port}/${name}";
     };
 
     secrets = {
@@ -62,13 +62,12 @@ in {
     lldap-db-pass = mkSecret "auth/ldap/s_db-pass";
     lldap-jwt = mkSecret "auth/ldap/s_jwt-secret";
     lldap-seed = mkSecret "auth/ldap/s_key-seed";
-
-    ldap-postgres-pw = mkSecret "db/s_postgres-pw";
   };
 
+  
   virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes;
-  in {
+    inherit (config.virtualisation.quadlet) volumes networks;
+  in {    
     volumes.lldap-db.volumeConfig = {
       type = "bind";
       device = "/opt/lldap/db";
@@ -89,7 +88,7 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.postgres}";
         name = "lldap-postgres";
-        networks = ["auth-net" "postgres-net"];
+        networks = [networks.auth-net.ref networks.postgres-net.ref];
 
         environments = {
           POSTGRES_USER = "admin";
@@ -102,7 +101,7 @@ in {
           "/etc/timezone:/etc/timezone:ro"
           "/etc/localtime:/etc/localtime:ro"
 
-          "${volumes.authelia-db.ref}:/var/lib/postgresql:U"
+          "${volumes.lldap-db.ref}:/var/lib/postgresql:U"
           "${config.age.secrets.lldap-db-pass.path}:/run/secrets/LLDAP_DB_PASS:ro"
         ];
       };
@@ -130,7 +129,7 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.lldap}";
         name = "lldap";
-        networks = ["auth-net"];
+        networks = [networks.auth-net.ref networks.postgres-net.ref];
 
         environments = {
           TZ = "Europe/Berlin";

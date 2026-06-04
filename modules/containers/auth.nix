@@ -193,7 +193,7 @@ in {
     secretMap;
 
   virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes;
+    inherit (config.virtualisation.quadlet) volumes networks;
   in {
     networks.auth-net = {
       networkConfig = {
@@ -221,7 +221,7 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.postgres}";
         name = "authelia-postgres";
-        networks = ["auth-net" "postgres-net"];
+        networks = [networks.auth-net.ref networks.postgres-net.ref];
 
         environments = {
           POSTGRES_USER = "admin";
@@ -278,7 +278,7 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.authelia}";
         name = "authelia";
-        networks = ["auth-net"];
+        networks = [networks.auth-net.ref networks.postgres-net.ref];
 
         volumes =
           (lib.mapAttrsToList (
