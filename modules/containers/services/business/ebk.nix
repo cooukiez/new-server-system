@@ -54,7 +54,7 @@ in {
 
     volumes.ebk-db.volumeConfig = {
       type = "bind";
-      device = "/opt/atuin/db";
+      device = "/opt/ebk/db";
     };
 
     volumes.ebk-data.volumeConfig = {
