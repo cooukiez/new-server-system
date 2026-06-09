@@ -6,7 +6,6 @@ created 2026-05-13 by ludw
 */
 {
   config,
-  ports,
   ...
 }: {
   # https://github.com/mayswind/ezbookkeeping/blob/e6c6d021124566325cdbafeb70616378dc9654f7/conf/ezbookkeeping.ini#L4

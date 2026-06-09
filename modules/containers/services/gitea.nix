@@ -16,9 +16,9 @@ created 2026-05-13 by ludw
     path = "containers/gitea/env";
     vars = {
       GITEA__database__DB_TYPE = "postgres";
-      GITEA__database__HOST = "host.containers.internal:${toString ports.postgres}";
+      GITEA__database__HOST = "gitea-postgres:5432";
       GITEA__database__NAME = "gitea";
-      GITEA__database__USER = "gitea";
+      GITEA__database__USER = "admin";
       GITEA__database__PASSWD = "@PLACEHOLDER_DB_PASS@";
     };
 
@@ -53,12 +53,54 @@ in {
   };
 
   virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes;
+    inherit (config.virtualisation.quadlet) volumes networks;
   in {
+    networks.gitea-net = {
+      networkConfig = {
+        internal = false;
+      };
+    };
+
+    volumes.gitea-db.volumeConfig = {
+      type = "bind";
+      device = "/opt/gitea/db";
+    };
+
     volumes.gitea-data.volumeConfig = {
       type = "bind";
       device = "/opt/gitea/data";
     };
+
+
+    containers.gitea-postgres = {
+      autoStart = true;
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
+      };
+
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.postgres}";
+        name = "gitea-postgres";
+        networks = [networks.gitea-net.ref networks.postgres-net.ref];
+
+        environments = {
+          POSTGRES_USER = "admin";
+          POSTGRES_PASSWORD_FILE = "/run/secrets/GITEA_DB_PASS";
+
+          POSTGRES_DB = "gitea";
+        };
+
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
+
+          "${volumes.gitea-db.ref}:/var/lib/postgresql:U"
+          "${config.age.secrets.gitea-db-pass.path}:/run/secrets/GITEA_DB_PASS:ro"
+        ];
+      };
+    };
+
 
     containers.gitea = {
       autoStart = true;
@@ -82,6 +124,7 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.gitea}";
         name = "gitea";
+        networks = [networks.gitea-net.ref];
 
         addHosts = [
           "auth.home.lan:host-gateway"

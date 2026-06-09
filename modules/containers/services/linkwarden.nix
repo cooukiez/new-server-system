@@ -29,11 +29,11 @@ created 2026-05-13 by ludw
     vars = {
       DATABASE_URL = let
         name = "linkwarden";
-        user = "linkwarden";
+        user = "admin";
         pass = "@PLACEHOLDER_DB_PASS@";
 
-        host = "host.containers.internal";
-        port = toString ports.postgres;
+        host = "linkwarden-postgres";
+        port = "5432";
       in "postgres://${user}:${pass}@${host}:${port}/${name}?sslmode=disable";
 
       MEILISEARCH_ENDPOINT = "http://linkwarden-meili:7700";
@@ -87,12 +87,17 @@ in {
   };
 
   virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes;
+    inherit (config.virtualisation.quadlet) volumes networks;
   in {
     networks.linkwarden-net = {
       networkConfig = {
         internal = false;
       };
+    };
+
+    volumes.linkwarden-db.volumeConfig = {
+      type = "bind";
+      device = "/opt/linkwarden/db";
     };
 
     volumes.linkwarden-meili.volumeConfig = {
@@ -121,7 +126,7 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.meili}";
         name = "linkwarden-meili";
-        networks = ["linkwarden-net"];
+        networks = [networks.linkwarden-net.ref];
 
         environments = {
           TZ = "Europe/Berlin";
@@ -139,6 +144,36 @@ in {
         ];
       };
     };
+
+    containers.linkwarden-postgres = {
+      autoStart = true;
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
+      };
+
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.postgres}";
+        name = "linkwarden-postgres";
+        networks = [networks.linkwarden-net.ref networks.postgres-net.ref];
+
+        environments = {
+          POSTGRES_USER = "admin";
+          POSTGRES_PASSWORD_FILE = "/run/secrets/LINK_DB_PASS";
+
+          POSTGRES_DB = "linkwarden";
+        };
+
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
+
+          "${volumes.linkwarden-db.ref}:/var/lib/postgresql:U"
+          "${config.age.secrets.link-db-pass.path}:/run/secrets/LINK_DB_PASS:ro"
+        ];
+      };
+    };
+
 
     containers.linkwarden = {
       autoStart = true;
@@ -169,7 +204,7 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.linkwarden}";
         name = "linkwarden";
-        networks = ["linkwarden-net"];
+        networks = [networks.linkwarden-net.ref];
 
         addHosts = [
           "auth.home.lan:host-gateway"

@@ -20,18 +20,6 @@ created 2026-05-13 by ludw
       pass = "@PLACEHOLDER_EBK_DB_PASS@";
     }
     {
-      name = "gitea";
-      user = "gitea";
-      dbs = ["gitea"];
-      pass = "@PLACEHOLDER_GITEA_DB_PASS@";
-    }
-    {
-      name = "linkwarden";
-      user = "linkwarden";
-      dbs = ["linkwarden"];
-      pass = "@PLACEHOLDER_LINK_DB_PASS@";
-    }
-    {
       name = "mail-archiver";
       user = "archiver";
       dbs = ["mail-archiver"];

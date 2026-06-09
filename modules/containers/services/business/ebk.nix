@@ -11,7 +11,7 @@ created 2026-05-13 by ludw
   ports,
   ...
 }: let
-  ebkSettings = (import ./ebk-config.nix {inherit config ports;}).ebkSettings;
+  ebkSettings = (import ./ebk-config.nix {inherit config;}).ebkSettings;
 in {
   myServices.ebk = {
     serviceConfig = {
