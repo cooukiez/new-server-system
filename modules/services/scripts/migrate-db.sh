@@ -56,9 +56,9 @@ echo "=> Restoring database in target container..."
 podman exec -t "$TARGET_CONTAINER" pg_restore -U "$DB_USER" -d "$TARGET_DB_NAME" --no-owner --no-acl -v /tmp/database.dump
 
 echo ""
-echo "=========================================="
-echo "Database migration completed successfully!"
-echo "=========================================="
+echo "========================================="
+echo "      Database migration completed!"
+echo "========================================="
 
 # optional cleanup
 read -p "Would you like to delete the local dump file ($LOCAL_DUMP_PATH)? (y/N): " CLEANUP

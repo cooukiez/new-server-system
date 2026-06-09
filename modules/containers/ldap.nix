@@ -30,7 +30,7 @@ created 2026-05-13 by ludw
 
         host = "lldap-postgres";
         port = "5432";
-      in "postgres://${user}:${pass}@${host}:${port}/${name}";
+      in "postgres://${user}:${pass}@${host}:${port}/${name}?sslmode=disable";
     };
 
     secrets = {
