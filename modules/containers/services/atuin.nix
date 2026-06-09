@@ -22,11 +22,11 @@ created 2026-05-13 by ludw
 
       ATUIN_DB_URI = let
         name = "atuin";
-        user = "atuin";
+        user = "admin";
         pass = "@PLACEHOLDER_DB_PASS@";
 
-        host = "host.containers.internal";
-        port = toString ports.postgres;
+        host = "atuin-postgres";
+        port = "5432";
       in "postgres://${user}:${pass}@${host}:${port}/${name}?sslmode=disable";
 
       RUST_LOG = "info,atuin_server=debug";
@@ -61,12 +61,53 @@ in {
   };
 
   virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes;
+    inherit (config.virtualisation.quadlet) volumes networks;
   in {
+    networks.atuin-net = {
+      networkConfig = {
+        internal = false;
+      };
+    };
+
     volumes.atuin-config.volumeConfig = {
       type = "bind";
       device = "/opt/atuin/config";
     };
+
+    volumes.atuin-db.volumeConfig = {
+      type = "bind";
+      device = "/opt/atuin/db";
+    };
+
+    containers.atuin-postgres = {
+      autoStart = true;
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
+      };
+
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.postgres}";
+        name = "atuin-postgres";
+        networks = [networks.atuin-net.ref networks.postgres-net.ref];
+
+        environments = {
+          POSTGRES_USER = "admin";
+          POSTGRES_PASSWORD_FILE = "/run/secrets/ATUIN_DB_PASS";
+
+          POSTGRES_DB = "atuin";
+        };
+
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
+
+          "${volumes.atuin-db.ref}:/var/lib/postgresql:U"
+          "${config.age.secrets.atuin-db-pass.path}:/run/secrets/ATUIN_DB_PASS:ro"
+        ];
+      };
+    };
+
 
     containers.atuin = {
       autoStart = true;
@@ -90,6 +131,7 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.atuin}";
         name = "atuin";
+        networks = [networks.atuin-net.ref];
 
         exec = ["start"];
 

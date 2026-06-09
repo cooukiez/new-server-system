@@ -43,6 +43,10 @@ if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
 fi
 
 echo ""
+echo "=> Starting database container..."
+systemctl --user start "$TARGET_CONTAINER"
+
+echo ""
 echo "=> Exporting database from source container ($SRC_CONTAINER)..."
 podman exec -t "$SRC_CONTAINER" pg_dump -U "$DB_USER" -d "$DB_NAME" -F c -b -v -f /tmp/database.dump
 
@@ -52,9 +56,18 @@ podman cp "$SRC_CONTAINER":/tmp/database.dump "$LOCAL_DUMP_PATH"
 echo "=> Copying dump file from local machine to target container ($TARGET_CONTAINER)..."
 podman cp "$LOCAL_DUMP_PATH" "$TARGET_CONTAINER":/tmp/database.dump
 
+echo ""
+echo "=> Preparing target database (dropping if exists and recreating)..."
+
+podman exec "$TARGET_CONTAINER" psql -U "$DB_USER" -d postgres -c \
+  "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$TARGET_DB_NAME' AND pid <> pg_backend_pid();"
+
+podman exec "$TARGET_CONTAINER" dropdb -U "$DB_USER" --if-exists "$TARGET_DB_NAME"
+
+podman exec "$TARGET_CONTAINER" createdb -U "$DB_USER" "$TARGET_DB_NAME"
+
 echo "=> Restoring database in target container..."
 podman exec -t "$TARGET_CONTAINER" pg_restore -U "$DB_USER" -d "$TARGET_DB_NAME" --no-owner --no-acl -v /tmp/database.dump
-
 echo ""
 echo "========================================="
 echo "      Database migration completed!"
