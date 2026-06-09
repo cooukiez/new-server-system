@@ -41,11 +41,11 @@ created 2026-05-13 by ludw
 
     database = {
       type = "postgres";
-      host = "host.containers.internal:${toString ports.postgres}";
+      host = "ebk-postgres:5432";
       ssl_mode = "disable";
 
       name = "ebk";
-      user = "ebk";
+      user = "admin";
 
       auto_update_database = true;
 

@@ -14,12 +14,6 @@ created 2026-05-13 by ludw
 }: let
   services = [
     {
-      name = "atuin";
-      user = "atuin";
-      dbs = ["atuin"];
-      pass = "@PLACEHOLDER_ATUIN_DB_PASS@";
-    }
-    {
       name = "ebk";
       user = "ebk";
       dbs = ["ebk"];

@@ -44,8 +44,19 @@ in {
   };
 
   virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes;
+    inherit (config.virtualisation.quadlet) volumes networks;
   in {
+    networks.ebk-net = {
+      networkConfig = {
+        internal = false;
+      };
+    };
+
+    volumes.ebk-db.volumeConfig = {
+      type = "bind";
+      device = "/opt/atuin/db";
+    };
+
     volumes.ebk-data.volumeConfig = {
       type = "bind";
       device = "/opt/ebk/data";
@@ -54,6 +65,35 @@ in {
     volumes.ebk-log.volumeConfig = {
       type = "bind";
       device = "/opt/ebk/log";
+    };
+
+    containers.ebk-postgres = {
+      autoStart = true;
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
+      };
+
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.postgres}";
+        name = "ebk-postgres";
+        networks = [networks.ebk-net.ref networks.postgres-net.ref];
+
+        environments = {
+          POSTGRES_USER = "admin";
+          POSTGRES_PASSWORD_FILE = "/run/secrets/EBK_DB_PASS";
+
+          POSTGRES_DB = "ebk";
+        };
+
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
+
+          "${volumes.ebk-db.ref}:/var/lib/postgresql:U"
+          "${config.age.secrets.ebk-db-pass.path}:/run/secrets/EBK_DB_PASS:ro"
+        ];
+      };
     };
 
     containers.ebk = {
@@ -72,6 +112,7 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.ebk}";
         name = "ebk";
+        networks = [networks.ebk-net.ref];
 
         addHosts = [
           "auth.home.lan:host-gateway"

@@ -108,7 +108,6 @@ in {
       };
     };
 
-
     containers.atuin = {
       autoStart = true;
 
