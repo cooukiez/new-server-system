@@ -174,7 +174,6 @@ in {
       };
     };
 
-
     containers.linkwarden = {
       autoStart = true;
 

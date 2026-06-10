@@ -71,7 +71,6 @@ in {
       device = "/opt/gitea/data";
     };
 
-
     containers.gitea-postgres = {
       autoStart = true;
       serviceConfig = {
@@ -100,7 +99,6 @@ in {
         ];
       };
     };
-
 
     containers.gitea = {
       autoStart = true;

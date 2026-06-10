@@ -64,10 +64,9 @@ in {
     lldap-seed = mkSecret "auth/ldap/s_key-seed";
   };
 
-  
   virtualisation.quadlet = let
     inherit (config.virtualisation.quadlet) volumes networks;
-  in {    
+  in {
     volumes.lldap-db.volumeConfig = {
       type = "bind";
       device = "/opt/lldap/db";
