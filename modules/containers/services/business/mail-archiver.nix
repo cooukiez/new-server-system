@@ -31,11 +31,11 @@ created 2026-05-13 by ludw
       DatabaseMaintenance__TimeoutMinutes = "30";
 
       ConnectionStrings__DefaultConnection = builtins.concatStringsSep ";" [
-        "Host=host.containers.internal"
-        "Port=${toString ports.postgres}"
+        "Host=mail-archiver-postgres"
+        "Port=5432"
         "Database=mail-archiver"
 
-        "Username=archiver"
+        "Username=admin"
         "Password=@PLACEHOLDER_DB_PASS@"
       ];
 
@@ -99,19 +99,59 @@ in {
   };
 
   virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes;
+    inherit (config.virtualisation.quadlet) volumes networks;
   in {
+    networks.mail-archiver-net = {
+      networkConfig = {
+        internal = false;
+      };
+    };
+
+    volumes.mail-archiver-db.volumeConfig = {
+      type = "bind";
+      device = "/opt/mail-archiver/db";
+    };
+
     volumes.mail-archiver-protection-keys.volumeConfig = {
       type = "bind";
       device = "/opt/mail-archiver/protection-keys";
+    };
+
+    containers.mail-archiver-postgres = {
+      autoStart = true;
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
+      };
+
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.postgres}";
+        name = "mail-archiver-postgres";
+        networks = [networks.mail-archiver-net.ref networks.postgres-net.ref];
+
+        environments = {
+          POSTGRES_USER = "admin";
+          POSTGRES_PASSWORD_FILE = "/run/secrets/ARCHIVER_DB_PASS";
+
+          POSTGRES_DB = "mail-archiver";
+        };
+
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
+
+          "${volumes.mail-archiver-db.ref}:/var/lib/postgresql:U"
+          "${config.age.secrets.archiver-db-pass.path}:/run/secrets/ARCHIVER_DB_PASS:ro"
+        ];
+      };
     };
 
     containers.mail-archiver = {
       autoStart = true;
 
       unitConfig = {
-        Requires = ["postgres.service"];
-        After = ["postgres.service"];
+        Requires = ["mail-archiver-postgres.service"];
+        After = ["mail-archiver-postgres.service"];
       };
 
       serviceConfig = {
@@ -128,6 +168,7 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.mail-archiver}";
         name = "mail-archiver";
+        networks = [networks.mail-archiver-net.ref];
 
         addHosts = [
           "auth.home.lan:host-gateway"

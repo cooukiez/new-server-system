@@ -18,11 +18,11 @@ created 2026-05-13 by ludw
       MEMOS_DRIVER = "postgres";
       MEMOS_DSN = let
         name = "memos";
-        user = "memos";
+        user = "admin";
         pass = "@PLACEHOLDER_DB_PASS@";
 
-        host = "host.containers.internal";
-        port = toString ports.postgres;
+        host = "memos-postgres";
+        port = "5432";
       in "postgres://${user}:${pass}@${host}:${port}/${name}?sslmode=disable";
 
       MEMOS_ADDR = "0.0.0.0";
@@ -62,19 +62,59 @@ in {
   };
 
   virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes;
+    inherit (config.virtualisation.quadlet) volumes networks;
   in {
+    networks.memos-net = {
+      networkConfig = {
+        internal = false;
+      };
+    };
+
+    volumes.memos-db.volumeConfig = {
+      type = "bind";
+      device = "/opt/memos/db";
+    };
+
     volumes.memos-data.volumeConfig = {
       type = "bind";
       device = "/opt/memos/data";
+    };
+
+    containers.memos-postgres = {
+      autoStart = true;
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
+      };
+
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.postgres}";
+        name = "memos-postgres";
+        networks = [networks.memos-net.ref networks.postgres-net.ref];
+
+        environments = {
+          POSTGRES_USER = "admin";
+          POSTGRES_PASSWORD_FILE = "/run/secrets/MEMOS_DB_PASS";
+
+          POSTGRES_DB = "memos";
+        };
+
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
+
+          "${volumes.memos-db.ref}:/var/lib/postgresql:U"
+          "${config.age.secrets.memos-db-pass.path}:/run/secrets/MEMOS_DB_PASS:ro"
+        ];
+      };
     };
 
     containers.memos = {
       autoStart = true;
 
       unitConfig = {
-        Requires = ["postgres.service"];
-        After = ["postgres.service"];
+        Requires = ["memos-postgres.service"];
+        After = ["memos-postgres.service"];
       };
 
       serviceConfig = {
@@ -91,6 +131,7 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.memos}";
         name = "memos";
+        networks = [networks.memos-net.ref];
 
         addHosts = [
           "auth.home.lan:host-gateway"

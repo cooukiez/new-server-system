@@ -19,11 +19,11 @@ created 2026-05-13 by ludw
 
       OG_DB_URI = let
         name = "opengist";
-        user = "opengist";
+        user = "admin";
         pass = "@PLACEHOLDER_DB_PASS@";
 
-        host = "host.containers.internal";
-        port = toString ports.postgres;
+        host = "opengist-postgres";
+        port = "5432";
       in "postgres://${user}:${pass}@${host}:${port}/${name}?sslmode=disable";
 
       OG_EXTERNAL_URL = config.myServices.opengist.serviceConfig.href;
@@ -69,19 +69,59 @@ in {
   };
 
   virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes;
+    inherit (config.virtualisation.quadlet) volumes networks;
   in {
+    networks.opengist-net = {
+      networkConfig = {
+        internal = false;
+      };
+    };
+
+    volumes.opengist-db.volumeConfig = {
+      type = "bind";
+      device = "/opt/opengist/db";
+    };
+
     volumes.opengist-data.volumeConfig = {
       type = "bind";
       device = "/opt/opengist/data";
+    };
+
+    containers.opengist-postgres = {
+      autoStart = true;
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
+      };
+
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.postgres}";
+        name = "opengist-postgres";
+        networks = [networks.opengist-net.ref networks.postgres-net.ref];
+
+        environments = {
+          POSTGRES_USER = "admin";
+          POSTGRES_PASSWORD_FILE = "/run/secrets/OPENGIST_DB_PASS";
+
+          POSTGRES_DB = "opengist";
+        };
+
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
+
+          "${volumes.opengist-db.ref}:/var/lib/postgresql:U"
+          "${config.age.secrets.opengist-db-pass.path}:/run/secrets/OPENGIST_DB_PASS:ro"
+        ];
+      };
     };
 
     containers.opengist = {
       autoStart = true;
 
       unitConfig = {
-        Requires = ["postgres.service"];
-        After = ["postgres.service"];
+        Requires = ["opengist-postgres.service"];
+        After = ["opengist-postgres.service"];
       };
 
       serviceConfig = {
@@ -99,6 +139,7 @@ in {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.opengist}";
         name = "opengist";
         user = "0:0";
+        networks = [networks.opengist-net.ref];
 
         addHosts = [
           "auth.home.lan:host-gateway"

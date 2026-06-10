@@ -106,8 +106,8 @@ in {
       autoStart = true;
 
       unitConfig = {
-        Requires = ["postgres.service"];
-        After = ["postgres.service"];
+        Requires = ["gitea-postgres.service"];
+        After = ["gitea-postgres.service"];
       };
 
       serviceConfig = {

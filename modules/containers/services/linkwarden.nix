@@ -95,14 +95,14 @@ in {
       };
     };
 
-    volumes.linkwarden-db.volumeConfig = {
-      type = "bind";
-      device = "/opt/linkwarden/db";
-    };
-
     volumes.linkwarden-meili.volumeConfig = {
       type = "bind";
       device = "/opt/linkwarden/meili";
+    };
+
+    volumes.linkwarden-db.volumeConfig = {
+      type = "bind";
+      device = "/opt/linkwarden/db";
     };
 
     volumes.linkwarden-data.volumeConfig = {
@@ -180,13 +180,13 @@ in {
 
       unitConfig = {
         Requires = [
-          "postgres.service"
           "linkwarden-meili.service"
+          "linkwarden-postgres.service"
         ];
 
         After = [
-          "postgres.service"
           "linkwarden-meili.service"
+          "linkwarden-postgres.service"
         ];
       };
 

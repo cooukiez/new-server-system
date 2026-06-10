@@ -20,24 +20,6 @@ created 2026-05-13 by ludw
       pass = "@PLACEHOLDER_EBK_DB_PASS@";
     }
     {
-      name = "mail-archiver";
-      user = "archiver";
-      dbs = ["mail-archiver"];
-      pass = "@PLACEHOLDER_ARCHIVER_DB_PASS@";
-    }
-    {
-      name = "memos";
-      user = "memos";
-      dbs = ["memos"];
-      pass = "@PLACEHOLDER_MEMOS_DB_PASS@";
-    }
-    {
-      name = "opengist";
-      user = "opengist";
-      dbs = ["opengist"];
-      pass = "@PLACEHOLDER_OPENGIST_DB_PASS@";
-    }
-    {
       name = "outline";
       user = "outline";
       dbs = ["outline"];

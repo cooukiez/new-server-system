@@ -100,8 +100,8 @@ in {
       autoStart = true;
 
       unitConfig = {
-        Requires = ["postgres.service"];
-        After = ["postgres.service"];
+        Requires = ["ebk-postgres.service"];
+        After = ["ebk-postgres.service"];
       };
 
       serviceConfig = {

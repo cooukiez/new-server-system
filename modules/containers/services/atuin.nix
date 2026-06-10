@@ -112,8 +112,8 @@ in {
       autoStart = true;
 
       unitConfig = {
-        Requires = ["postgres.service"];
-        After = ["postgres.service"];
+        Requires = ["atuin-postgres.service"];
+        After = ["atuin-postgres.service"];
       };
 
       serviceConfig = {

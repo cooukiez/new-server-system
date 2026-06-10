@@ -27,11 +27,11 @@ created 2026-05-13 by ludw
 
       DATABASE_URL = let
         name = "outline";
-        user = "outline";
+        user = "admin";
         pass = "@PLACEHOLDER_DB_PASS@";
 
-        host = "host.containers.internal";
-        port = toString ports.postgres;
+        host = "outline-postgres";
+        port = "5432";
       in "postgres://${user}:${pass}@${host}:${port}/${name}?sslmode=disable";
 
       REDIS_URL = "outline-redis:6379";
@@ -95,12 +95,17 @@ in {
   };
 
   virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes;
+    inherit (config.virtualisation.quadlet) volumes networks;
   in {
     networks.outline-net = {
       networkConfig = {
         internal = false;
       };
+    };
+
+    volumes.outline-db.volumeConfig = {
+      type = "bind";
+      device = "/opt/outline/db";
     };
 
     volumes.outline-data.volumeConfig = {
@@ -118,11 +123,40 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.redis}";
         name = "outline-redis";
-        networks = ["outline-net"];
+        networks = [networks.outline-net.ref];
 
         volumes = [
           "/etc/timezone:/etc/timezone:ro"
           "/etc/localtime:/etc/localtime:ro"
+        ];
+      };
+    };
+
+    containers.outline-postgres = {
+      autoStart = true;
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
+      };
+
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.postgres}";
+        name = "outline-postgres";
+        networks = [networks.outline-net.ref networks.postgres-net.ref];
+
+        environments = {
+          POSTGRES_USER = "admin";
+          POSTGRES_PASSWORD_FILE = "/run/secrets/OUTLINE_DB_PASS";
+
+          POSTGRES_DB = "outline";
+        };
+
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
+
+          "${volumes.outline-db.ref}:/var/lib/postgresql:U"
+          "${config.age.secrets.outline-db-pass.path}:/run/secrets/OUTLINE_DB_PASS:ro"
         ];
       };
     };
@@ -132,13 +166,13 @@ in {
 
       unitConfig = {
         Requires = [
-          "postgres.service"
           "outline-redis.service"
+          "outline-postgres.service"
         ];
 
         After = [
-          "postgres.service"
           "outline-redis.service"
+          "outline-postgres.service"
         ];
       };
 
@@ -156,7 +190,7 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.outline}";
         name = "outline";
-        networks = ["outline-net"];
+        networks = [networks.outline-net.ref];
 
         addHosts = [
           "auth.home.lan:host-gateway"
