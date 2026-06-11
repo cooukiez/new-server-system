@@ -19,6 +19,7 @@ created 2026-05-13 by ludw
 in {
   imports = [
     ./config.nix
+    ./disko-config.nix
     ./hardware-generated.nix
     ./hardware.nix
 
@@ -28,6 +29,7 @@ in {
     inputs.self.containerModules
     inputs.self.serviceModules
 
+    inputs.disko.nixosModules.disko
     inputs.agenix.nixosModules.default
     inputs.home-manager.nixosModules.home-manager
     inputs.quadlet-nix.nixosModules.quadlet

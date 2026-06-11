@@ -4,21 +4,11 @@ modules/service-config.nix
 part of server system
 created 2026-05-13 by ludw
 */
-{
-  config,
-  lib,
-  ...
-}: let
-  homeDir = config.home.homeDirectory;
-in {
+{lib, ...}: {
   options.myServices = lib.mkOption {
     type = lib.types.attrsOf (
       lib.types.submodule (
-        {
-          config,
-          name,
-          ...
-        }: let
+        {name, ...}: let
           serviceName = name;
         in {
           options = {
