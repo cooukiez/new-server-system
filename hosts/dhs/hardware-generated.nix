@@ -26,12 +26,12 @@ created 2026-05-13 by ludw
   boot.extraModulePackages = [];
 
   fileSystems."/" = {
-    device = "zroot/local/root";
+    device = lib.mkForce "zroot/local/root";
     fsType = "zfs";
   };
 
   fileSystems."/boot" = {
-    device = "/dev/disk/by-uuid/1BC0-2314";
+    device = lib.mkForce "/dev/disk/by-uuid/1BC0-2314";
     fsType = "vfat";
     options = [
       "fmask=0077"
@@ -40,27 +40,27 @@ created 2026-05-13 by ludw
   };
 
   fileSystems."/home" = {
-    device = "zroot/local/home";
+    device = lib.mkForce "zroot/local/home";
     fsType = "zfs";
   };
 
   fileSystems."/media" = {
-    device = "zroot/local/media";
+    device = lib.mkForce "zroot/local/media";
     fsType = "zfs";
   };
 
   fileSystems."/nix" = {
-    device = "zroot/local/nix";
+    device = lib.mkForce "zroot/local/nix";
     fsType = "zfs";
   };
 
   fileSystems."/opt" = {
-    device = "zroot/local/opt";
+    device = lib.mkForce "zroot/local/opt";
     fsType = "zfs";
   };
 
   fileSystems."/var" = {
-    device = "zroot/local/var";
+    device = lib.mkForce "zroot/local/var";
     fsType = "zfs";
   };
 

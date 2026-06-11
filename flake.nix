@@ -13,6 +13,11 @@ created 2026-05-13 by ludw
 
     nixos-system.url = "github:cooukiez/nixos-system";
 
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     home-manager = {
       url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";

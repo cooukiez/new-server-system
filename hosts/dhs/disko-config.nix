@@ -104,13 +104,10 @@ created 2026-05-13 by ludw
           };
 
           "swap" = {
-            type = "zfs_unmanaged";
+            type = "zfs_volume";
+            size = "16G";
             content = {
-              type = "zfs_volume";
-              size = "16G";
-              content = {
-                type = "swap";
-              };
+              type = "swap";
             };
           };
 

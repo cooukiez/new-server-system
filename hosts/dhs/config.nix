@@ -13,7 +13,7 @@ created 2026-05-13 by ludw
 }: {
   # boot configuration
   boot = {
-    kernelPackages = pkgs.linuxPackages_latest;
+    kernelPackages = pkgs.linuxPackages_6_12;
     consoleLogLevel = 0;
 
     initrd.verbose = false;
