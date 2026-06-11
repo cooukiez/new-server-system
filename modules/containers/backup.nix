@@ -72,7 +72,7 @@ in {
   };
 
   virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes;
+    inherit (config.virtualisation.quadlet) volumes networks;
   in {
     networks.borg-net = {
       networkConfig = {
@@ -128,7 +128,7 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.redis}";
         name = "borg-redis";
-        networks = ["borg-net"];
+        networks = [networks.borg-net.ref];
 
         volumes = [
           "/etc/timezone:/etc/timezone:ro"
@@ -159,7 +159,7 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.borg-ui}";
         name = "borg";
-        networks = ["borg-net"];
+        networks = [networks.borg-net.ref];
 
         environments = {
           TZ = "Europe/Berlin";

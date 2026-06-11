@@ -36,7 +36,7 @@ created 2026-05-13 by ludw
   };
 
   virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes;
+    inherit (config.virtualisation.quadlet) volumes networks;
   in {
     networks.media-net = {
       networkConfig = {
@@ -86,7 +86,7 @@ created 2026-05-13 by ludw
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.jellyfin}";
         name = "jellyfin";
-        networks = ["media-net"];
+        networks = [networks.media-net.ref];
 
         addHosts = [
           "ldap.home.lan:host-gateway"

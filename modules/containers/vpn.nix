@@ -84,7 +84,7 @@ in {
   };
 
   virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes;
+    inherit (config.virtualisation.quadlet) volumes networks;
   in {
     networks.vpn-service-net = {
       networkConfig = {
@@ -113,7 +113,7 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.gluetun}";
         name = "gluetun";
-        networks = ["vpn-service-net"];
+        networks = [networks.vpn-service-net.ref];
 
         addCapabilities = [
           "NET_ADMIN"
@@ -168,7 +168,7 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.gluetun-webui}";
         name = "gluetun-webui";
-        networks = ["vpn-service-net"];
+        networks = [networks.vpn-service-net.ref];
 
         addCapabilities = ["NET_RAW"];
 

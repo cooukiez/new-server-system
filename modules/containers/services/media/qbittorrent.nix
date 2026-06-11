@@ -30,7 +30,7 @@ created 2026-05-13 by ludw
   };
 
   virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes;
+    inherit (config.virtualisation.quadlet) containers volumes;
   in {
     volumes.qbittorrent-download.volumeConfig = {
       type = "bind";
@@ -60,7 +60,7 @@ created 2026-05-13 by ludw
         name = "qbittorrent";
 
         # networking through gluetun
-        networks = ["container:gluetun"];
+        networks = [containers.gluetun.ref];
 
         environments = {
           TZ = "Europe/Berlin";

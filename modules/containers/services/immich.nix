@@ -36,7 +36,7 @@ created 2026-05-13 by ludw
   };
 
   virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes;
+    inherit (config.virtualisation.quadlet) volumes networks;
   in {
     networks.immich-net = {
       networkConfig = {
@@ -74,7 +74,7 @@ created 2026-05-13 by ludw
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.immich-ml}";
         name = "immich-ml";
-        networks = ["immich-net"];
+        networks = [networks.immich-net.ref];
 
         volumes = [
           "/etc/timezone:/etc/timezone:ro"
@@ -99,7 +99,7 @@ created 2026-05-13 by ludw
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.valkey}";
         name = "immich-redis";
-        networks = ["immich-net"];
+        networks = [networks.immich-net.ref];
 
         volumes = [
           "/etc/timezone:/etc/timezone:ro"
@@ -120,7 +120,7 @@ created 2026-05-13 by ludw
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.immich-db}";
         name = "immich-postgres";
-        networks = ["immich-net"];
+        networks = [networks.immich-net.ref networks.postgres-net.ref];
 
         environments = {
           POSTGRES_USER = "admin";
@@ -165,7 +165,7 @@ created 2026-05-13 by ludw
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.immich-server}";
         name = "immich-server";
-        networks = ["immich-net"];
+        networks = [networks.immich-net.ref];
 
         addHosts = [
           "auth.home.lan:host-gateway"

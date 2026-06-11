@@ -185,7 +185,7 @@ in {
   };
 
   virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes;
+    inherit (config.virtualisation.quadlet) volumes networks;
   in {
     volumes.lidarr-db.volumeConfig = {
       type = "bind";
@@ -227,7 +227,7 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.postgres}";
         name = "lidarr-postgres";
-        networks = ["media-net" "postgres-net"];
+        networks = [networks.media-net.ref networks.postgres-net.ref];
 
         environments = {
           POSTGRES_USER = "admin";
@@ -277,7 +277,7 @@ in {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.lidarr}";
         name = "lidarr";
         userns = "keep-id:uid=10000,gid=10000";
-        networks = ["media-net"];
+        networks = [networks.media-net.ref];
 
         environments = {
           TZ = "Europe/Berlin";

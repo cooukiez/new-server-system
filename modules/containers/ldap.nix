@@ -128,7 +128,7 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.lldap}";
         name = "lldap";
-        networks = [networks.auth-net.ref networks.postgres-net.ref];
+        networks = [networks.auth-net.ref];
 
         environments = {
           TZ = "Europe/Berlin";

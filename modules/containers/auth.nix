@@ -278,7 +278,7 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.authelia}";
         name = "authelia";
-        networks = [networks.auth-net.ref networks.postgres-net.ref];
+        networks = [networks.auth-net.ref];
 
         volumes =
           (lib.mapAttrsToList (

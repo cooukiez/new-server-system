@@ -278,9 +278,9 @@ in {
   };
 
   virtualisation.quadlet = let
-    inherit (config.virtualisation.quadlet) volumes;
+    inherit (config.virtualisation.quadlet) volumes networks;
   in {
-    networks.monitoring = {
+    networks.monitoring-net = {
       networkConfig = {
         internal = false;
       };
@@ -320,7 +320,7 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.grafana}";
         name = "grafana";
-        networks = ["monitoring.network"];
+        networks = [networks.monitoring-net.ref];
 
         userns = "keep-id:uid=472,gid=472";
 
@@ -380,7 +380,7 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.prometheus}";
         name = "prometheus";
-        networks = ["monitoring.network"];
+        networks = [networks.monitoring-net.ref];
 
         userns = "keep-id:uid=65534,gid=65534";
 
@@ -427,7 +427,7 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.prometheus-podman-exporter}";
         name = "podman-exporter";
-        networks = ["monitoring.network"];
+        networks = [networks.monitoring-net.ref];
 
         environments = {
           TZ = "Europe/Berlin";
@@ -461,7 +461,7 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.loki}";
         name = "loki";
-        networks = ["monitoring.network"];
+        networks = [networks.monitoring-net.ref];
 
         environments = {
           TZ = "Europe/Berlin";
