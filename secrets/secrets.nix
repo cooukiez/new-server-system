@@ -140,6 +140,7 @@ in {
   #
   # unsorted
   #
+  "copyparty.age".publicKeys = allKeys;
   "global-agenix.age".publicKeys = allKeys;
   "proton-key.age".publicKeys = allKeys;
   "github-token.age".publicKeys = allKeys;
