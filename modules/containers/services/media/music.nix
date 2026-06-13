@@ -13,6 +13,8 @@ created 2026-05-13 by ludw
   downloadPath,
   ...
 }: let
+  lidarr-opus-convert = pkgs.writeShellScript "lidarr-opus-convert.sh" (builtins.readFile ./scripts/lidarr-opus-convert.sh);
+
   mkLidarrXml = attrs: ''
     <Config>
       ${builtins.concatStringsSep "\n  " (
@@ -301,6 +303,8 @@ in {
           # media volumes
           "${volumes.media-download.ref}:/download"
           "${volumes.media-music.ref}:/music"
+
+          "${lidarr-opus-convert}:/usr/local/bin/lidarr-opus-convert:ro"
         ];
 
         publishPorts = [
