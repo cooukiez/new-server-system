@@ -21,7 +21,8 @@ created 2026-06-14 by ludw
       subdomain = "tdarr";
       port = ports.tdarrWeb;
 
-      policy = "bypass";
+      policy = "two_factor";
+      group = "admins";
 
       icon = "tdarr";
     };
@@ -61,13 +62,14 @@ created 2026-06-14 by ludw
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.tdarr}";
         name = "tdarr";
+        userns = "keep-id:uid=10000,gid=10000";
         networks = [networks.media-net.ref];
 
         environments = {
           TZ = "Europe/Berlin";
 
-          PUID = "1000";
-          PGID = "1000";
+          PUID = "10000";
+          GUID = "10000";
 
           serverIP = "0.0.0.0";
           serverPort = "8266";
@@ -102,16 +104,6 @@ created 2026-06-14 by ludw
           "${volumes.tdarr-logs.ref}:/app/logs:U"
           
           "${volumes.media-music.ref}:/media/music"
-        ];
-
-        devices = [
-          "/dev/dri"
-        ];
-
-        podmanArgs = [
-          "--gpus=all"
-          "--log-opt=max-size=10m"
-          "--log-opt=max-file=5"
         ];
 
         publishPorts = [
