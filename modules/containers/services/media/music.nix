@@ -7,134 +7,16 @@ created 2026-05-13 by ludw
 {
   config,
   pkgs,
+  lib,
   images,
   ports,
   mkConf,
   downloadPath,
   ...
 }: let
-  mkLidarrXml = attrs: ''
-    <Config>
-      ${builtins.concatStringsSep "\n  " (
-      pkgs.lib.mapAttrsToList (k: v: "<${k}>${toString v}</${k}>") attrs
-    )}
-    </Config>
-  '';
-
-  # lidarr settings
-  createLidarrConf = mkConf {
-    path = "containers/lidarr/config.xml";
-    source = pkgs.writeText "lidarr-settings" (mkLidarrXml {
-      InstanceName = "Lidarr";
-
-      BindAddress = "*";
-      Port = "8686";
-      SslPort = "6868";
-
-      UrlBase = "";
-
-      EnableSsl = "False";
-      SslCertPath = "";
-      SslCertPassword = "";
-
-      LaunchBrowser = "True";
-      ApiKey = "@PLACEHOLDER_API_KEY@";
-
-      AuthenticationMethod = "Forms";
-      AuthenticationRequired = "Enabled";
-
-      Branch = "nightly";
-      UpdateMechanism = "Docker";
-
-      # postgres configuration
-      PostgresUser = "admin";
-      PostgresPassword = "@PLACEHOLDER_DB_PASS@";
-
-      PostgresHost = "lidarr-postgres";
-      PostgresPort = "5432";
-
-      PostgresMainDb = "lidarr-main";
-      PostgresLogDb = "lidarr-log";
-
-      LogLevel = "debug";
-      AnalyticsEnabled = "False";
-    });
-
-    secrets = {
-      PLACEHOLDER_API_KEY = config.age.secrets.lidarr-api-key.path;
-      PLACEHOLDER_DB_PASS = config.age.secrets.lidarr-db-pass.path;
-    };
-  };
-
-  # slskd settings
-  createSlskdConf = mkConf {
-    path = "containers/slskd/slskd.yml";
-    source = (pkgs.formats.yaml {}).generate "slskd-settings" {
-      directories = {
-        downloads = "/download/finished";
-        incomplete = "/download/incomplete";
-      };
-
-      shares = {
-        directories = ["/music"];
-      };
-
-      web = {
-        port = 5030;
-        https = {
-          disabled = false;
-          port = 5031;
-        };
-
-        authentication = {
-          disabled = false;
-          username = "admin";
-          password = "@PLACEHOLDER_WEBUI_PASS@";
-
-          apiKeys = {
-            lidarr = {
-              key = "@PLACEHOLDER_LIDARR_API_KEY@";
-              cidr = "0.0.0.0/0,::/0";
-            };
-          };
-        };
-      };
-
-      soulseek = {
-        address = "vps.slsknet.org";
-        port = 2271;
-
-        username = "@PLACEHOLDER_USER@";
-        password = "@PLACEHOLDER_PASS@";
-      };
-
-      flags = {
-        no_remote_configuration = true;
-      };
-
-      integrations = {
-        vpn = {
-          enabled = true;
-          portForwarding = false;
-          pollingInterval = 2500;
-          gluetun = {
-            version = 1;
-            url = "http://gluetun:8888";
-            auth = "apikey";
-            apiKey = "@PLACEHOLDER_GLUETUN_API_KEY@";
-          };
-        };
-      };
-    };
-
-    secrets = {
-      PLACEHOLDER_GLUETUN_API_KEY = config.age.secrets.slskd-gluetun-api-key.path;
-      PLACEHOLDER_LIDARR_API_KEY = config.age.secrets.slskd-lidarr-api-key.path;
-      PLACEHOLDER_USER = config.age.secrets.slskd-user.path;
-      PLACEHOLDER_PASS = config.age.secrets.slskd-pass.path;
-      PLACEHOLDER_WEBUI_PASS = config.age.secrets.slskd-webui-pass.path;
-    };
-  };
+  createLidarrConf = import ./settings/soularr.nix {inherit config pkgs mkConf;};
+  createSlskdConf = import ./settings/soularr.nix {inherit config pkgs mkConf;};
+  createSoularrConf = import ./settings/soularr.nix {inherit config pkgs lib mkConf;};
 in {
   myServices = {
     lidarr = {
@@ -161,7 +43,8 @@ in {
         subdomain = "deemix";
         port = ports.deemix;
 
-        policy = "bypass";
+        policy = "two_factor";
+        group = "admins";
 
         icon = "deemix";
       };
@@ -197,6 +80,9 @@ in {
     slskd-user = mkSecret "containers/slskd/s_user";
     slskd-pass = mkSecret "containers/slskd/s_pass";
     slskd-webui-pass = mkSecret "containers/slskd/s_webui-pass";
+
+    soularr-lidarr-api-key = mkSecret "containers/soularr/s_lidarr-key";
+    soularr-slskd-api-key = mkSecret "containers/soularr/s_slskd-key";
   };
 
   virtualisation.quadlet = let
@@ -240,6 +126,11 @@ in {
     volumes.slskd-download.volumeConfig = {
       type = "bind";
       device = "${downloadPath}/slskd";
+    };
+
+    volumes.soularr-data.volumeConfig = {
+      type = "bind";
+      device = "/opt/soularr/data";
     };
 
     containers.lidarr-postgres = {
@@ -347,14 +238,13 @@ in {
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.deemix}";
         name = "deemix";
-        userns = "keep-id:uid=10000,gid=10000";
         networks = [networks.media-net.ref];
 
         environments = {
           TZ = "Europe/Berlin";
 
-          PUID = "10000";
-          PGID = "10000";
+          PUID = "0";
+          PGID = "0";
 
           DEEMIX_SERVER_PORT = "6595";
           DEEMIX_DATA_DIR = "/config";
@@ -378,8 +268,6 @@ in {
         ];
       };
     };
-
-    # todo: use soularr
 
     containers.slskd = {
       autoStart = true;
@@ -442,6 +330,63 @@ in {
           "${toString ports.slskdHttp}:5030/tcp"
           "${toString ports.slskdHttps}:5031/tcp"
           "${toString ports.slskdPeer}:50300/tcp"
+        ];
+      };
+    };
+
+    containers.soularr = {
+      autoStart = true;
+
+      unitConfig = {
+        Requires = [
+          "lidarr.service"
+          "slskd.service"
+        ];
+
+        After = [
+          "lidarr.service"
+          "slskd.service"
+        ];
+      };
+
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
+
+        ExecStartPre = [
+          "+${pkgs.writeShellScript "pre-soularr" ''
+            ${createSoularrConf}
+          ''}"
+
+          /*
+          ${pkgs.coreutils}/bin/cp ${config.home.homeDirectory}/containers/soularr/config.ini /opt/soularr/data/config.ini
+          ${pkgs.coreutils}/bin/chmod 644 /opt/soularr/data/config.ini
+          */
+        ];
+      };
+
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.soularr}";
+        name = "soularr";
+        userns = "keep-id:uid=10000,gid=10000";
+        user = "10000:10000";
+
+        networks = [networks.media-net.ref];
+
+        environments = {
+          TZ = "Europe/Berlin";
+
+          SCRIPT_INTERVAL = "300";
+        };
+
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
+
+          "${volumes.soularr-data.ref}:/data"
+
+          "${config.home.homeDirectory}/containers/soularr/config.ini:/data/config.ini:ro"
+          "${volumes.slskd-download.ref}:/download"
         ];
       };
     };

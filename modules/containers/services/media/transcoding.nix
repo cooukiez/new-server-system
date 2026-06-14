@@ -10,8 +10,7 @@ created 2026-06-14 by ludw
   images,
   ports,
   ...
-}:
-{
+}: {
   myServices.tdarr = {
     serviceConfig = {
       name = "Tdarr";
@@ -102,7 +101,7 @@ created 2026-06-14 by ludw
           "${volumes.tdarr-server.ref}:/app/server:U"
           "${volumes.tdarr-transcode-cache.ref}:/temp:U"
           "${volumes.tdarr-logs.ref}:/app/logs:U"
-          
+
           "${volumes.media-music.ref}:/media/music"
         ];
 
