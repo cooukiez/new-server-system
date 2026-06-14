@@ -51,8 +51,8 @@
   },
   "qbittorrent": {
     "imageName": "lscr.io/linuxserver/qbittorrent",
-    "imageDigest": "sha256:2e0148428b6769e2ee1eb6781246b6fca4b70cd680edfcb16e7113d9d6cb1631",
-    "sha256": "sha256-/H5sYYKwmta721mdd7wWM8LSxCUt8bAnCaHcJ+8hQJk="
+    "imageDigest": "sha256:1fc3067c4e684a4139be2e17915a63e9355ccba91c954a330d33fcb033bf7e71",
+    "sha256": "sha256-DEHZTjelxa8AZCBejzwqJs39pn0IOEmBRB+ARUpsDLs="
   },
   "tdarr": {
     "imageName": "ghcr.io/haveagitgat/tdarr",
