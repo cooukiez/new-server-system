@@ -61,14 +61,13 @@ created 2026-06-14 by ludw
       containerConfig = {
         image = "docker-archive:${pkgs.dockerTools.pullImage images.tdarr}";
         name = "tdarr";
-        userns = "keep-id:uid=10000,gid=10000";
         networks = [networks.media-net.ref];
 
         environments = {
           TZ = "Europe/Berlin";
 
-          PUID = "10000";
-          GUID = "10000";
+          PUID = "0";
+          GUID = "0";
 
           serverIP = "0.0.0.0";
           serverPort = "8266";
