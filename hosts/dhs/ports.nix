@@ -81,6 +81,10 @@ created 2026-05-13 by ludw
   qBittorrent = 6880;
   qBittorrentTorrenting = 6881;
 
+  # transcoding
+  tdarrWeb = 8265;
+  tdarr = 8266;
+
   # transfer-sh
   transferSH = 8010;
 

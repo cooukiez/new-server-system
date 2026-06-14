@@ -13,8 +13,6 @@ created 2026-05-13 by ludw
   downloadPath,
   ...
 }: let
-  lidarr-opus-convert = pkgs.writeShellScript "lidarr-opus-convert.sh" (builtins.readFile ./scripts/lidarr-opus-convert.sh);
-
   mkLidarrXml = attrs: ''
     <Config>
       ${builtins.concatStringsSep "\n  " (
@@ -204,11 +202,6 @@ in {
       device = "/opt/lidarr/cache";
     };
 
-    volumes.lidarr-log.volumeConfig = {
-      type = "bind";
-      device = "/opt/lidarr/log";
-    };
-
     volumes.deezer-download.volumeConfig = {
       type = "bind";
       device = "${downloadPath}/deezer";
@@ -301,20 +294,13 @@ in {
           "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
           "/certs/ca.crt:/certs/ca.crt:ro"
 
-          "/nix/store:/nix/store:ro"
-          "${pkgs.ffmpeg-headless}/bin/ffmpeg:/usr/local/bin/ffmpeg:ro"
-          "${pkgs.ffmpeg-headless}/bin/ffprobe:/usr/local/bin/ffprobe:ro"
-
           # volumes
           "${volumes.lidarr-data.ref}:/config:U"
           "${volumes.lidarr-cache.ref}:/cache:U"
-          "${volumes.lidarr-log.ref}:/log:U"
 
           # media volumes
           "${volumes.media-download.ref}:/download"
           "${volumes.media-music.ref}:/music"
-
-          "${lidarr-opus-convert}:/usr/local/bin/lidarr-opus-convert:ro"
         ];
 
         publishPorts = [

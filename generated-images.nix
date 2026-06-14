@@ -1,9 +1,3 @@
-/*
-generated-images.nix
-
-part of server system
-created 2026-05-13 by ludw
-*/
 {
   ebk = {
     imageName = "docker.io/mayswind/ezbookkeeping";
@@ -49,6 +43,11 @@ created 2026-05-13 by ludw
     imageName = "lscr.io/linuxserver/qbittorrent";
     imageDigest = "sha256:2e0148428b6769e2ee1eb6781246b6fca4b70cd680edfcb16e7113d9d6cb1631";
     sha256 = "sha256-/H5sYYKwmta721mdd7wWM8LSxCUt8bAnCaHcJ+8hQJk=";
+  };
+  tdarr = {
+    imageName = "ghcr.io/haveagitgat/tdarr";
+    imageDigest = "sha256:e5163f305367b47baacee761aa98f420fb4e46a8e5db22b197f23a550f96dd6b";
+    sha256 = "sha256-XTWrGNeeIZ4tH+2Veq9cdpoBu1yg39q8IIyB2Ig5a1o=";
   };
   atuin = {
     imageName = "ghcr.io/atuinsh/atuin";

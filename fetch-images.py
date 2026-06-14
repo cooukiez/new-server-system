@@ -18,6 +18,7 @@ IMAGES = [
     {"name": "lidarr", "repo": "lscr.io/linuxserver/lidarr", "tag": "nightly"},
     {"name": "slskd", "repo": "docker.io/slskd/slskd", "tag": "latest"},
     {"name": "qbittorrent", "repo": "lscr.io/linuxserver/qbittorrent", "tag": "latest"},
+    {"name": "tdarr", "repo": "ghcr.io/haveagitgat/tdarr", "tag": "latest"},
 
     {"name": "atuin", "repo": "ghcr.io/atuinsh/atuin", "tag": "latest"},
     {"name": "crontab", "repo": "docker.io/alseambusher/crontab-ui", "tag": "latest"},
