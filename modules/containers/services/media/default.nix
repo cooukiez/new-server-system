@@ -18,7 +18,7 @@ created 2026-05-13 by ludw
   imports = [
     ./music.nix
     ./qbittorrent.nix
-    ./transcoding.nix
+    # ./transcoding.nix
   ];
 
   myServices.jellyfin = {

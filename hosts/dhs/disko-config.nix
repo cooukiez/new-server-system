@@ -103,6 +103,7 @@ created 2026-05-13 by ludw
             options."com.sun:auto-snapshot" = "false";
           };
 
+          /*
           "swap" = {
             type = "zfs_volume";
             size = "16G";
@@ -110,6 +111,7 @@ created 2026-05-13 by ludw
               type = "swap";
             };
           };
+          */
 
           reserved = {
             type = "zfs_fs";
