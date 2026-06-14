@@ -31,8 +31,13 @@
   },
   "lidarr": {
     "imageName": "lscr.io/linuxserver/lidarr",
-    "imageDigest": "sha256:854684b3df33139a8907fa3e316a3c030676e8e753b7fac78b98d297b8cc6fe0",
-    "sha256": "sha256-l7+5OugrJGzeacsNXiLFD6pHvIZJYnaK0SdeWVdTHx0="
+    "imageDigest": "sha256:bcd0d60ab77e2fc6bbc19fe286281bd80c22929029026a0728ce723e13711343",
+    "sha256": "sha256-AqSlBb+YHIJaAKDtEgo9GExT6yqgoF4uk9U6o/1bBSE="
+  },
+  "deemix": {
+    "imageName": "ghcr.io/bambanah/deemix",
+    "imageDigest": "sha256:cd53202a41e77066419af2af9e1ff68b2d68682df3698e6a5e84d9b29a12912d",
+    "sha256": "sha256-tfPy+yWjzu4dis0lS56R7qAHHA5WMUc3zeOVnG95hTk="
   },
   "slskd": {
     "imageName": "docker.io/slskd/slskd",

@@ -152,6 +152,21 @@ in {
       };
     };
 
+    deemix = {
+      serviceConfig = {
+        name = "Deemix";
+        description = "Deezer Downloader";
+        serviceType = "Restricted";
+
+        subdomain = "deemix";
+        port = ports.deemix;
+
+        policy = "bypass";
+
+        icon = "deemix";
+      };
+    };
+
     slskd = {
       serviceConfig = {
         name = "Slskd";
@@ -207,14 +222,24 @@ in {
       device = "${downloadPath}/deezer";
     };
 
-    volumes.slskd-download.volumeConfig = {
+    volumes.deemix-config.volumeConfig = {
       type = "bind";
-      device = "${downloadPath}/slskd";
+      device = "/opt/deemix/config";
+    };
+
+    volumes.deemix-download.volumeConfig = {
+      type = "bind";
+      device = "${downloadPath}/deezer/deemix";
     };
 
     volumes.slskd-data.volumeConfig = {
       type = "bind";
       device = "/opt/slskd/data";
+    };
+
+    volumes.slskd-download.volumeConfig = {
+      type = "bind";
+      device = "${downloadPath}/slskd";
     };
 
     containers.lidarr-postgres = {
@@ -246,6 +271,7 @@ in {
       };
     };
 
+    /*
     containers.lidarr = {
       autoStart = true;
 
@@ -308,8 +334,50 @@ in {
         ];
       };
     };
+    */
 
-    # todo: bring deemix back
+    containers.deemix = {
+      autoStart = true;
+
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
+      };
+
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.deemix}";
+        name = "deemix";
+        userns = "keep-id:uid=10000,gid=10000";
+        networks = [networks.media-net.ref];
+
+        environments = {
+          TZ = "Europe/Berlin";
+
+          PUID = "10000";
+          PGID = "10000";
+
+          DEEMIX_SERVER_PORT = "6595";
+          DEEMIX_DATA_DIR = "/config";
+          DEEMIX_MUSIC_DIR = "/downloads";
+        };
+
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
+
+          # certificates
+          "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
+          "/certs/ca.crt:/certs/ca.crt:ro"
+
+          "${volumes.deemix-config.ref}:/config:U"
+          "${volumes.deemix-download.ref}:/downloads:U"
+        ];
+
+        publishPorts = [
+          "${toString ports.deemix}:6595/tcp"
+        ];
+      };
+    };
 
     # todo: use soularr
 
@@ -342,8 +410,8 @@ in {
         user = "10000:10000";
 
         networks = [
-          "media-net"
-          "vpn-service-net"
+          networks.media-net.ref
+          networks.vpn-service-net.ref
         ];
 
         environments = {

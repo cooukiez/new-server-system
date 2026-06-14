@@ -16,6 +16,7 @@ IMAGES = [
     
     {"name": "jellyfin", "repo": "docker.io/jellyfin/jellyfin", "tag": "latest"},
     {"name": "lidarr", "repo": "lscr.io/linuxserver/lidarr", "tag": "nightly"},
+    {"name": "deemix", "repo": "ghcr.io/bambanah/deemix", "tag": "latest"},
     {"name": "slskd", "repo": "docker.io/slskd/slskd", "tag": "latest"},
     {"name": "qbittorrent", "repo": "lscr.io/linuxserver/qbittorrent", "tag": "latest"},
     {"name": "tdarr", "repo": "ghcr.io/haveagitgat/tdarr", "tag": "latest"},

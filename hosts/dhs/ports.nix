@@ -73,6 +73,7 @@ created 2026-05-13 by ludw
   cmdarr = 8688;
   lidarr = 8686;
   lidarrLists = 18686;
+  deemix = 6595;
   slskdHttp = 5030;
   slskdHttps = 5031;
   slskdPeer = 50300;
