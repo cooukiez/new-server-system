@@ -65,6 +65,9 @@ created 2026-05-13 by ludw
         environments = {
           TZ = "Europe/Berlin";
 
+          PUID = "0";
+          PGID = "0";
+
           WEBUI_PORT = "8080";
           TORRENTING_PORT = "6881";
 

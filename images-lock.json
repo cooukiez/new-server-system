@@ -44,6 +44,11 @@
     "imageDigest": "sha256:ab9ed50e028b524cefdb7c1dd8ebca368a076e18441ee8ac2326473eb850b4c3",
     "sha256": "sha256-mSZIhcrqnjx6b9Co/etsiR0OBkTOmZhuI71KiWy53Js="
   },
+  "soularr": {
+    "imageName": "docker.io/mrusse08/soularr",
+    "imageDigest": "sha256:a46d4b0af667e54e816e2058ec574a03337519ee74476e17875d4c5cb3a3c288",
+    "sha256": "sha256-TVAMx6jmk7uQX4tipBAkIRpqQF6ItYODEWtSMfcBB9w="
+  },
   "qbittorrent": {
     "imageName": "lscr.io/linuxserver/qbittorrent",
     "imageDigest": "sha256:2e0148428b6769e2ee1eb6781246b6fca4b70cd680edfcb16e7113d9d6cb1631",

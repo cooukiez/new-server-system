@@ -14,8 +14,8 @@ created 2026-05-13 by ludw
   downloadPath,
   ...
 }: let
-  createLidarrConf = import ./settings/soularr.nix {inherit config pkgs mkConf;};
-  createSlskdConf = import ./settings/soularr.nix {inherit config pkgs mkConf;};
+  createLidarrConf = import ./settings/lidarr.nix {inherit config pkgs mkConf;};
+  createSlskdConf = import ./settings/slskd.nix {inherit config pkgs mkConf;};
   createSoularrConf = import ./settings/soularr.nix {inherit config pkgs lib mkConf;};
 in {
   myServices = {
