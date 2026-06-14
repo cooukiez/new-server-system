@@ -894,11 +894,11 @@
         "zen-browser": "zen-browser"
       },
       "locked": {
-        "lastModified": 1781362523,
-        "narHash": "sha256-r05K7qYvLWRBT2FGl++krVyGkixLEl2aY6/ipJ+tlH4=",
+        "lastModified": 1781370761,
+        "narHash": "sha256-1YLvhdpSNtO30SqUGl4VwgoMK4WUuE03Xq/pXh1ztMk=",
         "owner": "cooukiez",
         "repo": "nixos-system",
-        "rev": "deeba2edcaf9de6462a3ab465f28148de5945290",
+        "rev": "1dc7c0c228be33c7dca5707458f18a8420b54812",
         "type": "github"
       },
       "original": {
@@ -2082,11 +2082,11 @@
         "rust-overlay": "rust-overlay"
       },
       "locked": {
-        "lastModified": 1781356561,
-        "narHash": "sha256-ojTdoq5ddKzrPrIXLa/CK7paoUPeoc+vohNY3QHzctc=",
+        "lastModified": 1781365533,
+        "narHash": "sha256-/uEoBFZtAOxuw+w+57L74P35K/t+DYsFuRE8aS99uAQ=",
         "owner": "zed-industries",
         "repo": "zed",
-        "rev": "3e54ce8bce23706104c1b76e56685bd4fd4e8930",
+        "rev": "e044074eb2f9125f240424bd15e95da29d49d0b0",
         "type": "github"
       },
       "original": {

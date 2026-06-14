@@ -3,7 +3,7 @@
 # exit on error
 set -e
 
-LOGFILE="/var/log/lidarr_opus_convert.log"
+LOGFILE="/log/lidarr_opus_convert.log"
 exec > >(tee -a "$LOGFILE") 2>&1
 
 echo "--- Lidarr Event Triggered: $lidarr_eventtype ---"
@@ -11,6 +11,11 @@ echo "--- Lidarr Event Triggered: $lidarr_eventtype ---"
 # handle events
 if [ "$lidarr_eventtype" = "Test" ]; then
     echo "Test event detected. Script will run in simulation/dry-run mode (original files will not be deleted)."
+
+    if [ -z "$lidarr_trackfile_paths" ]; then
+        lidarr_trackfile_paths="/tmp/test_lidarr_audio.flac"
+        ffmpeg -y -f lavfi -i anullsrc=r=44100:cl=stereo -t 1 "$lidarr_trackfile_paths" > /dev/null 2>&1
+    fi
 elif [ "$lidarr_eventtype" != "Rename" ]; then
     echo "Event type is not Rename."
     exit 0
