@@ -39,7 +39,6 @@ in {
     overlays = [
       inputs.self.overlays.additions
       inputs.self.overlays.modifications
-      inputs.self.overlays.unstable-packages
 
       (final: prev: {
         valkey = prev.valkey.overrideAttrs (oldAttrs: {
@@ -192,7 +191,7 @@ in {
                 '';
               };
 
-              stateVersion = "25.11";
+              stateVersion = "26.05";
             };
 
             age.secrets.github-token.file = ../../secrets/github-token.age;
@@ -242,7 +241,6 @@ in {
             overlays = [
               inputs.self.overlays.additions
               inputs.self.overlays.modifications
-              inputs.self.overlays.unstable-packages
 
               (final: prev: {
                 valkey = prev.valkey.overrideAttrs (oldAttrs: {
@@ -293,7 +291,7 @@ in {
           };
 
           systemd.user.startServices = "sd-switch";
-          home.stateVersion = "25.11";
+          home.stateVersion = "26.05";
         };
       };
   };

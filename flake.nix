@@ -8,8 +8,7 @@ created 2026-05-13 by ludw
   description = "system configuration for home server";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
-    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
     nixos-system.url = "github:cooukiez/nixos-system";
 
@@ -19,19 +18,16 @@ created 2026-05-13 by ludw
     };
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.11";
+      url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     agenix.url = "github:ryantm/agenix";
+    copyparty.url = "github:9001/copyparty";
     quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
 
-    nixvim = {
-      url = "github:nix-community/nixvim/nixos-25.11";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    copyparty.url = "github:9001/copyparty";
+    # fixed versions
+    nixvim.url = "github:nix-community/nixvim/nixos-26.05";
   };
 
   outputs = {
@@ -66,7 +62,7 @@ created 2026-05-13 by ludw
         modules = [
           hostPath
 
-          {system.stateVersion = "25.11";}
+          {system.stateVersion = "26.05";}
         ];
       };
 
@@ -83,7 +79,6 @@ created 2026-05-13 by ludw
         (import ./overlays {inherit inputs system;})
         additions
         modifications
-        unstable-packages
         ;
     };
 

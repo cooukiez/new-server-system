@@ -5,18 +5,9 @@ part of server system
 created 2026-05-13 by ludw
 */
 {
-  inputs,
   pkgs,
   ...
 }: {
-  disabledModules = [
-    "hardware/facter"
-  ];
-
-  imports = [
-    "${inputs.nixpkgs-unstable}/nixos/modules/hardware/facter"
-  ];
-
   hardware.facter = {
     enable = true;
     reportPath = ./facter.json;

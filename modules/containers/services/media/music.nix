@@ -162,7 +162,6 @@ in {
       };
     };
 
-    /*
     containers.lidarr = {
       autoStart = true;
 
@@ -224,7 +223,6 @@ in {
         ];
       };
     };
-    */
 
     containers.deemix = {
       autoStart = true;

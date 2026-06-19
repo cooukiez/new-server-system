@@ -47,9 +47,16 @@ process_audio() {
         ffmpeg_filter="-af loudnorm=I=-14:TP=-1:LRA=11"
     fi
 
+    output_file="${file%.*}.trans.ogg"
+
     # check if we can safely skip this file completely (Updated target container check to ogg)
     if [[ "$codec" == "opus" ]] && [ "$ext_lower" == "ogg" ] && [ "$needs_normalization" = false ]; then
         echo "--> File is already properly transcoded."
+        if mv "$file" "$output_file"; then
+            echo "--> Successfully moved audio file to: $output_file"
+        else
+            echo "--> Error moving $file."
+        fi
         echo "==================================================="
         return 0
     fi
@@ -102,8 +109,6 @@ process_audio() {
         fi
     fi
 
-    output_file="${file%.*}.trans.ogg"
-
     # prepare bitrate flags if encoding
     bitrate_flags=""
     if [ -n "$target_bitrate" ] && [ "$ffmpeg_codec" != "-c:a copy" ]; then
@@ -136,6 +141,6 @@ export -f process_audio
 
 # find all files and pipe them into gnu parallel
 find . -type f \( -iname "*.aac" -o -iname "*.alac" -o -iname "*.ape" -o -iname "*.flac" -o -iname "*.m4a" -o -iname "*.mp3" -o -iname "*.ogg" -o -iname "*.wav" -o -iname "*.wma" \) ! -iname "*.trans.ogg" -print0 | \
-parallel -0 --jobs 4 process_audio "{}"
+parallel -0 --jobs 8 process_audio "{}"
 
 echo "All audio files have been processed to Opus OGG!"
