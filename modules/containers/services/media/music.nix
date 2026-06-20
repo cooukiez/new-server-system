@@ -77,12 +77,10 @@ in {
     slskd-gluetun-api-key = mkSecret "containers/gluetun/s_api-key";
 
     slskd-lidarr-api-key = mkSecret "containers/slskd/s_lidarr-api-key";
+    slskd-soularr-api-key = mkSecret "containers/slskd/s_soularr-api-key";
     slskd-user = mkSecret "containers/slskd/s_user";
     slskd-pass = mkSecret "containers/slskd/s_pass";
     slskd-webui-pass = mkSecret "containers/slskd/s_webui-pass";
-
-    soularr-lidarr-api-key = mkSecret "containers/soularr/s_lidarr-key";
-    soularr-slskd-api-key = mkSecret "containers/soularr/s_slskd-key";
   };
 
   virtualisation.quadlet = let

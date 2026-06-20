@@ -72,7 +72,7 @@ mkConf {
   secrets = {
     PLACEHOLDER_GLUETUN_API_KEY = config.age.secrets.slskd-gluetun-api-key.path;
     PLACEHOLDER_LIDARR_API_KEY = config.age.secrets.slskd-lidarr-api-key.path;
-    PLACEHOLDER_SOULARR_API_KEY = config.age.secrets.soularr-slskd-api-key.path;
+    PLACEHOLDER_SOULARR_API_KEY = config.age.secrets.slskd-soularr-api-key.path;
     PLACEHOLDER_USER = config.age.secrets.slskd-user.path;
     PLACEHOLDER_PASS = config.age.secrets.slskd-pass.path;
     PLACEHOLDER_WEBUI_PASS = config.age.secrets.slskd-webui-pass.path;

@@ -119,13 +119,10 @@ in {
 
   # slskd
   "containers/slskd/s_lidarr-api-key.age".publicKeys = allKeys;
+  "containers/slskd/s_soularr-api-key.age".publicKeys = allKeys;
   "containers/slskd/s_pass.age".publicKeys = allKeys;
   "containers/slskd/s_user.age".publicKeys = allKeys;
   "containers/slskd/s_webui-pass.age".publicKeys = allKeys;
-
-  # soularr
-  "containers/soularr/s_lidarr-key.age".publicKeys = allKeys;
-  "containers/soularr/s_slskd-key.age".publicKeys = allKeys;
 
   # trek
   "containers/trek/s_auth-client.age".publicKeys = allKeys;

@@ -67,7 +67,7 @@ mkConf {
   });
 
   secrets = {
-    PLACEHOLDER_LIDARR_API_KEY = config.age.secrets.soularr-lidarr-api-key.path;
-    PLACEHOLDER_SLSKD_API_KEY = config.age.secrets.soularr-slskd-api-key.path;
+    PLACEHOLDER_LIDARR_API_KEY = config.age.secrets.lidarr-api-key.path;
+    PLACEHOLDER_SLSKD_API_KEY = config.age.secrets.slskd-soularr-api-key.path;
   };
 }

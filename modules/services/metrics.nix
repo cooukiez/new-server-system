@@ -34,6 +34,7 @@ in {
       port = hostConfig.ports.nodeExporter;
     };
 
+    /*
     services.promtail = lib.mkIf cfg.promtail {
       enable = true;
       configuration = {
@@ -82,5 +83,6 @@ in {
         ];
       };
     };
+    */
   };
 }
