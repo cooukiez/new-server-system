@@ -11,12 +11,15 @@ created 2026-05-13 by ludw
   images,
   ports,
   mkConf,
+  mkEnv,
   downloadPath,
   ...
 }: let
   createLidarrConf = import ./settings/lidarr.nix {inherit config pkgs mkConf;};
   createSlskdConf = import ./settings/slskd.nix {inherit config pkgs mkConf;};
   createSoularrConf = import ./settings/soularr.nix {inherit config pkgs lib mkConf;};
+
+  createLidatubeEnv = import ./settings/lidatube.nix {inherit config mkEnv;};
 in {
   myServices = {
     lidarr = {
@@ -47,6 +50,22 @@ in {
         group = "admins";
 
         icon = "deemix";
+      };
+    };
+
+    lidatube = {
+      serviceConfig = {
+        name = "Lidatube";
+        description = "Lidarr Integration for YouTube";
+        serviceType = "Restricted";
+
+        subdomain = "lidatube";
+        port = ports.lidatube;
+
+        policy = "two_factor";
+        group = "admins";
+
+        icon = "lidatube";
       };
     };
 
@@ -106,14 +125,24 @@ in {
       device = "${downloadPath}/deezer";
     };
 
-    volumes.deemix-config.volumeConfig = {
+    volumes.deemix-data.volumeConfig = {
       type = "bind";
-      device = "/opt/deemix/config";
+      device = "/opt/deemix/data";
     };
 
     volumes.deemix-download.volumeConfig = {
       type = "bind";
       device = "${downloadPath}/deezer/deemix";
+    };
+
+    volumes.lidatube-data.volumeConfig = {
+      type = "bind";
+      device = "/opt/lidatube/data";
+    };
+
+    volumes.lidatube-download.volumeConfig = {
+      type = "bind";
+      device = "${downloadPath}/lidatube";
     };
 
     volumes.slskd-data.volumeConfig = {
@@ -167,7 +196,6 @@ in {
         Requires = ["lidarr-postgres.service"];
         After = ["lidarr-postgres.service"];
       };
-
       serviceConfig = {
         Restart = "always";
         RestartSec = "10";
@@ -241,7 +269,9 @@ in {
           PUID = "0";
           PGID = "0";
 
+          DEEMIX_HOST = "0.0.0.0";
           DEEMIX_SERVER_PORT = "6595";
+
           DEEMIX_DATA_DIR = "/config";
           DEEMIX_MUSIC_DIR = "/downloads";
         };
@@ -254,12 +284,60 @@ in {
           "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
           "/certs/ca.crt:/certs/ca.crt:ro"
 
-          "${volumes.deemix-config.ref}:/config:U"
+          "${volumes.deemix-data.ref}:/config:U"
           "${volumes.deemix-download.ref}:/downloads:U"
         ];
 
         publishPorts = [
           "${toString ports.deemix}:6595/tcp"
+        ];
+      };
+    };
+
+    containers.lidatube = {
+      autoStart = true;
+
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = "10";
+
+        ExecStartPre = [
+          "+${pkgs.writeShellScript "pre-lidatube" ''
+            ${createLidatubeEnv}
+          ''}"
+        ];
+      };
+
+      containerConfig = {
+        image = "docker-archive:${pkgs.dockerTools.pullImage images.lidatube}";
+        name = "lidatube";
+        networks = [networks.media-net.ref];
+
+        environments = {
+          TZ = "Europe/Berlin";
+
+          PUID = "0";
+          PGID = "0";
+        };
+
+        environmentFiles = [
+          "env/containers/lidatube/env"
+        ];
+
+        volumes = [
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
+
+          # certificates
+          "/etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro"
+          "/certs/ca.crt:/certs/ca.crt:ro"
+
+          "${volumes.lidatube-data.ref}:/lidatube/config:U"
+          "${volumes.lidatube-download.ref}:/lidatube/downloads"
+        ];
+
+        publishPorts = [
+          "${toString ports.lidatube}:5000/tcp"
         ];
       };
     };
@@ -371,7 +449,7 @@ in {
         environments = {
           TZ = "Europe/Berlin";
 
-          SCRIPT_INTERVAL = "300";
+          SCRIPT_INTERVAL = "30";
         };
 
         volumes = [

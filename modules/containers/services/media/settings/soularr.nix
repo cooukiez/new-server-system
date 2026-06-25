@@ -51,7 +51,7 @@ mkConf {
 
       search_type = "incrementing_page";
 
-      number_of_albums_to_grab = 10;
+      number_of_albums_to_grab = 100;
       remove_wanted_on_failure = "False";
 
       title_blacklist = "";

@@ -74,6 +74,7 @@ created 2026-05-13 by ludw
   lidarr = 8686;
   lidarrLists = 18686;
   deemix = 6595;
+  lidatube = 8705;
   slskdHttp = 5030;
   slskdHttps = 5031;
   slskdPeer = 50300;
