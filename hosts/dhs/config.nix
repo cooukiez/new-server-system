@@ -129,13 +129,20 @@ created 2026-05-13 by ludw
 
   # virtualisation
   virtualisation = {
+    containers.enable = true;
     quadlet.enable = true;
-    podman.defaultNetwork.settings.dns_enabled = true;
+
     containers.storage.settings.storage = {
       driver = "overlay";
       options.overlay.mount_program = "${lib.getExe pkgs.fuse-overlayfs}";
     };
+
+    podman.defaultNetwork.settings.dns_enabled = true;
   };
+
+  environment.etc."containers/registries.conf".text = lib.mkForce ''
+    unqualified-search-registries = ["ghcr.io", "docker.io", "quay.io"]
+  '';
 
   # security configuration
   security.sudo.wheelNeedsPassword = false;

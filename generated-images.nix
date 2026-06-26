@@ -39,6 +39,11 @@
     imageDigest = "sha256:cd53202a41e77066419af2af9e1ff68b2d68682df3698e6a5e84d9b29a12912d";
     sha256 = "sha256-tfPy+yWjzu4dis0lS56R7qAHHA5WMUc3zeOVnG95hTk=";
   };
+  lidatube = {
+    imageName = "docker.io/thewicklowwolf/lidatube";
+    imageDigest = "sha256:de3d721758165cdd818fa058417ce556878bad2b9a478c8284040aa9b05a88f8";
+    sha256 = "sha256-cqiGiTl+Y7oScCm4L0c0wpVQ2NLXNg85geNrqMBa9wM=";
+  };
   slskd = {
     imageName = "docker.io/slskd/slskd";
     imageDigest = "sha256:ab9ed50e028b524cefdb7c1dd8ebca368a076e18441ee8ac2326473eb850b4c3";

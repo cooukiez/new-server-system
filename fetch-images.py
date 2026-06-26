@@ -18,6 +18,7 @@ IMAGES = [
 
     {"name": "lidarr", "repo": "lscr.io/linuxserver/lidarr", "tag": "nightly"},
     {"name": "deemix", "repo": "ghcr.io/bambanah/deemix", "tag": "latest"},
+    {"name": "lidatube", "repo": "docker.io/thewicklowwolf/lidatube", "tag": "latest"},
     {"name": "slskd", "repo": "docker.io/slskd/slskd", "tag": "latest"},
     {"name": "soularr", "repo": "docker.io/mrusse08/soularr", "tag": "latest"},
 
