@@ -31,7 +31,7 @@ in {
       prefixDir = "${config.home.homeDirectory}/.config/containers/systemd/env";
 
       target = "${prefixDir}/${path}";
-      targetDir = builtins.dirOf target;
+      targetDir = dirOf target;
 
       envContent = lib.mapAttrsToList (n: v: "${n}=${v}") vars;
       envFile = pkgs.writeText "env-template" (builtins.concatStringsSep "\n" envContent);
@@ -41,7 +41,7 @@ in {
 
       sedCommands =
         lib.mapAttrsToList (
-          placeholder: path: "${sed} -i \"s|@${placeholder}@|$(${cat} ${path})|g\" \"${target}\""
+          placeholder-name: path: "${sed} -i \"s|@${placeholder-name}@|$(${cat} ${path})|g\" \"${target}\""
         )
         secrets;
     in
@@ -63,14 +63,14 @@ in {
       prefixDir = "${config.home.homeDirectory}";
 
       target = "${prefixDir}/${path}";
-      targetDir = builtins.dirOf target;
+      targetDir = dirOf target;
 
       sed = "${pkgs.gnused}/bin/sed";
       cat = "${pkgs.coreutils}/bin/cat";
 
       sedCommands =
         lib.mapAttrsToList (
-          placeholder: path: "${sed} -i \"s|@${placeholder}@|$(${cat} ${path})|g\" \"${target}\""
+          placeholder-name: path: "${sed} -i \"s|@${placeholder-name}@|$(${cat} ${path})|g\" \"${target}\""
         )
         secrets;
     in

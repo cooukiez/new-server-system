@@ -33,6 +33,10 @@ in {
           ${pkgs.coreutils}/bin/mkdir -p /data/documents-backup
 
           ${pkgs.bun}/bin/bun run ${./export.ts} --org org_epgl80n46kblsqfih852xtqy --folder /data/documents-backup/general-ludwig
+          ${pkgs.bun}/bin/bun run ${./export.ts} --org org_to3j3xq92h8v5zm3o493u27t --folder /data/documents-backup/kkg-ludwig
+          ${pkgs.bun}/bin/bun run ${./export.ts} --org org_ja752yex0x69vhfddhrlt0bg --folder /data/documents-backup/media-ludwig
+          ${pkgs.bun}/bin/bun run ${./export.ts} --org org_ymzlf04ao0ln1l3o14m2inpj --folder /data/documents-backup/redi-ludwig
+          ${pkgs.bun}/bin/bun run ${./export.ts} --org org_dmo2ojori88q2duv1addgapn --folder /data/documents-backup/urkunden-ludwig
 
           ${pkgs.coreutils}/bin/chown -R admin:users /data/documents-backup
         ''}"
