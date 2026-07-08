@@ -48,6 +48,7 @@ in {
       Persistent = true;
       Unit = "opengist-exporter.service";
     };
+
     wantedBy = ["timers.target"];
   };
 }

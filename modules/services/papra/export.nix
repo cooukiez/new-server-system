@@ -50,6 +50,7 @@ in {
       Persistent = true;
       Unit = "papra-exporter.service";
     };
+
     wantedBy = ["timers.target"];
   };
 }

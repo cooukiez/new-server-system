@@ -12,8 +12,8 @@ created 2026-05-13 by ludw
 }: let
   cfg = config.containerServices.papra;
 in {
-  systemd.services.papra-db-maintenance = let
-    papraMaintenanceScript = pkgs.writeShellScript "papra-db-update" ''
+  systemd.services.papra-maintenance = let
+    papraMaintenanceScript = pkgs.writeShellScript "papra-maintenance" ''
       set -e
       SYSTEMCTL="${pkgs.systemd}/bin/systemctl"
       SQLITE="${pkgs.sqlite}/bin/sqlite3"
@@ -32,12 +32,13 @@ in {
       };
     };
 
-  systemd.timers.papra-db-maintenance = lib.mkIf cfg.maintenance {
+  systemd.timers.papra-maintenance = lib.mkIf cfg.maintenance {
     timerConfig = {
       OnCalendar = "*-*-* 03:00:00";
       Persistent = true;
-      Unit = "papra-db-maintenance.service";
+      Unit = "papra-maintenance.service";
     };
+
     wantedBy = ["timers.target"];
   };
 }
