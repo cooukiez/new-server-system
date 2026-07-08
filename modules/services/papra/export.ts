@@ -19,7 +19,9 @@ const baseUrl = "http://127.0.0.1:1221";
 
 if (!secretFilePath || !organizationId || !downloadFolder) {
   console.error("Error: Missing required arguments or environment variables.");
-  console.error("Usage: bun run script.ts --org <org_id> --folder <download_path>");
+  console.error(
+    "Usage: bun run script.ts --org <org_id> --folder <download_path>",
+  );
   process.exit(1);
 }
 
@@ -28,7 +30,9 @@ let apiKey: string;
 try {
   apiKey = (await Bun.file(secretFilePath).text()).trim();
 } catch (error) {
-  console.error(`Failed to read secret at ${secretFilePath}: ${(error as Error).message}`);
+  console.error(
+    `Failed to read secret at ${secretFilePath}: ${(error as Error).message}`,
+  );
   process.exit(1);
 }
 
@@ -49,7 +53,11 @@ interface DocResponse {
   documentsCount: number;
 }
 
-async function getUniquePath(folder: string, fileName: string, suffix = ""): Promise<string> {
+async function getUniquePath(
+  folder: string,
+  fileName: string,
+  suffix = "",
+): Promise<string> {
   const safeName = fileName.replaceAll("/", "-");
   const { name, ext } = parse(safeName);
   const actualExt = suffix || ext;
@@ -58,7 +66,9 @@ async function getUniquePath(folder: string, fileName: string, suffix = ""): Pro
   if (!(await Bun.file(filePath).exists())) return filePath;
 
   let counter = 1;
-  while (await Bun.file(join(folder, `${name}-${counter}${actualExt}`)).exists()) {
+  while (
+    await Bun.file(join(folder, `${name}-${counter}${actualExt}`)).exists()
+  ) {
     counter++;
   }
   return join(folder, `${name}-${counter}${actualExt}`);
@@ -71,14 +81,20 @@ async function listAllDocuments(): Promise<DocumentItem[]> {
 
   while (hasMore) {
     console.log(`Scanning page ${pageIndex + 1}...`);
-    const response = await api<DocResponse>(`/api/organizations/${organizationId}/documents`, {
-      query: { pageIndex, pageSize: 100 },
-    });
+    const response = await api<DocResponse>(
+      `/api/organizations/${organizationId}/documents`,
+      {
+        query: { pageIndex, pageSize: 100 },
+      },
+    );
 
     allDocs.push(...response.documents);
 
     // stop if we hit total count or get an empty page
-    if (allDocs.length >= response.documentsCount || response.documents.length === 0) {
+    if (
+      allDocs.length >= response.documentsCount ||
+      response.documents.length === 0
+    ) {
       hasMore = false;
     } else {
       pageIndex++;
@@ -88,9 +104,12 @@ async function listAllDocuments(): Promise<DocumentItem[]> {
 }
 
 async function downloadDocument(documentId: string): Promise<ArrayBuffer> {
-  return api(`/api/organizations/${organizationId}/documents/${documentId}/file`, {
-    responseType: "arrayBuffer",
-  });
+  return api(
+    `/api/organizations/${organizationId}/documents/${documentId}/file`,
+    {
+      responseType: "arrayBuffer",
+    },
+  );
 }
 
 // main orchestrator
@@ -117,12 +136,18 @@ async function main() {
         await Bun.write(fileSavedPath, fileBuffer);
 
         // save the accompanying metadata
-        const metaSavedPath = await getUniquePath(downloadFolder, doc.name, ".json");
+        const metaSavedPath = await getUniquePath(
+          downloadFolder,
+          doc.name,
+          ".json",
+        );
         await Bun.write(metaSavedPath, JSON.stringify(doc, null, 2));
 
         console.log(`${progress} Saved: ${doc.name}`);
       } catch (err) {
-        console.error(`${progress} Failed to download ${doc.name}: ${(err as Error).message}`);
+        console.error(
+          `${progress} Failed to download ${doc.name}: ${(err as Error).message}`,
+        );
       }
     }
 
