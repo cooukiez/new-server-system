@@ -145,7 +145,7 @@ in {
         ];
 
         publishPorts = [
-          "${toString ports.mailArchiverPostgres}:5432/tcp"
+          "${toString ports.mailArchiverDb}:5432/tcp"
         ];
       };
     };

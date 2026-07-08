@@ -9,8 +9,9 @@ REQUIRED_VARS = {
     "MAIL_ARCHIVER_DB_PASS_PATH": "PASSWORD_PATH",
     "MAIL_ARCHIVER_DB_HOST": "HOST",
     "MAIL_ARCHIVER_DB_PORT": "PORT",
-    "MAIL_ARCHIVER_DB_NAME": "DBNAME",
 }
+
+# WARNING: CHANGES MADE TO THE ARCHIVE ARE NOT RECOVERABLE
 
 # extensible filter rules
 FILTER_RULES = [
@@ -42,7 +43,7 @@ def validate_environment() -> dict:
 
     try:
         return {
-            "dbname": os.environ.get("MAIL_ARCHIVER_DB_NAME"),
+            "dbname": "mail-archiver",
             "user": os.environ.get("MAIL_ARCHIVER_DB_USER"),
             "password": secret_path.read_text().strip(),
             "host": os.environ.get("MAIL_ARCHIVER_DB_HOST"),
@@ -72,7 +73,7 @@ def build_query_and_params(conditions: dict) -> tuple:
         else:
             raise ValueError(f"Unsupported operator: {operator}")
 
-    query = f'SELECT "Id" FROM "Emails" WHERE {" AND ".join(where_clauses)};'
+    query = f'SELECT "Id" FROM "ArchivedEmails" WHERE {" AND ".join(where_clauses)};'
     return query, tuple(params)
 
 
@@ -115,7 +116,7 @@ def get_targeted_email_ids(cursor) -> list:
 def run_dry_run(cursor, target_ids: list):
     """simulate deletion and calculate the impact"""
 
-    query = 'SELECT COUNT(*) FROM "Attachments" WHERE "ArchivedEmailId" = ANY(%s);'
+    query = 'SELECT COUNT(*) FROM "EmailAttachments" WHERE "ArchivedEmailId" = ANY(%s);'
     cursor.execute(query, (target_ids,))
     attachments_count = cursor.fetchone()[0]
 
@@ -129,22 +130,18 @@ def run_dry_run(cursor, target_ids: list):
 def execute_cleanup(cursor, target_ids: list):
     """execute the actual deletion inside the transaction block"""
 
-    """
-
     # delete attachments first due to foreign key constraints
     del_attachments_query = (
-        'DELETE FROM "Attachments" WHERE "ArchivedEmailId" = ANY(%s);'
+        'DELETE FROM "EmailAttachments" WHERE "ArchivedEmailId" = ANY(%s);'
     )
 
     cursor.execute(del_attachments_query, (target_ids,))
     print(f"Deleted {cursor.rowcount} associated attachment(s).")
 
     # delete emails
-    del_emails_query = 'DELETE FROM "Emails" WHERE "Id" = ANY(%s);'
+    del_emails_query = 'DELETE FROM "ArchivedEmails" WHERE "Id" = ANY(%s);'
     cursor.execute(del_emails_query, (target_ids,))
     print(f"Deleted {cursor.rowcount} email record(s).")
-
-    """
 
 
 def main():
@@ -152,12 +149,13 @@ def main():
     db_config = validate_environment()
 
     if args.dry_run:
-        print("RUNNING IN DRY-RUN MODE: No changes will be saved.\n")
+        print("RUNNING IN DRY-RUN MODE: No changes will be made.\n")
 
     try:
         # using context managers auto-closes connections / cursors and manages transactions
         with psycopg2.connect(**db_config) as conn:
             with conn.cursor() as cursor:
+                cursor.execute('SET search_path TO mail_archiver, public;')
                 target_ids = get_targeted_email_ids(cursor)
 
                 if not target_ids:

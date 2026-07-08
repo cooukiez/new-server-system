@@ -33,7 +33,7 @@ in {
 
       ExecStart = [
         "+${pkgs.writeShellScript "mail-archiver-maintenance" ''
-          ${pkgs.python3.withPackages (ps: with ps; [psycopg2])}/bin/python3 ${./maintenance.py} --dry-run
+          ${pkgs.python3.withPackages (ps: with ps; [psycopg2])}/bin/python3 ${./maintenance.py}
         ''}"
       ];
     };
