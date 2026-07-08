@@ -12,7 +12,7 @@ created 2026-06-29 by ludw
 }: let
   cfg = config.containerServices.papra;
 in {
-  age.secrets.papra-download.file = ../../secrets/papra-download.age;
+  age.secrets.papra-download.file = ../../../secrets/papra-download.age;
 
   systemd.services.papra-exporter = lib.mkIf cfg.export {
     description = "Export Papra documents";

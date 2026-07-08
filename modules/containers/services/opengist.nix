@@ -113,6 +113,10 @@ in {
           "${volumes.opengist-db.ref}:/var/lib/postgresql:U"
           "${config.age.secrets.opengist-db-pass.path}:/run/secrets/OPENGIST_DB_PASS:ro"
         ];
+
+        publishPorts = [
+          "${toString ports.opengistDb}:5432/tcp"
+        ];
       };
     };
 

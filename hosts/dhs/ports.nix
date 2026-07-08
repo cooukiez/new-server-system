@@ -16,9 +16,6 @@ created 2026-05-13 by ludw
   postgres = 5432;
   pgadmin = 5434;
 
-  # database clients
-  opengistDb = 5441;
-
   # dns
   adguard = 3000;
   dns = 53;
@@ -63,6 +60,7 @@ created 2026-05-13 by ludw
   gitea = 222;
   giteaHttp = 3030;
   opengist = 2222;
+  opengistDb = 2224;
   opengistHttp = 6157;
 
   # immich
