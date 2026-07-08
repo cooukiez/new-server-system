@@ -49,12 +49,14 @@ created 2026-05-13 by ludw
   atuin = 8989;
   ebk = 8040;
   linkwarden = 3020;
-  mailArchiver = 5000;
   memos = 5230;
   outline = 3090;
   papra = 1221;
   radicale = 5232;
   trek = 3010;
+
+  mailArchiver = 5000;
+  mailArchiverDb = 5001;
 
   # git
   gitea = 222;

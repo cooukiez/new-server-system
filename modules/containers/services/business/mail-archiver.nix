@@ -143,6 +143,10 @@ in {
           "${volumes.mail-archiver-db.ref}:/var/lib/postgresql:U"
           "${config.age.secrets.archiver-db-pass.path}:/run/secrets/ARCHIVER_DB_PASS:ro"
         ];
+
+        publishPorts = [
+          "${toString ports.mailArchiverPostgres}:5432/tcp"
+        ];
       };
     };
 
