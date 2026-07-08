@@ -1,3 +1,9 @@
+/*
+modules/services/opengist/export.nix
+
+part of server system
+created 2026-07-08 by ludw
+*/
 {
   config,
   pkgs,
