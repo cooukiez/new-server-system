@@ -1,151 +1,154 @@
+import argparse
 import os
 import re
+import shutil
 import sys
-import argparse
 from pathlib import Path
-import psycopg2
 from git import Repo
+import psycopg2
 
-required_vars = {
+REQUIRED_VARS = {
     "OPENGIST_DB_USER": "USER",
     "OPENGIST_DB_PASS_PATH": "PASSWORD_PATH", 
     "OPENGIST_DB_HOST": "HOST",
     "OPENGIST_DB_PORT": "PORT",
 }
 
-# validate environment variables
-for env_key in required_vars:
-    if not os.environ.get(env_key):
-        print(f"Error: {env_key} environment variable is not set.")
+
+def validate_environment() -> dict:
+    """validate env variables and read database password"""
+
+    missing = [var for var in REQUIRED_VARS if not os.environ.get(var)]
+    if missing:
+        print(f"Error: Missing environment variables: {', '.join(missing)}", file=sys.stderr)
         sys.exit(1)
 
-# read and validate db pass secret path
-secret_path_str = os.environ.get("OPENGIST_DB_PASS_PATH")
-secret_path = Path(secret_path_str)
+    secret_path = Path(os.environ["OPENGIST_DB_PASS_PATH"])
+    if not secret_path.is_file():
+        print(f"Error: Secret file at {secret_path} does not exist.", file=sys.stderr)
+        sys.exit(1)
 
-if not secret_path.is_file():
-    print(f"Error: Secret file at {secret_path_str} does not exist or is not a file.")
-    sys.exit(1)
-
-try:
-    # read the password and strip
-    db_password = secret_path.read_text().strip()
-except Exception as e:
-    print(f"Error: Could not read secret file at {secret_path_str}. Details: {e}")
-    sys.exit(1)
-
-DB_CONFIG = {
-    "dbname": "opengist",
-    "user": os.environ.get("OPENGIST_DB_USER"),
-    "password": db_password,
-    "host": os.environ.get("OPENGIST_DB_HOST"),
-    "port": os.environ.get("OPENGIST_DB_PORT"),
-}
+    try:
+        return {
+            "dbname": "opengist",
+            "user": os.environ.get("OPENGIST_DB_USER"),
+            "password": secret_path.read_text().strip(),
+            "host": os.environ.get("OPENGIST_DB_HOST"),
+            "port": os.environ.get("OPENGIST_DB_PORT"),
+        }
+    except Exception as e:
+        print(f"Error reading secret file: {e}", file=sys.stderr)
+        sys.exit(1)
 
 
-def sanitize_filename(name):
-    """remove invalid file/folder name characters and replaces spaces"""
+def sanitize_filename(name: str) -> str:
+    """remove invalid file / folder name characters and replace spaces"""
+
     if not name:
         return "unnamed_gist"
     name = name.replace(" ", "_")
     return re.sub(r'(?u)[^-\w.]', '', name).strip('_')
 
 
-def get_postgres_gist_titles():
-    """fetch mapping of gist hex id to clean title from postgres"""
+def get_postgres_gist_titles(db_config: dict) -> dict:
+    """fetch mapping of gist hex uuid to clean title from postgres"""
+
     titles = {}
-    query = "SELECT id, title FROM gist;"
+    query = "SELECT uuid, title FROM gists;" 
     
     try:
-        conn = psycopg2.connect(**DB_CONFIG)
-        with conn.cursor() as cur:
-            cur.execute(query)
-            for gist_id, title in cur.fetchall():
-                titles[gist_id] = sanitize_filename(title)
-        conn.close()
+        with psycopg2.connect(**db_config) as conn:
+            with conn.cursor() as cur:
+                cur.execute(query)
+                for gist_id, title in cur.fetchall():
+                    titles[str(gist_id)] = sanitize_filename(title)
     except Exception as e:
-        print(f"Postgres Failed: {e}")
-        print("Falling back to using raw Hex IDs for naming.")
-
+        print(f"Postgres Connection Failed: {e}. Falling back to raw Hex IDs.", file=sys.stderr)
+    
     return titles
 
 
+def export_gist(repo_path: Path, export_dir: Path, gist_titles: dict):
+    """process and export a single git repository mapping"""
+
+    gist_id = repo_path.name
+
+    try:
+        repo = Repo(repo_path)
+        commit = repo.head.commit
+        files = [obj.path for obj in commit.tree.traverse() if obj.type == 'blob']
+        
+        if not files:
+            return
+
+        base_name = gist_titles.get(gist_id, f"gist_{gist_id[:7]}")
+
+        # single file gist
+        if len(files) == 1:
+            filename = files[0]
+            export_path = export_dir / filename
+            
+            if export_path.exists():
+                export_path = export_dir / f"{gist_id[:7]}_{filename}"
+
+            with open(export_path, "wb") as f_out:
+                shutil.copyfileobj(commit.tree[filename].data_stream, f_out)
+                
+            print(f"Exported file: {export_path.name}")
+
+        # multi-file gist (folder structure)
+        else:
+            gist_export_folder = export_dir / base_name
+            if gist_export_folder.exists():
+                gist_export_folder = export_dir / f"{base_name}_{gist_id[:7]}"
+                
+            gist_export_folder.mkdir(parents=True, exist_ok=True)
+            
+            for filename in files:
+                file_export_path = gist_export_folder / filename
+                file_export_path.parent.mkdir(parents=True, exist_ok=True)
+                
+                with open(file_export_path, "wb") as f_out:
+                    shutil.copyfileobj(commit.tree[filename].data_stream, f_out)
+                    
+            print(f"Exported folder: {gist_export_folder.name}/ ({len(files)} files)")
+
+    except Exception as e:
+        print(f"Failed processing repo {gist_id}: {e}", file=sys.stderr)
+
+
 def main():
-    # setup argument parser
     parser = argparse.ArgumentParser(description="Export Opengist repositories to clean named files/folders.")
+
     parser.add_argument(
         "--gists-dir", 
         default="/opt/opengist/data/repos/ludwig",
-        help="Path to the Opengist repositories directory (default: %(default)s)"
+        help="Path to the Opengist repositories directory"
     )
+
     parser.add_argument(
         "--export-dir", 
         default="/data/gists",
-        help="Path where the gists should be exported (default: %(default)s)"
+        help="Path where the gists should be exported"
     )
-    
+
     args = parser.parse_args()
     
-    gists_dir = args.gists_dir
-    export_dir = args.export_dir
+    gists_dir = Path(args.gists_dir)
+    export_dir = Path(args.export_dir)
 
-    # validate that the source directory exists
-    if not os.path.isdir(gists_dir):
-        print(f"Error: The source gists directory '{gists_dir}' does not exist.")
+    if not gists_dir.is_dir():
+        print(f"Error: Source directory '{gists_dir}' does not exist.", file=sys.stderr)
         sys.exit(1)
 
-    os.makedirs(export_dir, exist_ok=True)
-    gist_titles = get_postgres_gist_titles()
+    export_dir.mkdir(parents=True, exist_ok=True)
     
-    for gist_id in os.listdir(gists_dir):
-        repo_path = os.path.join(gists_dir, gist_id)
-        
-        if not os.path.isdir(repo_path):
-            continue
-            
-        try:
-            repo = Repo(repo_path)
-            commit = repo.head.commit
-            files = [obj.path for obj in commit.tree.traverse() if obj.type == 'blob']
-            
-            if not files:
-                continue
-
-            base_name = gist_titles.get(gist_id, f"gist_{gist_id[:7]}")
-
-            if len(files) == 1:
-                filename = files[0]
-                _, ext = os.path.splitext(filename)
-                
-                export_filename = f"{base_name}{ext}" if ext else base_name
-                export_path = os.path.join(export_dir, export_filename)
-                
-                if os.path.exists(export_path):
-                    export_path = os.path.join(export_dir, f"{gist_id[:7]}_{export_filename}")
-
-                with open(export_path, "wb") as f:
-                    f.write(commit.tree[filename].data_stream.read())
-                print(f"Exported file: {os.path.basename(export_path)}")
-
-            else:
-                gist_export_folder = os.path.join(export_dir, base_name)
-                
-                if os.path.exists(gist_export_folder):
-                    gist_export_folder = os.path.join(export_dir, f"{base_name}_{gist_id[:7]}")
-                    
-                os.makedirs(gist_export_folder, exist_ok=True)
-                
-                for filename in files:
-                    file_export_path = os.path.join(gist_export_folder, filename)
-                    os.makedirs(os.path.dirname(file_export_path), exist_ok=True)
-                    
-                    with open(file_export_path, "wb") as f:
-                        f.write(commit.tree[filename].data_stream.read())
-                        
-                print(f"Exported folder: {os.path.basename(gist_export_folder)}/ ({len(files)} files)")
-
-        except Exception as e:
-            print(f"Failed processing repo {gist_id}: {e}")
+    db_config = validate_environment()
+    gist_titles = get_postgres_gist_titles(db_config)
+    
+    for repo_path in gists_dir.iterdir():
+        if repo_path.is_dir():
+            export_gist(repo_path, export_dir, gist_titles)
 
 
 if __name__ == "__main__":
