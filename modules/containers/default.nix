@@ -102,7 +102,6 @@ in {
       ./services/node-red.nix
       ./services/opengist.nix
       ./services/outline.nix
-      ./services/stirling.nix
       ./services/transfer-sh.nix
       ./services/trek.nix
       ./services/vnstat.nix

@@ -11,6 +11,7 @@ in {
   imports = [
     ./maintenance.nix
     ./metrics.nix
+    ./papra-export.nix
   ];
 
   environment.systemPackages = [

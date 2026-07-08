@@ -65,7 +65,7 @@ in {
         policy = "two_factor";
         group = "admins";
 
-        icon = "lidatube";
+        icon = "https://avatars.githubusercontent.com/u/111055425?s=48&v=4";
       };
     };
 

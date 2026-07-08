@@ -10,14 +10,10 @@ created 2026-06-29 by ludw
   lib,
   ...
 }:
-let
-  exporterScript = pkgs.writers.writeTypeScript "papra-exporter.ts" ./scripts/papra-exporter.ts;
-  in
 {
   age.secrets.papra-download.file = ../../secrets/papra-download.age;
 
-  systemd.services.papra-exporter =
-    lib.mkIf cfg.papra {
+  systemd.services.papra-exporter = {
       description = "Export Papra documents";
       after = [ "network-online.target" ];
       wants = [ "network-online.target" ];
@@ -32,13 +28,18 @@ let
 
         ExecStart = [
           "+${pkgs.writeShellScript "papra-export" ''
-            ${pkgs.bun}/bin/bun run ${exporterScript} --org org_epgl80n46kblsqfih852xtqy --folder /data/documents-backup/general-ludwig
+            ${pkgs.coreutils}/bin/rm -rf /data/documents-backup
+            ${pkgs.coreutils}/bin/mkdir -p /data/documents-backup
+
+            ${pkgs.bun}/bin/bun run ${./scripts/papra-exporter.ts} --org org_epgl80n46kblsqfih852xtqy --folder /data/documents-backup/general-ludwig
+
+            ${pkgs.coreutils}/bin/chown -R admin:users /data/documents-backup
           ''}"
         ];
       };
     };
 
-  systemd.timers.papra-exporter = lib.mkIf cfg.papra {
+  systemd.timers.papra-exporter = {
     timerConfig = {
       OnCalendar = "*-*-* 03:15:00";
       Persistent = true;

@@ -16,6 +16,9 @@ created 2026-05-13 by ludw
   postgres = 5432;
   pgadmin = 5434;
 
+  # database clients
+  opengistDb = 5441;
+
   # dns
   adguard = 3000;
   dns = 53;
@@ -54,7 +57,6 @@ created 2026-05-13 by ludw
   outline = 3090;
   papra = 1221;
   radicale = 5232;
-  stirling = 9010;
   trek = 3010;
 
   # git
