@@ -1,3 +1,9 @@
+/*
+generated-images.nix
+
+part of server system
+created 2026-05-13 by ludw
+*/
 {
   ebk = {
     imageName = "docker.io/mayswind/ezbookkeeping";

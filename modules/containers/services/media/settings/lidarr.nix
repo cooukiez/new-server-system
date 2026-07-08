@@ -1,3 +1,9 @@
+/*
+modules/containers/services/media/settings/lidarr.nix
+
+part of server system
+created 2026-06-14 by ludw
+*/
 {
   config,
   pkgs,

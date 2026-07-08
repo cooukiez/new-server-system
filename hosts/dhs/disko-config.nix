@@ -1,5 +1,5 @@
 /*
-disko-config.nix
+hosts/dhs/disko-config.nix
 
 part of server system
 created 2026-05-13 by ludw

@@ -9,9 +9,10 @@ created 2026-05-13 by ludw
   migrate-db = pkgs.writeShellScriptBin "migrate-db" (builtins.readFile ./scripts/migrate-db.sh);
 in {
   imports = [
+    ./papra
+
     ./maintenance.nix
     ./metrics.nix
-    ./papra-export.nix
   ];
 
   environment.systemPackages = [

@@ -1,3 +1,9 @@
+/*
+modules/containers/services/media/settings/lidatube.nix
+
+part of server system
+created 2026-06-25 by ludw
+*/
 {
   config,
   mkEnv,
