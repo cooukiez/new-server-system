@@ -74,6 +74,7 @@ def build_query_and_params(conditions: dict) -> tuple:
             raise ValueError(f"Unsupported operator: {operator}")
 
     query = f'SELECT "Id" FROM "ArchivedEmails" WHERE {" AND ".join(where_clauses)};'
+
     return query, tuple(params)
 
 
@@ -83,12 +84,14 @@ def parse_arguments():
     parser = argparse.ArgumentParser(
         description="Mail archiver cleanup maintenance script."
     )
+
     parser.add_argument(
         "-d",
         "--dry-run",
         action="store_true",
         help="Simulate the cleanup process and display counts without modifying the database.",
     )
+
     return parser.parse_args()
 
 
@@ -155,7 +158,7 @@ def main():
         # using context managers auto-closes connections / cursors and manages transactions
         with psycopg2.connect(**db_config) as conn:
             with conn.cursor() as cursor:
-                cursor.execute('SET search_path TO mail_archiver, public;')
+                cursor.execute("SET search_path TO mail_archiver, public;")
                 target_ids = get_targeted_email_ids(cursor)
 
                 if not target_ids:
