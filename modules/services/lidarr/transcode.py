@@ -354,6 +354,8 @@ def main():
     if not files_to_process:
         print("No matching audio files found.")
         return
+    else:
+        print(f"Found {len(files_to_process)} audio files to process.")
 
     # handle threading allocation
     if args.parallel is not None:
