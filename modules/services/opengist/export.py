@@ -163,7 +163,7 @@ def main():
             f"Error: Source directory '{gists_dir}' does not exist.",
             file=sys.stderr,
         )
-        
+
         sys.exit(1)
 
     export_dir.mkdir(parents=True, exist_ok=True)

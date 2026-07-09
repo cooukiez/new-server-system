@@ -54,7 +54,7 @@ def validate_environment() -> dict:
             "host": os.environ.get("MAIL_ARCHIVER_DB_HOST"),
             "port": os.environ.get("MAIL_ARCHIVER_DB_PORT"),
         }
-        
+
     except Exception as e:
         print(f"Error reading secret file: {e}", file=sys.stderr)
         sys.exit(1)

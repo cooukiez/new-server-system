@@ -60,6 +60,7 @@ def process_nix_files():
             file_path.write_text(
                 new_header + cleaned_content, encoding="utf-8"
             )
+
             print(f"Updated: {rel_path} [{creation_date}]")
 
         except Exception as e:
