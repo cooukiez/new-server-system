@@ -5,11 +5,11 @@ part of server system
 created 2026-07-09 by ludw
 */
 {pkgs, ...}: let
-  opus-transcoder = pkgs.writers.writePython3Bin "opus-transcoder" {
+  opus-transcode = pkgs.writers.writePython3Bin "opus-transcode" {
     makeWrapperArgs = ["--prefix PATH : ${pkgs.lib.makeBinPath [pkgs.ffmpeg]}"];
-  } (builtins.readFile ./transcoder.py);
+  } (builtins.readFile ./transcode.py);
 in {
   environment.systemPackages = [
-    opus-transcoder
+    opus-transcode
   ];
 }

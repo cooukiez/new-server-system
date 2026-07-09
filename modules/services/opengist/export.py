@@ -24,11 +24,16 @@ def validate_environment() -> dict:
             f"Error: Missing environment variables: {', '.join(missing)}",
             file=sys.stderr,
         )
+
         sys.exit(1)
 
     secret_path = Path(os.environ["OPENGIST_DB_PASS_PATH"])
     if not secret_path.is_file():
-        print(f"Error: Secret file at {secret_path} does not exist.", file=sys.stderr)
+        print(
+            f"Error: Secret file at {secret_path} does not exist.",
+            file=sys.stderr,
+        )
+
         sys.exit(1)
 
     try:
@@ -39,6 +44,7 @@ def validate_environment() -> dict:
             "host": os.environ.get("OPENGIST_DB_HOST"),
             "port": os.environ.get("OPENGIST_DB_PORT"),
         }
+
     except Exception as e:
         print(f"Error reading secret file: {e}", file=sys.stderr)
         sys.exit(1)
@@ -49,6 +55,7 @@ def sanitize_filename(name: str) -> str:
 
     if not name:
         return "unnamed_gist"
+
     name = name.replace(" ", "_")
     return re.sub(r"(?u)[^-\w.]", "", name).strip("_")
 
@@ -82,7 +89,9 @@ def export_gist(repo_path: Path, export_dir: Path, gist_titles: dict):
     try:
         repo = Repo(repo_path)
         commit = repo.head.commit
-        files = [obj.path for obj in commit.tree.traverse() if obj.type == "blob"]
+        files = [
+            obj.path for obj in commit.tree.traverse() if obj.type == "blob"
+        ]
 
         if not files:
             return
@@ -115,9 +124,13 @@ def export_gist(repo_path: Path, export_dir: Path, gist_titles: dict):
                 file_export_path.parent.mkdir(parents=True, exist_ok=True)
 
                 with open(file_export_path, "wb") as f_out:
-                    shutil.copyfileobj(commit.tree[filename].data_stream, f_out)
+                    shutil.copyfileobj(
+                        commit.tree[filename].data_stream, f_out
+                    )
 
-            print(f"Exported folder: {gist_export_folder.name}/ ({len(files)} files)")
+            print(
+                f"Exported folder: {gist_export_folder.name}/ ({len(files)} files)"
+            )
 
     except Exception as e:
         print(f"Failed processing repo {gist_id}: {e}", file=sys.stderr)
@@ -146,7 +159,11 @@ def main():
     export_dir = Path(args.export_dir)
 
     if not gists_dir.is_dir():
-        print(f"Error: Source directory '{gists_dir}' does not exist.", file=sys.stderr)
+        print(
+            f"Error: Source directory '{gists_dir}' does not exist.",
+            file=sys.stderr,
+        )
+        
         sys.exit(1)
 
     export_dir.mkdir(parents=True, exist_ok=True)

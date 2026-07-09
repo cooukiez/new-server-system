@@ -32,6 +32,7 @@ VALID_EXTENSIONS = [
 
 print_lock = threading.Lock()
 
+
 def log(message):
     with print_lock:
         print(message)
@@ -70,7 +71,11 @@ def get_audio_info(file_path):
         )
 
         result = subprocess.run(
-            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True,
         )
 
         data = json.loads(result.stdout)
@@ -137,7 +142,9 @@ def process_audio(file_path):
     ext_lower = ext.lstrip(".").lower()
 
     measured_loudness = get_loudness(file_path)
-    output_lines.append(f"--> Measured integrated loudness: {measured_loudness} LUFS")
+    output_lines.append(
+        f"--> Measured integrated loudness: {measured_loudness} LUFS"
+    )
 
     # target -14.0 LUFS with small tolerance (-15.0 to -13.0)
     needs_normalization = False
@@ -146,7 +153,9 @@ def process_audio(file_path):
         output_lines.append("--> Audio is already normalized.")
         needs_normalization = False
     else:
-        output_lines.append("--> Audio is not normalized. Applying loudnorm filter.")
+        output_lines.append(
+            "--> Audio is not normalized. Applying loudnorm filter."
+        )
         needs_normalization = True
 
     # set output file
@@ -157,7 +166,9 @@ def process_audio(file_path):
     # skip if already opus ogg and normalized
     if codec == "opus" and ext_lower == "ogg" and not needs_normalization:
         output_lines.append("--> File is already properly transcoded.")
-        output_lines.append("===================================================")
+        output_lines.append(
+            "==================================================="
+        )
         log("\n".join(output_lines))
         return
 
@@ -176,14 +187,12 @@ def process_audio(file_path):
                 target_bitrate = "128000"
 
             output_lines.append(
-                f"--> Re-encoding to apply loudness normalization. Target bitrate: {int(target_bitrate) // 1000}k"
+                "--> Re-encoding to apply loudness normalization."
             )
         else:
             needs_transcoding = False
 
-            output_lines.append(
-                f"--> Container change needed ({ext_lower} -> ogg). Stream copying audio without re-encoding."
-            )
+            output_lines.append("--> Stream copying audio to OGG container.")
 
     elif codec in COMPRESSED_LOSSLESS or codec.startswith(PCM_PREFIXES):
         output_lines.append(f"--> Detected lossless ({codec}).")
@@ -201,20 +210,25 @@ def process_audio(file_path):
             target_bitrate = str(target_bps)
 
             output_lines.append(
-                f"--> Detected lossy ({codec}) at {int(bitrate) // 1000}k. Target bitrate: {target_bps // 1000}k"
+                f"--> Found ({codec}) at {int(bitrate) // 1000}k."
             )
         else:
             needs_transcoding = True
             target_bitrate = "64000"
 
-            output_lines.append(
-                f"--> Could not detect bitrate for lossy ({codec}). Defaulting to: 64k"
-            )
+            output_lines.append(f"--> Could not get bitrate for ({codec}).")
 
-    ffmpeg_codec = ["-c:a", "libopus"] if needs_transcoding else ["-c:a", "copy"]
+    if target_bitrate:
+        output_lines.append(f"--> Target bitrate: {target_bps // 1000}k")
+
+    ffmpeg_codec = (
+        ["-c:a", "libopus"] if needs_transcoding else ["-c:a", "copy"]
+    )
 
     bitrate_flags = (
-        ["-b:a", target_bitrate] if target_bitrate and needs_transcoding else []
+        ["-b:a", target_bitrate]
+        if target_bitrate and needs_transcoding
+        else []
     )
 
     ffmpeg_filter = (
@@ -251,22 +265,25 @@ def process_audio(file_path):
 
     # execute conversion
     try:
-        result = subprocess.run(cmd, check=True)
+        subprocess.run(cmd, check=True)
 
         os.remove(file_path)
         shutil.move(output_file, final_output_file)
 
-        output_lines.append("--> Successfully processed audio file to Opus OGG!")
-        output_lines.append(f"--> Saved as: {final_output_file}")
+        output_lines.append("--> Successfully processed audio file.")
         output_lines.append("--> Deleted original file.")
 
+        output_lines.append(f"--> Saved as: {final_output_file}")
+
     except subprocess.CalledProcessError:
-        output_lines.append(f"--> Error converting {file_path}. Original file has been kept safe.")
+        output_lines.append(f"--> Error converting {file_path}.")
 
         if os.path.exists(output_file):
             os.remove(output_file)
 
-    output_lines.append("===================================================\n")
+    output_lines.append(
+        "===================================================\n"
+    )
     log("\n".join(output_lines))
 
 
@@ -278,7 +295,10 @@ def main():
     )
 
     parser.add_argument(
-        "--recursive", "-r", action="store_true", help="Search directories recursively"
+        "--recursive",
+        "-r",
+        action="store_true",
+        help="Search directories recursively",
     )
 
     parser.add_argument(
@@ -287,14 +307,14 @@ def main():
         nargs="?",
         const=4,
         type=int,
-        help="Number of parallel threads (defaults to 4 if flag is given without a value)",
+        help="Number of parallel threads",
     )
 
     parser.add_argument(
         "path",
         nargs="?",
         default=".",
-        help="Directory or file path to process (default: current directory)",
+        help="Directory or file path to process",
     )
 
     args = parser.parse_args()
@@ -347,7 +367,6 @@ def main():
         for file in files_to_process:
             process_audio(file)
 
-    print("All audio files have been processed to Opus OGG!")
 
 if __name__ == "__main__":
     main()

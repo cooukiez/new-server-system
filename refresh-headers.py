@@ -4,13 +4,16 @@ import subprocess
 from datetime import datetime
 from pathlib import Path
 
+
 # nix run nixpkgs#python3 -- ./refresh-headers.py
 
 
 def get_birthtime(file_path):
     try:
         cmd = ["stat", "-c", "%W", str(file_path)]
-        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        result = subprocess.run(
+            cmd, capture_output=True, text=True, check=True
+        )
 
         timestamp = int(result.stdout.strip())
 
@@ -21,7 +24,9 @@ def get_birthtime(file_path):
         pass
 
     # fallback to last modified if birthtime is unavailable
-    return datetime.fromtimestamp(file_path.stat().st_mtime).strftime("%Y-%m-%d")
+    return datetime.fromtimestamp(file_path.stat().st_mtime).strftime(
+        "%Y-%m-%d"
+    )
 
 
 def process_nix_files():
@@ -52,7 +57,9 @@ def process_nix_files():
                 f"*/\n\n"
             )
 
-            file_path.write_text(new_header + cleaned_content, encoding="utf-8")
+            file_path.write_text(
+                new_header + cleaned_content, encoding="utf-8"
+            )
             print(f"Updated: {rel_path} [{creation_date}]")
 
         except Exception as e:

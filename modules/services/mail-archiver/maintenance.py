@@ -34,11 +34,16 @@ def validate_environment() -> dict:
             f"Error: Missing environment variables: {', '.join(missing)}",
             file=sys.stderr,
         )
+
         sys.exit(1)
 
     secret_path = Path(os.environ["MAIL_ARCHIVER_DB_PASS_PATH"])
     if not secret_path.is_file():
-        print(f"Error: Secret file at {secret_path} does not exist.", file=sys.stderr)
+        print(
+            f"Error: Secret file at {secret_path} does not exist.",
+            file=sys.stderr,
+        )
+
         sys.exit(1)
 
     try:
@@ -49,6 +54,7 @@ def validate_environment() -> dict:
             "host": os.environ.get("MAIL_ARCHIVER_DB_HOST"),
             "port": os.environ.get("MAIL_ARCHIVER_DB_PORT"),
         }
+        
     except Exception as e:
         print(f"Error reading secret file: {e}", file=sys.stderr)
         sys.exit(1)
@@ -165,7 +171,9 @@ def main():
                     print("\nNo matching records found across all rules.")
                     return
 
-                print(f"\nTotal unique emails target matched: {len(target_ids)}")
+                print(
+                    f"\nTotal unique emails target matched: {len(target_ids)}"
+                )
 
                 if args.dry_run:
                     run_dry_run(cursor, target_ids)
