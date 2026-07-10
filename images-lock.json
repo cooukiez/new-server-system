@@ -81,8 +81,8 @@
   },
   "immich-ml": {
     "imageName": "ghcr.io/immich-app/immich-machine-learning",
-    "imageDigest": "sha256:a2501141440f10516d329fdfba2c68082e19eb9ba6016c061ac80d23beadf7f3",
-    "sha256": "sha256-S2m39ceaPLJjiLLDr0sCr43A4uSUEEy/U+hyv41JSko="
+    "imageDigest": "sha256:412f68e46e1966d0f87a8733a430369ee184b3a83e7b1e2db536dff291a34aa7",
+    "sha256": "sha256-dEmCIGkJYjCJaqd31pMMPsZQPZ48NHZxYt1ETyt3ZHo="
   },
   "valkey": {
     "imageName": "docker.io/valkey/valkey",
@@ -91,13 +91,13 @@
   },
   "immich-db": {
     "imageName": "ghcr.io/immich-app/postgres",
-    "imageDigest": "sha256:19d66f46b43a33a24128383de14806ccd5c8aad549dd99c7850bf51b9cc22814",
-    "sha256": "sha256-gD5AeWsZAcNN575OnMrnKr45ZcHngH9upHAT4uuR67k="
+    "imageDigest": "sha256:89817026d570de0dd4fdd29486a417bcdff31ce4010f8ddc8e8790f42eca710f",
+    "sha256": "sha256-BJowV81Bn0NFjF+jnFPn4+/5EHUtBAc0hYcMYqjZts8="
   },
   "immich-server": {
     "imageName": "ghcr.io/immich-app/immich-server",
-    "imageDigest": "sha256:c15bff75068effb03f4355997d03dc7e0fc58720c2b54ad6f7f10d1bc57efaa5",
-    "sha256": "sha256-cXf8PYajVnSEOaaB6mXRVvCVhHLU3g6zDVNCSnUcumE="
+    "imageDigest": "sha256:14390f3dc9512dc3273b12ccee6363d9be16c388699abc3f3fe0498bb9829937",
+    "sha256": "sha256-w0D0KqHmbJVZiID9HFMRim5IG8j0EwpNnC92c0Ad83Y="
   },
   "linkwarden": {
     "imageName": "ghcr.io/linkwarden/linkwarden",
