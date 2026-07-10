@@ -167,9 +167,11 @@ def process_audio(file_path):
     if codec == "opus" and ext_lower == "ogg" and not needs_normalization:
         output_lines.append("--> File is already properly transcoded.")
         output_lines.append(
-            "==================================================="
+            "===================================================\n"
         )
+
         log("\n".join(output_lines))
+
         return
 
     # determine encoder and target bitrate based on codec
@@ -284,6 +286,7 @@ def process_audio(file_path):
     output_lines.append(
         "===================================================\n"
     )
+
     log("\n".join(output_lines))
 
 
