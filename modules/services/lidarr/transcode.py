@@ -1,5 +1,6 @@
 import argparse
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from tqdm import tqdm
 import json
 import os
 import re
@@ -34,8 +35,7 @@ print_lock = threading.Lock()
 
 
 def log(message):
-    with print_lock:
-        print(message)
+    tqdm.write(message)
 
 
 def check_dependencies():
@@ -170,23 +170,26 @@ def process_audio(file_path):
             "===================================================\n"
         )
 
-        log("\n".join(output_lines))
+        with print_lock:
+            log("\n".join(output_lines))
 
         return
 
     # determine encoder and target bitrate based on codec
     needs_transcoding = False
     target_bitrate = None
+    target_bps = None
 
     if codec == "opus":
         output_lines.append("--> Audio is already Opus.")
         if needs_normalization:
-            needs_transcoding = True
-
             if bitrate.isdigit():
-                target_bitrate = bitrate
+                target_bps = int(bitrate)
             else:
-                target_bitrate = "128000"
+                target_bps = 128000
+
+            needs_transcoding = True
+            target_bitrate = str(target_bps)
 
             output_lines.append(
                 "--> Re-encoding to apply loudness normalization."
@@ -198,9 +201,10 @@ def process_audio(file_path):
 
     elif codec in COMPRESSED_LOSSLESS or codec.startswith(PCM_PREFIXES):
         output_lines.append(f"--> Detected lossless ({codec}).")
+        target_bps = 256000
 
         needs_transcoding = True
-        target_bitrate = "256000"
+        target_bitrate = str(target_bps)
     else:
         if bitrate.isdigit():
             target_bps = int(bitrate) // 2
@@ -215,12 +219,14 @@ def process_audio(file_path):
                 f"--> Found ({codec}) at {int(bitrate) // 1000}k."
             )
         else:
+            target_bps = 64000
+
             needs_transcoding = True
-            target_bitrate = "64000"
+            target_bitrate = str(target_bps)
 
             output_lines.append(f"--> Could not get bitrate for ({codec}).")
 
-    if target_bitrate:
+    if target_bps:
         output_lines.append(f"--> Target bitrate: {target_bps // 1000}k")
 
     ffmpeg_codec = (
@@ -269,12 +275,16 @@ def process_audio(file_path):
     try:
         subprocess.run(cmd, check=True)
 
-        os.remove(file_path)
-        shutil.move(output_file, final_output_file)
+        if os.path.abspath(file_path) == os.path.abspath(final_output_file):
+            shutil.move(output_file, final_output_file)
+        else:
+            shutil.move(output_file, final_output_file)
+            os.remove(file_path)
 
         output_lines.append("--> Successfully processed audio file.")
-        output_lines.append("--> Deleted original file.")
-
+        if os.path.abspath(file_path) != os.path.abspath(final_output_file):
+            output_lines.append("--> Deleted original file.")
+            
         output_lines.append(f"--> Saved as: {final_output_file}")
 
     except subprocess.CalledProcessError:
@@ -287,7 +297,8 @@ def process_audio(file_path):
         "===================================================\n"
     )
 
-    log("\n".join(output_lines))
+    with print_lock:
+        log("\n".join(output_lines))
 
 
 def main():
@@ -366,12 +377,21 @@ def main():
         print(f"Processing in parallel using {max_workers} threads...")
 
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            executor.map(process_audio, files_to_process)
+            futures = {
+                executor.submit(process_audio, file): file
+                for file in files_to_process
+            }
+            # tqdm maps across the wrapped iterable
+            for _ in tqdm(
+                as_completed(futures),
+                total=len(files_to_process),
+                desc="Transcoding",
+            ):
+                pass
     else:
         print("Processing sequentially...")
-        for file in files_to_process:
+        for file in tqdm(files_to_process, desc="Transcoding"):
             process_audio(file)
-
 
 if __name__ == "__main__":
     main()
