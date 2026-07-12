@@ -284,7 +284,7 @@ def process_audio(file_path):
         output_lines.append("--> Successfully processed audio file.")
         if os.path.abspath(file_path) != os.path.abspath(final_output_file):
             output_lines.append("--> Deleted original file.")
-            
+
         output_lines.append(f"--> Saved as: {final_output_file}")
 
     except subprocess.CalledProcessError:
@@ -392,6 +392,7 @@ def main():
         print("Processing sequentially...")
         for file in tqdm(files_to_process, desc="Transcoding"):
             process_audio(file)
+
 
 if __name__ == "__main__":
     main()
