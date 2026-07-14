@@ -6,6 +6,7 @@ created 2026-07-09 by ludw
 */
 {pkgs, ...}: let
   opus-transcode = pkgs.writers.writePython3Bin "opus-transcode" {
+    libraries = [ pkgs.python3Packages.tqdm ];
     makeWrapperArgs = ["--prefix PATH : ${pkgs.lib.makeBinPath [pkgs.ffmpeg]}"];
   } (builtins.readFile ./transcode.py);
 in {

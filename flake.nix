@@ -10,7 +10,7 @@ created 2026-05-13 by ludw
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
-    nixos-system.url = "github:cooukiez/nixos-system";
+    nixos-system.url = "git+https://codeberg.org/cooukiez/nixos-system";
 
     disko = {
       url = "github:nix-community/disko";
