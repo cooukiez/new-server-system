@@ -145,6 +145,8 @@ in {
   "global-agenix.age".publicKeys = allKeys;
   "papra-download.age".publicKeys = allKeys;
   "proton-key.age".publicKeys = allKeys;
+
+  "codeberg-token.age".publicKeys = allKeys;
   "github-token.age".publicKeys = allKeys;
 
   # tailscale
