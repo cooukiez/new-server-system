@@ -325,6 +325,12 @@ def main():
     )
 
     parser.add_argument(
+        "--full",
+        action="store_true",
+        help="Process all audio files, including existing .ogg containers",
+    )
+
+    parser.add_argument(
         "path",
         nargs="?",
         default=".",
@@ -333,6 +339,10 @@ def main():
 
     args = parser.parse_args()
 
+    active_extensions = set(VALID_EXTENSIONS)
+    if not args.full:
+        active_extensions.discard(".ogg")
+
     files_to_process = []
     target_path = args.path
 
@@ -340,7 +350,7 @@ def main():
     if os.path.isfile(target_path):
         _, ext = os.path.splitext(target_path)
 
-        if ext.lower() in VALID_EXTENSIONS:
+        if ext.lower() in active_extensions:
             files_to_process.append(target_path)
 
     # case directory
@@ -351,7 +361,7 @@ def main():
                 for file in files:
                     _, ext = os.path.splitext(file)
 
-                    if ext.lower() in VALID_EXTENSIONS:
+                    if ext.lower() in active_extensions:
                         files_to_process.append(os.path.join(root, file))
 
         # only current directory
@@ -362,7 +372,7 @@ def main():
                 if os.path.isfile(full_path):
                     _, ext = os.path.splitext(file)
 
-                    if ext.lower() in VALID_EXTENSIONS:
+                    if ext.lower() in active_extensions:
                         files_to_process.append(full_path)
 
     if not files_to_process:
